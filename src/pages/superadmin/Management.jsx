@@ -58,9 +58,9 @@ export default function MailPage() {
         };
 
         const [jobsRes, achievementsRes, internshipsRes] = await Promise.all([
-          axios.get("http://localhost:8000/api/jobs", config),
-          axios.get("http://localhost:8000/api/achievements/", config),
-          axios.get("http://localhost:8000/api/internship/", config),
+          axios.get("https://cce-backend-kw0b.onrender.com/api/jobs", config),
+          axios.get("https://cce-backend-kw0b.onrender.com/api/achievements/", config),
+          axios.get("https://cce-backend-kw0b.onrender.com/api/internship/", config),
         ]);
 
         setJobs(jobsRes.data.jobs);
@@ -79,7 +79,7 @@ export default function MailPage() {
   useEffect(() => {
     const fetchAutoApproval = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/get-auto-approval-status/", {
+        const response = await axios.get("https://cce-backend-kw0b.onrender.com/api/get-auto-approval-status/", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setAutoApproval(response.data.is_auto_approval);
@@ -94,7 +94,7 @@ export default function MailPage() {
   const toggleAutoApproval = async () => {
     try {
       await axios.post(
-        "http://localhost:8000/api/toggle-auto-approval/",
+        "https://cce-backend-kw0b.onrender.com/api/toggle-auto-approval/",
         { is_auto_approval: !autoApproval },
         {
           headers: {
@@ -121,10 +121,10 @@ export default function MailPage() {
     try {
       const endpoint =
         type === "job"
-          ? `http://localhost:8000/api/review-job/${id}/`
+          ? `https://cce-backend-kw0b.onrender.com/api/review-job/${id}/`
           : type === "achievement"
-          ? `http://localhost:8000/api/review-achievement/${id}/`
-          : `http://localhost:8000/api/review-internship/${id}/`;
+          ? `https://cce-backend-kw0b.onrender.com/api/review-achievement/${id}/`
+          : `https://cce-backend-kw0b.onrender.com/api/review-internship/${id}/`;
 
       const response = await axios.post(
         endpoint,
@@ -172,10 +172,10 @@ export default function MailPage() {
     try {
       const endpoint =
         type === "job"
-          ? `http://localhost:8000/api/job-delete/${id}/`
+          ? `https://cce-backend-kw0b.onrender.com/api/job-delete/${id}/`
           : type === "achievement"
-          ? `http://localhost:8000/api/delete-achievement/${id}/`
-          : `http://localhost:8000/api/internship-delete/${id}/`;
+          ? `https://cce-backend-kw0b.onrender.com/api/delete-achievement/${id}/`
+          : `https://cce-backend-kw0b.onrender.com/api/internship-delete/${id}/`;
 
       const response = await axios.delete(endpoint, {
         headers: {
@@ -267,7 +267,7 @@ export default function MailPage() {
   const handleFeedbackSubmit = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/submit-feedback/",
+        "https://cce-backend-kw0b.onrender.com/api/submit-feedback/",
         {
           item_id: rejectedItemId,
           item_type: rejectedItemType,

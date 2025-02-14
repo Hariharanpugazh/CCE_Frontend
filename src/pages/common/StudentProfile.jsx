@@ -24,14 +24,14 @@ const StudentProfile = () => {
       try {
         const token = Cookies.get("jwt");
         const userId = JSON.parse(atob(token.split(".")[1])).student_user;
-        const response = await axios.get(`http://localhost:8000/api/profile/${userId}/`);
+        const response = await axios.get(`https://cce-backend-kw0b.onrender.com/api/profile/${userId}/`);
         const studentData = response.data.data;
 
         setStudent(studentData);
         setEditedName(studentData.name); // Set editable name field
         // Fetch details for each saved job
         const jobDetailsPromises = studentData.saved_jobs.map(jobId =>
-          axios.get(`http://localhost:8000/api/job/${jobId}/`)
+          axios.get(`https://cce-backend-kw0b.onrender.com/api/job/${jobId}/`)
         );
 
         const jobDetails = await Promise.all(jobDetailsPromises);
@@ -64,7 +64,7 @@ const StudentProfile = () => {
         profile_image: selectedImage, // Send image filename only
       };
 
-      await axios.put(`http://localhost:8000/api/update-profile/${userId}/`, updatedData);
+      await axios.put(`https://cce-backend-kw0b.onrender.com/api/update-profile/${userId}/`, updatedData);
       
       setEditMode(false);
       alert("Profile updated successfully!");

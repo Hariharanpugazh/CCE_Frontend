@@ -34,7 +34,7 @@ const StudentManagement = () => {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/students/"); // Replace with your API endpoint
+        const response = await axios.get("https://cce-backend-kw0b.onrender.com/api/students/"); // Replace with your API endpoint
         setStudents(response.data.students);
       } catch (error) {
         console.error("Error fetching students:", error);
@@ -66,7 +66,7 @@ const StudentManagement = () => {
     try {
       setIsLoading(true);
       const newStatus = student.status === "active" ? "inactive" : "active";
-      await axios.put(`http://localhost:8000/api/students/${student._id}/update/`, { status: newStatus });
+      await axios.put(`https://cce-backend-kw0b.onrender.com/api/students/${student._id}/update/`, { status: newStatus });
       setStudents((prev) =>
         prev.map((s) =>
           s._id === student._id ? { ...s, status: newStatus } : s
@@ -82,7 +82,7 @@ const StudentManagement = () => {
   // Handle student deletion
   const deleteStudent = async (studentId) => {
     try {
-      await axios.delete(`http://localhost:8000/api/students/${studentId}/delete/`);
+      await axios.delete(`https://cce-backend-kw0b.onrender.com/api/students/${studentId}/delete/`);
       setStudents((prev) => prev.filter((s) => s._id !== studentId));
       setSelectedStudent(null);
     } catch (error) {
@@ -118,7 +118,7 @@ const StudentManagement = () => {
         year: formData.year || selectedStudent.year
       };
   
-      const response = await axios.put(`http://localhost:8000/api/students/${selectedStudent._id}/update/`, validData);
+      const response = await axios.put(`https://cce-backend-kw0b.onrender.com/api/students/${selectedStudent._id}/update/`, validData);
       if (response.status === 200) {
         setStudents((prev) =>
           prev.map((s) =>

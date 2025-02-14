@@ -25,7 +25,7 @@ const StudentMail = () => {
         return;
       }
 
-      fetch(`http://localhost:8000/api/get_student_messages/`, {
+      fetch(`https://cce-backend-kw0b.onrender.com/api/get_student_messages/`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,

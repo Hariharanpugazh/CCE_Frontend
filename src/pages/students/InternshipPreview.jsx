@@ -40,7 +40,7 @@ const InternshipPreview = () => {
 
     // ✅ Move this AFTER the JWT effect
     useEffect(() => {
-        fetch(`http://127.0.0.1:8000/api/internship/${id}/`)
+        fetch(`https://cce-backend-kw0b.onrender.com/api/internship/${id}/`)
             .then((response) => response.json())
             .then((data) => setInternship(data.internship))
             .catch((error) => console.error("Error fetching internship:", error));

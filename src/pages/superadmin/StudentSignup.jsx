@@ -108,7 +108,7 @@ export default function StudentSignup() {
 
     try {
       const response = await fetch(
-        "http://localhost:8000/api/student-signup/",
+        "https://cce-backend-kw0b.onrender.com/api/student-signup/",
         {
           method: "POST",
           headers: {

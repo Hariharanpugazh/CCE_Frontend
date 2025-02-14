@@ -23,7 +23,7 @@ const SuperAdminProfile = () => {
       try {
         const token = Cookies.get("jwt");
         const userId = JSON.parse(atob(token.split(".")[1])).superadmin_user;
-        const response = await axios.get(`http://localhost:8000/api/get-superadmin/${userId}/`);
+        const response = await axios.get(`https://cce-backend-kw0b.onrender.com/api/get-superadmin/${userId}/`);
         const superAdminData = response.data.data;
 
         setSuperAdmin(superAdminData);
@@ -52,7 +52,7 @@ const SuperAdminProfile = () => {
         profile_image: selectedImage, // Send image filename only
       };
 
-      await axios.put(`http://localhost:8000/api/update-superadmin/${userId}/`, updatedData);
+      await axios.put(`https://cce-backend-kw0b.onrender.com/api/update-superadmin/${userId}/`, updatedData);
       
       setEditMode(false);
       alert("Profile updated successfully!");

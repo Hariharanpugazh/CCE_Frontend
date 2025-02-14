@@ -92,7 +92,7 @@ export default function StudentAchievementPostForm() {
       }
 
       const response = await axios.post(
-        "http://localhost:8000/api/studentachievement/",
+        "https://cce-backend-kw0b.onrender.com/api/studentachievement/",
         formDataObj,
         {
           headers: {

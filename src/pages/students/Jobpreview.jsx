@@ -15,7 +15,7 @@ const JobPreview = () => {
 
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/api/job/${id}/`)
+    fetch(`https://cce-backend-kw0b.onrender.com/api/job/${id}/`)
       .then(response => response.json())
       .then(data => setJob(data.job))
       .catch(error => console.error("Error fetching job:", error));
@@ -41,7 +41,7 @@ const JobPreview = () => {
     try {
       const token = Cookies.get("jwt");
       const userId = JSON.parse(atob(token.split(".")[1])).student_user;
-      await axios.post('http://localhost:8000/api/apply-job/', {
+      await axios.post('https://cce-backend-kw0b.onrender.com/api/apply-job/', {
         studentId: userId,
         jobId: id
       });

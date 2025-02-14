@@ -16,7 +16,7 @@ const StudentStudyMaterial = () => {
     useEffect(() => {
         const fetchStudymaterials = async () => {
             try {
-                const response = await axios.get("http://127.0.0.1:8000/api/all-study-material/");
+                const response = await axios.get("https://cce-backend-kw0b.onrender.com/api/all-study-material/");
                 if (response.data && Array.isArray(response.data.study_materials)) {
                     setStudymaterial(response.data.study_materials);
                 } else {

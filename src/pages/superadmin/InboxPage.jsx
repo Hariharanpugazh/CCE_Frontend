@@ -38,7 +38,7 @@ const InboxPage = () => {
 
   const fetchMessages = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/get-contact-messages/");
+      const response = await axios.get("https://cce-backend-kw0b.onrender.com/api/get-contact-messages/");
       setMessages(response.data.messages);
     } catch (err) {
       console.error("Failed to fetch messages.");
@@ -47,7 +47,7 @@ const InboxPage = () => {
 
   const fetchAchievements = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/get_achievements_with_admin/");
+      const response = await axios.get("https://cce-backend-kw0b.onrender.com/api/get_achievements_with_admin/");
       setAchievements(response.data.achievements);
     } catch (err) {
       console.error("Failed to fetch achievements.");
@@ -56,7 +56,7 @@ const InboxPage = () => {
 
   const fetchJobs = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/get_jobs_with_admin/");
+      const response = await axios.get("https://cce-backend-kw0b.onrender.com/api/get_jobs_with_admin/");
       setJobs(response.data.jobs);
     } catch (err) {
       console.error("Error fetching jobs:", err);
@@ -65,7 +65,7 @@ const InboxPage = () => {
 
   const fetchInternships = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/get_internships_with_admin/");
+      const response = await axios.get("https://cce-backend-kw0b.onrender.com/api/get_internships_with_admin/");
       setInternships(response.data.internships);
     } catch (err) {
       console.error("Failed to fetch internships.");
@@ -74,7 +74,7 @@ const InboxPage = () => {
 
   const fetchStudyMaterials = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/get_study_materials_with_admin/");
+      const response = await axios.get("https://cce-backend-kw0b.onrender.com/api/get_study_materials_with_admin/");
       console.log("Study Materials Response:", response.data);
       setStudyMaterials(response.data.study_materials || []);
     } catch (err) {
@@ -84,7 +84,7 @@ const InboxPage = () => {
 
   const fetchStudentAchievements = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/get_student_achievements_with_students/");
+      const response = await axios.get("https://cce-backend-kw0b.onrender.com/api/get_student_achievements_with_students/");
       setStudentAchievements(response.data.student_achievements);
     } catch (err) {
       console.error("Failed to fetch student achievements.");
@@ -94,7 +94,7 @@ const InboxPage = () => {
   const sendReply = async (messageId) => {
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:8000/api/reply_to_message/", {
+      const response = await fetch("https://cce-backend-kw0b.onrender.com/api/reply_to_message/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

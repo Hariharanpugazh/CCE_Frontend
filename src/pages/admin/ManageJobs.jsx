@@ -35,7 +35,7 @@ const ManageJobs = () => {
     const fetchData = async (endpoint, setState, key) => {
       try {
         const token = Cookies.get("jwt");
-        const response = await axios.get(`http://localhost:8000/api/${endpoint}/`, {
+        const response = await axios.get(`https://cce-backend-kw0b.onrender.com/api/${endpoint}/`, {
           headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
         });

@@ -20,7 +20,7 @@ export default function AppliedJobs() {
         const token = Cookies.get("jwt");
         const userId = JSON.parse(atob(token.split(".")[1])).student_user;
         const response = await axios.get(
-          `http://localhost:8000/api/applied-jobs/${userId}/`
+          `https://cce-backend-kw0b.onrender.com/api/applied-jobs/${userId}/`
         );
 
         // Access the job details within the response data
@@ -32,7 +32,7 @@ export default function AppliedJobs() {
         // Fetch additional job details if necessary
         const jobIds = confirmedJobs.map(job => job.job_id);
         const jobDetailsPromises = jobIds.map(jobId =>
-          axios.get(`http://localhost:8000/api/job/${jobId}/`)
+          axios.get(`https://cce-backend-kw0b.onrender.com/api/job/${jobId}/`)
         );
 
         const jobResponses = await Promise.all(jobDetailsPromises);
@@ -65,7 +65,7 @@ export default function AppliedJobs() {
         const token = Cookies.get("jwt");
         const userId = JSON.parse(atob(token.split(".")[1])).student_user;
         const response = await axios.get(
-          `http://localhost:8000/api/saved-jobs/${userId}/`
+          `https://cce-backend-kw0b.onrender.com/api/saved-jobs/${userId}/`
         );
 
         // Access the jobs array within the response data

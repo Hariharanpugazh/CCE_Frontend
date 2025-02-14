@@ -41,7 +41,7 @@ const AdminHome = () => {
           return;
         }
 
-        const response = await axios.get("http://localhost:8000/api/get-jobs/", {
+        const response = await axios.get("https://cce-backend-kw0b.onrender.com/api/get-jobs/", {
           headers: {
             'Authorization': `Bearer ${token}`
           },

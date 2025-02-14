@@ -22,7 +22,7 @@ export default function AdminDetailPage() {
     useEffect(() => {
         const fetchAdminDetails = async () => {
             try {
-                const response = await axios.get(`http://localhost:8000/api/admin-details/${id}/`);
+                const response = await axios.get(`https://cce-backend-kw0b.onrender.com/api/admin-details/${id}/`);
                 setAdmin(response.data.admin);
                 setJobs(response.data.jobs);
                 setFormData({
@@ -47,7 +47,7 @@ export default function AdminDetailPage() {
         setMessage("");
 
         try {
-            const response = await axios.post(`http://localhost:8000/api/admin-status/${id}/`, {
+            const response = await axios.post(`https://cce-backend-kw0b.onrender.com/api/admin-status/${id}/`, {
                 status: newStatus,
             });
 
@@ -71,7 +71,7 @@ export default function AdminDetailPage() {
         setMessage("");
 
         try {
-            const response = await axios.put(`http://localhost:8000/api/admin/${id}/edit/`, formData);
+            const response = await axios.put(`https://cce-backend-kw0b.onrender.com/api/admin/${id}/edit/`, formData);
 
             if (response.status === 200) {
                 setAdmin((prevAdmin) => ({ ...prevAdmin, ...formData }));

@@ -17,9 +17,9 @@ export default function HomeDashboard() {
     const fetchData = async () => {
       try {
         const [jobsRes, achievementsRes, internshipsRes] = await Promise.all([
-          axios.get("http://localhost:8000/api/published-jobs/"),
-          axios.get("http://localhost:8000/api/published-achievement/"),
-          axios.get("http://localhost:8000/api/published-internship/")
+          axios.get("https://cce-backend-kw0b.onrender.com/api/published-jobs/"),
+          axios.get("https://cce-backend-kw0b.onrender.com/api/published-achievement/"),
+          axios.get("https://cce-backend-kw0b.onrender.com/api/published-internship/")
         ]);
 
         setJobs(jobsRes.data.jobs);
@@ -39,13 +39,13 @@ export default function HomeDashboard() {
       try {
         const token = Cookies.get("jwt");
         const userId = JSON.parse(atob(token.split(".")[1])).student_user;
-        const response = await axios.get(`http://localhost:8000/api/applied-jobs/${userId}/`);
+        const response = await axios.get(`https://cce-backend-kw0b.onrender.com/api/applied-jobs/${userId}/`);
         const appliedJobs = response.data.jobs;
 
         const unconfirmed = appliedJobs.find(job => !job.confirmed);
         if (unconfirmed) {
           // Fetch job details using the job ID
-          const jobResponse = await axios.get(`http://localhost:8000/api/job/${unconfirmed.job_id}/`);
+          const jobResponse = await axios.get(`https://cce-backend-kw0b.onrender.com/api/job/${unconfirmed.job_id}/`);
           const jobDetails = jobResponse.data.job;
           setUnconfirmedJob({ ...unconfirmed, job_data: jobDetails.job_data });
           setShowPopup(true);
@@ -62,7 +62,7 @@ export default function HomeDashboard() {
     try {
       const token = Cookies.get("jwt");
       const userId = JSON.parse(atob(token.split(".")[1])).student_user;
-      await axios.post('http://localhost:8000/api/confirm-job/', {
+      await axios.post('https://cce-backend-kw0b.onrender.com/api/confirm-job/', {
         studentId: userId,
         jobId: unconfirmedJob.job_id
       });

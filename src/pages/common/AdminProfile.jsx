@@ -23,7 +23,7 @@ const AdminProfile = () => {
       try {
         const token = Cookies.get("jwt");
         const userId = JSON.parse(atob(token.split(".")[1])).admin_user;
-        const response = await axios.get(`http://localhost:8000/api/get-admin/${userId}/`);
+        const response = await axios.get(`https://cce-backend-kw0b.onrender.com/api/get-admin/${userId}/`);
         const adminData = response.data.data;
 
         setAdmin(adminData);
@@ -52,7 +52,7 @@ const AdminProfile = () => {
         profile_image: selectedImage, // Send image filename only
       };
 
-      await axios.put(`http://localhost:8000/api/update-admin/${userId}/`, updatedData);
+      await axios.put(`https://cce-backend-kw0b.onrender.com/api/update-admin/${userId}/`, updatedData);
       
       setEditMode(false);
       alert("Profile updated successfully!");

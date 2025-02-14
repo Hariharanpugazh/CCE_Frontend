@@ -13,7 +13,7 @@ export default function AchievementDashboard() {
   useEffect(() => {
     const fetchPublishedAchievements = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/published-achievement/");
+        const response = await axios.get("https://cce-backend-kw0b.onrender.com/api/published-achievement/");
         setAchievements(response.data.achievements);
       } catch (err) {
         console.error("Error fetching published achievements:", err);

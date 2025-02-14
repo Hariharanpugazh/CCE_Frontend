@@ -45,7 +45,7 @@ export default function AdminLogin() {
         if (isLocked) return;
     
         try {
-            const response = await fetch("http://localhost:8000/api/login/", {
+            const response = await fetch("https://cce-backend-kw0b.onrender.com/api/login/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -91,7 +91,7 @@ export default function AdminLogin() {
         const email = formData.email;
 
         try {
-            const response = await fetch("http://localhost:8000/api/forgot-password/", {
+            const response = await fetch("https://cce-backend-kw0b.onrender.com/api/forgot-password/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -118,7 +118,7 @@ export default function AdminLogin() {
         const email = formData.email;
         const otp = formData.token;
         try {
-            const response = await fetch("http://localhost:8000/api/verify-otp/", {
+            const response = await fetch("https://cce-backend-kw0b.onrender.com/api/verify-otp/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -150,7 +150,7 @@ export default function AdminLogin() {
         }
 
         try {
-            const response = await fetch("http://localhost:8000/api/reset-password/", {
+            const response = await fetch("https://cce-backend-kw0b.onrender.com/api/reset-password/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
