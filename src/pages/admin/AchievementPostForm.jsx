@@ -11,8 +11,8 @@ export default function AchievementPostForm() {
     achievement_type: "",
     company_name: "",
     date_of_achievement: "",
-    batch: "", // Added batch field
-    photo: null, // Image file
+    batch: "",
+    photo: null,
   });
 
   const [imagePreview, setImagePreview] = useState(null);
@@ -33,22 +33,15 @@ export default function AchievementPostForm() {
     const decodedToken = jwtDecode(token);
     if (decodedToken.role !== "superadmin" && decodedToken.role !== "admin") {
       setError("You do not have permission to access this page.");
-      // Optionally, you can redirect the user to a different page
-      // navigate("/unauthorized");
+      return;
     }
-    if (token) {
-      const payload = JSON.parse(atob(token.split(".")[1])); // Decode JWT payload
-      console.log("Decoded JWT Payload:", payload); // Debugging line
-      setUserRole(payload.role); // Assuming the payload has a 'role' field
-      if (payload.role === "admin") 
-        {
-          setUserId(payload.admin_user); // Assuming the payload has an 'id' field
-        }
-      else if (payload.role === "superadmin")
-        {
-          setUserId(payload.superadmin_user); // Assuming the payload has an 'id' field
-        }
 
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    setUserRole(payload.role);
+    if (payload.role === "admin") {
+      setUserId(payload.admin_user);
+    } else if (payload.role === "superadmin") {
+      setUserId(payload.superadmin_user);
     }
   }, [navigate]);
 
@@ -62,14 +55,40 @@ export default function AchievementPostForm() {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFormData({ ...formData, photo: file });
-      setImagePreview(URL.createObjectURL(file));
+      if (file.type === "image/jpeg" || file.type === "image/png") {
+        setFormData({ ...formData, photo: file });
+        setImagePreview(URL.createObjectURL(file));
+        setError(""); // Clear any previous errors
+      } else {
+        setError("Only JPG and PNG images are allowed.");
+        setFormData({ ...formData, photo: null });
+        setImagePreview(null);
+      }
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
+    // Validate date
+    const selectedDate = new Date(formData.date_of_achievement);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set time to midnight for accurate comparison
+
+    if (selectedDate > today) {
+      setError("Date of achievement cannot be in the future.");
+      setLoading(false);
+      return;
+    }
+
+    // Check if all fields are filled
+    if (!formData.name || !formData.achievement_description || !formData.achievement_type ||
+        !formData.company_name || !formData.date_of_achievement || !formData.batch || !formData.photo) {
+      setError("All fields are required.");
+      setLoading(false);
+      return;
+    }
 
     try {
       const token = Cookies.get("jwt");
@@ -86,39 +105,21 @@ export default function AchievementPostForm() {
       formDataObj.append("achievement_type", formData.achievement_type);
       formDataObj.append("company_name", formData.company_name);
       formDataObj.append("date_of_achievement", formData.date_of_achievement);
-      formDataObj.append("batch", formData.batch); // Added batch field
-      if (formData.photo) {
-        formDataObj.append("photo", formData.photo);
-      }
-      formDataObj.append("userId",userId);
-      formDataObj.append("role",userRole);
+      formDataObj.append("batch", formData.batch);
+      formDataObj.append("photo", formData.photo);
+      formDataObj.append("userId", userId);
+      formDataObj.append("role", userRole);
 
-      
-
-      // const response = await axios.post(
-      //   "http://localhost:8000/api/upload_achievement/",
-      //   formDataObj,
-      //   {
-      //     headers: {
-      //       Authorization: `Bearer ${token}`,
-      //       "Content-Type": "multipart/form-data",
-      //     },
-      //   }
-      // );
-
-
-        const response = await axios.post(
+      const response = await axios.post(
         "http://localhost:8000/api/upload_achievement/",
         formDataObj,
         {
           headers: {
-            // Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
             "Content-Type": "multipart/form-data",
           },
         }
       );
-
-    
 
       setMessage(response.data.message);
       setError("");
@@ -130,18 +131,14 @@ export default function AchievementPostForm() {
     }
   };
 
-  if (error) {
-    return <div className="text-red-600">{error}</div>;
-  }
-
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg">
       <h2 className="text-3xl font-bold mb-6 text-center">Post an Achievement</h2>
 
+      {error && <p className="text-red-600 mb-4">{error}</p>}
       {message && <p className="text-green-600 mb-4">{message}</p>}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Name */}
         <div>
           <label className="block font-medium">Name</label>
           <input
@@ -154,7 +151,6 @@ export default function AchievementPostForm() {
           />
         </div>
 
-        {/* Achievement Description */}
         <div>
           <label className="block font-medium">Achievement Description</label>
           <textarea
@@ -166,7 +162,6 @@ export default function AchievementPostForm() {
           ></textarea>
         </div>
 
-        {/* Achievement Type */}
         <div>
           <label className="block font-medium">Achievement Type</label>
           <select
@@ -184,7 +179,6 @@ export default function AchievementPostForm() {
           </select>
         </div>
 
-        {/* Company Name */}
         <div>
           <label className="block font-medium">Company/Organization Name</label>
           <input
@@ -197,7 +191,6 @@ export default function AchievementPostForm() {
           />
         </div>
 
-        {/* Date of Achievement */}
         <div>
           <label className="block font-medium">Date of Achievement</label>
           <input
@@ -210,7 +203,6 @@ export default function AchievementPostForm() {
           />
         </div>
 
-        {/* Batch */}
         <div>
           <label className="block font-medium">Batch</label>
           <input
@@ -223,7 +215,6 @@ export default function AchievementPostForm() {
           />
         </div>
 
-        {/* Drag & Drop Image Upload */}
         <div className="border-dashed border-2 border-gray-400 rounded-lg p-6 text-center">
           <label
             htmlFor="photo"
@@ -235,9 +226,10 @@ export default function AchievementPostForm() {
             type="file"
             id="photo"
             name="photo"
-            accept="image/*"
+            accept="image/jpeg, image/png"
             onChange={handleImageChange}
             className="hidden"
+            required
           />
           {imagePreview && (
             <div className="mt-4">
@@ -250,7 +242,6 @@ export default function AchievementPostForm() {
           )}
         </div>
 
-        {/* Submit Button */}
         <button
           type="submit"
           className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 w-full"

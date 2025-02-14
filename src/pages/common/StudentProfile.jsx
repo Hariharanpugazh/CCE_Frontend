@@ -15,7 +15,7 @@ const StudentProfile = () => {
   const [savedJobs, setSavedJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const [editedName, setEditedName] = useState(""); // Editable name field
   // List of predefined images
   const availableImages = ["boy-1.png", "boy-2.png", "boy-3.png", "boy-4.png", "boy-5.png", "boy-6.png", "Girl-1.png", "Girl-2.png", "Girl-3.png", "Girl-4.png", "Girl-5.png",];
 
@@ -28,6 +28,7 @@ const StudentProfile = () => {
         const studentData = response.data.data;
 
         setStudent(studentData);
+        setEditedName(studentData.name); // Set editable name field
         // Fetch details for each saved job
         const jobDetailsPromises = studentData.saved_jobs.map(jobId =>
           axios.get(`http://localhost:8000/api/job/${jobId}/`)
@@ -59,7 +60,7 @@ const StudentProfile = () => {
       const userId = JSON.parse(atob(token.split(".")[1])).student_user;
 
       const updatedData = {
-        name: student.name,
+        name: editedName, // Save the edited name
         profile_image: selectedImage, // Send image filename only
       };
 
@@ -110,7 +111,17 @@ const StudentProfile = () => {
                   ))}
                 </select>
               )}
-              <h1 className="text-3xl font-bold tracking-wide">{student.name}</h1>
+              {/* Editable Name Field */}
+              {editMode ? (
+                <input
+                  type="text"
+                  value={editedName}
+                  onChange={(e) => setEditedName(e.target.value)}
+                  className="mt-2 p-2 text-black bg-white rounded-lg border border-gray-300"
+                />
+              ) : (
+                <h1 className="text-3xl font-bold tracking-wide">{student.name}</h1>
+              )}
             </div>
           </div>
 

@@ -167,11 +167,12 @@ const InboxPage = () => {
                     <div className="flex justify-between items-center mb-2">
                       <h2 className="text-lg font-bold text-gray-800">{message.name}</h2>
                       <p className="text-xs font-semibold bg-gray-100 text-gray-600 px-3 py-1 rounded-lg">
-                        {message.timestamp !== "Invalid Date"
-                          ? new Date(message.timestamp).toLocaleString()
+                        {message.timestamp && !isNaN(new Date(message.timestamp))
+                          ? new Date(message.timestamp).toLocaleDateString()
                           : "Invalid Date"}
                       </p>
                     </div>
+
     
                     {/* Contact Info */}
                     <p className="text-sm text-gray-600 font-medium flex items-center">

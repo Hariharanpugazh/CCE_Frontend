@@ -135,7 +135,9 @@ export default function JobDashboard() {
         const response = await axios.get("http://localhost:8000/api/published-jobs/");
         const jobsWithType = response.data.jobs.map((job) => ({
           ...job,
-          type: "job", // Add type field
+          type: "job",
+          status: job.status, // Add status field
+          updated_at: job.updated_at // // Add type field
         }));
         setJobs(jobsWithType); // Set jobs with type
         setFilteredJobs(jobsWithType); // Update filtered jobs

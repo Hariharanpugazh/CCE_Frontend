@@ -95,6 +95,9 @@ export default function AdminDetailPage() {
 
     const generateCSV = () => {
         const csvRows = [];
+
+        let last_login = admin.last_login ? new Date(admin.last_login).toLocaleString() : "Never"
+        last_login = last_login.replace(/,/g, " "); // Replace all commas with spaces
     
         // Add admin details
         const adminHeaders = ["Name", "Email", "Department", "College Name", "Status", "Last Login", "Date Created"];
@@ -104,9 +107,14 @@ export default function AdminDetailPage() {
             admin.department,
             admin.college_name,
             admin.status,
-            admin.last_login ? new Date(admin.last_login).toLocaleString() : "Never",
+            last_login,
             admin.created_at ? new Date(admin.created_at).toLocaleDateString() : "Unknown"
+
         ];
+
+        console.log(admin.last_login);
+        console.log(admin.created_at);
+
         csvRows.push(adminHeaders.join(","));
         csvRows.push(adminValues.join(","));
     
@@ -114,11 +122,14 @@ export default function AdminDetailPage() {
         if (jobs.length > 0) {
             const jobHeaders = ["Job Title", "Company", "Location", "Published Date"];
             csvRows.push("\n" + jobHeaders.join(","));
+            
             jobs.forEach(job => {
+                let location = job.job_location;
+                location = location.replace(/,/g, " "); // Replace all commas with spaces
                 const jobValues = [
                     job.title,
                     job.company_name,
-                    job.job_location,
+                    location,
                     job.updated_at ? new Date(job.updated_at).toLocaleDateString() : "Unknown" // Use updated_at as published_at
                 ];
                 csvRows.push(jobValues.join(","));

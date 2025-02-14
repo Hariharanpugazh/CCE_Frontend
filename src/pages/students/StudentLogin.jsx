@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie"; // Import js-cookie
-import { ToastContainer, toast } from "react-toastify"; // Import Toast notifications
-import "react-toastify/dist/ReactToastify.css"; // Import Toastify styles
+import Cookies from "js-cookie";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import LoginCard from "../../components/Cards/LoginCard";
 import ForgotPasswordCard from "../../components/Cards/ForgotPasswordCard";
 import ResetPasswordCard from "../../components/Cards/ResetPasswordCard";
@@ -16,7 +16,7 @@ export default function StudentLogin() {
         newPassword: "",
         confirmPassword: "",
     });
-    
+
     const [isForgotPassword, setIsForgotPassword] = useState(false);
     const [isResetPassword, setIsResetPassword] = useState(false);
     const [isLocked, setIsLocked] = useState(false);
@@ -29,7 +29,6 @@ export default function StudentLogin() {
             const interval = setInterval(() => {
                 setLockoutTime((prev) => prev - 1);
             }, 1000);
-
             return () => clearInterval(interval);
         } else {
             setIsLocked(false);
@@ -40,26 +39,26 @@ export default function StudentLogin() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (isLocked) return;
-    
+
         try {
-            const response = await fetch("https://1xpug8kx2c.execute-api.us-east-1.amazonaws.com/dev/api/stud/login/", {
+            const response = await fetch("http://localhost:8000/api/stud/login/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({ email: formData.email, password: formData.password }),
             });
-    
+
             const data = await response.json();
-    
+
             if (response.ok) {
                 // Store JWT token and username in cookies
-                Cookies.set("jwt", data.token.jwt, { expires: 1, path: "/" }); // Store JWT
-                Cookies.set("username", data.username, { expires: 1, path: "/" }); // Store username
-                
+                Cookies.set("jwt", data.token.jwt, { expires: 1, path: "/" });
+                Cookies.set("username", data.username, { expires: 1, path: "/" });
+
                 // Store email in localStorage
                 localStorage.setItem("student.email", formData.email);
-    
+
                 toast.success("Login successful! Redirecting...");
                 navigate("/home"); // Redirect to student dashboard
             } else {
@@ -73,7 +72,7 @@ export default function StudentLogin() {
             console.error("Error during login:", error);
             toast.error("Something went wrong. Please try again.");
         }
-    };        
+    };
 
     /** Handle Forgot Password */
     const handleForgotPassword = () => {
@@ -85,45 +84,61 @@ export default function StudentLogin() {
         setIsResetPassword(true);
     };
 
-/** Submit Forgot Password */
-const handleForgotPasswordSubmit = async (e) => {
-    e.preventDefault();
-    const email = formData.email;
+    /** Submit Forgot Password */
+    const handleForgotPasswordSubmit = async (e) => {
+        e.preventDefault();
+        const email = formData.email;
 
-    try {
-        const response = await fetch("http://localhost:8000/api/student-forgot-password/", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ email }),
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            toast.success(data.message);
-
-            // Transition to Reset Password step
-            setIsForgotPassword(false);
-            setIsResetPassword(true);
-
-            // Prepare formData for Reset Password step
-            setFormData({
-                email: email, // Keep email pre-filled
-                token: "", // Clear token field for user input
-                newPassword: "", // Clear new password field
-                confirmPassword: "", // Clear confirm password field
+        try {
+            const response = await fetch("http://localhost:8000/api/student-forgot-password/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email }),
             });
-        } else {
-            toast.error(data.error || "Something went wrong!");
-        }
-    } catch (error) {
-        console.error("Error:", error);
-        toast.error("Failed to send reset email. Please try again.");
-    }
-};
 
+            const data = await response.json();
+
+            if (response.ok) {
+                toast.success(data.message);
+            } else {
+                toast.error(data.error || "Something went wrong!");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            toast.error("Failed to send reset email. Please try again.");
+        }
+    };
+
+    /** Verify OTP */
+    const handleVerifyOtp = async (e) => {
+        e.preventDefault();
+        const { email, token } = formData;
+
+        try {
+            const response = await fetch("http://localhost:8000/api/student-verify-otp/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email, token }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                toast.success(data.message);
+                setIsForgotPassword(false);
+                setIsResetPassword(true);
+            } else {
+                toast.error(data.error || "Something went wrong!");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            toast.error("Failed to verify OTP. Please try again.");
+        }
+    };
 
     /** Submit Reset Password */
     const handleResetPasswordSubmit = async (e) => {
@@ -164,29 +179,31 @@ const handleForgotPasswordSubmit = async (e) => {
         }
     };
 
-/** Render Forgot Password Page */
-if (isForgotPassword) {
-    return (
-        <ForgotPasswordCard
-            page={AppPages.forgotPassword}
-            formData={formData}
-            formDataSetter={setFormData}
-            onSubmit={handleForgotPasswordSubmit}
-        />
-    );
-}
+    /** Render Forgot Password Page */
+    if (isForgotPassword) {
+        return (
+            <ForgotPasswordCard
+                page={AppPages.forgotPassword}
+                formData={formData}
+                formDataSetter={setFormData}
+                onSubmit={handleForgotPasswordSubmit}
+                onResendOTP={handleForgotPasswordSubmit} // Resend OTP
+                onVerifyOTP={handleVerifyOtp} // Verify OTP and proceed to reset password
+            />
+        );
+    }
 
-/** Render Reset Password Page */
-if (isResetPassword) {
-    return (
-        <ResetPasswordCard
-            page={AppPages.resetPassword}
-            formData={formData}
-            formDataSetter={setFormData}
-            onSubmit={handleResetPasswordSubmit}
-        />
-    );
-}
+    /** Render Reset Password Page */
+    if (isResetPassword) {
+        return (
+            <ResetPasswordCard
+                page={AppPages.resetPassword}
+                formData={formData}
+                formDataSetter={setFormData}
+                onSubmit={handleResetPasswordSubmit}
+            />
+        );
+    }
 
     /** Render Login Page */
     return (

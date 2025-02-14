@@ -27,6 +27,11 @@ export default function SuperAdminPageNavbar() {
     window.location.href = "/";
   };
 
+  const handleStudyMaterialClick = (event) => {
+    event.preventDefault();
+    alert("Coming Soon!");
+  };
+
   return (
     <div className="sticky top-0 bg-white shadow z-10 rounded-b-lg mx-3">
       <nav className="flex justify-between p-4 items-stretch pt-8 relative">
@@ -51,11 +56,7 @@ export default function SuperAdminPageNavbar() {
           >
             Internships
           </p>
-          <p className="cursor-pointer hover:underline hover:text-blue-400"
-           onClick={() => (window.location.href = "/study-material")}
-          >
-          Study Material 
-          </p>
+          <p className="cursor-pointer hover:underline hover:text-blue-400" onClick={handleStudyMaterialClick}>Study Material</p>
           <p
             className="cursor-pointer hover:underline hover:text-blue-400"
             onClick={() => (window.location.href = "/superadmin/achievements")}

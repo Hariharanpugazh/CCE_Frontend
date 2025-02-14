@@ -28,6 +28,11 @@ export default function StudentPageNavbar() {
     window.location.href = "/";
   };
 
+  const handleStudyMaterialClick = (event) => {
+    event.preventDefault();
+    alert("Coming Soon!");
+  };
+
   return (
     <div className="sticky top-0 bg-white shadow z-10 rounded-b-lg mx-3">
       <nav className="flex justify-between p-4 items-stretch pt-8 relative">
@@ -43,9 +48,7 @@ export default function StudentPageNavbar() {
           <p className="cursor-pointer hover:underline hover:text-blue-400" onClick={() => (window.location.href = AppPages.internShipDashboard.route)}>
             Internships
           </p>
-          <p className="cursor-pointer hover:underline hover:text-blue-400" onClick={() => (window.location.href = "/study-material")}>
-            Study Material
-          </p>
+          <p className="cursor-pointer hover:underline hover:text-blue-400" onClick={handleStudyMaterialClick}>Study Material</p>
           <p className="cursor-pointer hover:underline hover:text-blue-400" onClick={() => (window.location.href = "/achievements")}>
             Achievements
           </p>
@@ -91,7 +94,7 @@ export default function StudentPageNavbar() {
                     <MdOutlinePostAdd className="text-xl mr-2" />  Post Achievement
                   </li>
                   <li className="flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100" onClick={() => (window.location.href = "/saved-jobs")}>
-                    <IoBookmarksSharp className="text-xl mr-2"/> Saved Jobs
+                    <IoBookmarksSharp className="text-xl mr-2" /> Saved Items
                   </li>
                   <li className="flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100" onClick={() => (window.location.href = "/applied-jobs")}>
                     <MdWork className="text-xl mr-2" /> Applied Jobs

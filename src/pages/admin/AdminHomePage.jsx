@@ -3,7 +3,7 @@ import axios from "axios";
 import { FaListAlt, FaCheck, FaBook, FaTrophy, FaUserPlus, FaFilter } from "react-icons/fa";
 import AdminPageNavbar from "../../components/Admin/AdminNavBar";
 import Cookies from 'js-cookie';
-import JobCard from "../../components/Admin/JobCard";
+import ApplicationCard from "../../components/Students/ApplicationCard";
 import InternCard from "../../components/Admin/InternCard"; // Import InternCard
 import { AppPages, Departments } from "../../utils/constants";
 import { FiSearch } from "react-icons/fi";
@@ -83,29 +83,27 @@ const AdminHome = () => {
     if (searchPhrase === "") {
       setFilteredJobs(jobs)
     } else {
-      setFilteredJobs(jobs.filter((job) => job.job_data.title.includes(searchPhrase)
+      setFilteredJobs(jobs.filter((job) => job.job_data.title.toLocaleLowerCase().includes(searchPhrase)
         ||
-        job.job_data.company_name.includes(searchPhrase)
+        job.job_data.company_name.toLocaleLowerCase().includes(searchPhrase)
         ||
-        job.job_data.job_description.includes(searchPhrase)
+        job.job_data.job_description.toLocaleLowerCase().includes(searchPhrase)
         ||
-        job.job_data.required_skills.includes(searchPhrase)
+        job.job_data.required_skills.map(skill => skill.toLowerCase()).includes(searchPhrase.toLowerCase())
         ||
-        job.job_data.work_type.includes(searchPhrase)
+        job.job_data.work_type.toLocaleLowerCase().includes(searchPhrase)
       ))
 
-      setFilteredInterns(jobs.filter((interns) => interns.job_data.title.includes(searchPhrase)
+      setFilteredInterns(internships.filter((interns) => interns.internship_data.title.toLocaleLowerCase().includes(searchPhrase)
         ||
-        interns.job_data.company_name.includes(searchPhrase)
+        interns.internship_data.company_name.toLocaleLowerCase().includes(searchPhrase)
         ||
-        interns.job_data.job_description.includes(searchPhrase)
+        interns.internship_data.job_description.toLocaleLowerCase().includes(searchPhrase)
         ||
-        interns.job_data.required_skills.includes(searchPhrase)
-        ||
-        interns.job_data.work_type.includes(searchPhrase)
+        interns.internship_data.required_skills.map(skill => skill.toLowerCase()).includes(searchPhrase.toLowerCase())
       ))
     }
-  }, [searchPhrase])
+  }, [searchPhrase, jobs, internships])
 
 
   useEffect(() => {
@@ -160,7 +158,7 @@ const AdminHome = () => {
         </p>
 
         <div className="relative flex items-stretch w-[70%]">
-          <input type="text" value={searchPhrase} onChange={(e) => setSearchPhrase(e.target.value)} placeholder={`Search postings`} className="w-full text-lg my-5 p-2 px-5 rounded-full bg-gray-100 border-transparent border-2 hover:bg-white hover:border-blue-200 outline-blue-400" />
+          <input type="text" value={searchPhrase} onChange={(e) => setSearchPhrase(e.target.value.toLocaleLowerCase())} placeholder={`Search postings`} className="w-full text-lg my-5 p-2 px-5 rounded-full bg-gray-100 border-transparent border-2 hover:bg-white hover:border-blue-200 outline-blue-400" />
           <div className="absolute right-2 h-full flex items-center">
             <FiSearch className="bi bi-search bg-blue-400 rounded-full text-white" style={{ color: "white", width: "35", height: "35", padding: "8px" }} />
           </div>
@@ -245,14 +243,14 @@ const AdminHome = () => {
         {/* Render Job Cards */}
         <div className="w-full self-center mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 justify-stretch">
           {filteredJobs.map((job) => (
-            <JobCard key={job._id} job={{...job.job_data, _id: job._id}}  />
+            <ApplicationCard application={{ ...job, ...job.job_data }} key={job._id} handleCardClick={() => { setSelectedJob(job); }} isSaved={ undefined } />
           ))}
         </div>
 
         {/* Render Internship Cards */}
         <div className="w-full self-center mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 justify-stretch">
           {filteredInterns.map((internship) => (
-            <InternCard key={internship._id} internship={{...internship, _id: internship._id}} />
+            <ApplicationCard application={{ ...internship}} key={internship._id} handleCardClick={() => { setSelectedJob(internship); }} isSaved={ undefined } />
           ))}
         </div>
       </div>

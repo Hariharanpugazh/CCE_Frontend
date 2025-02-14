@@ -93,6 +93,7 @@ export default function InternshipDashboard() {
           ...internship.internship_data, // Extract internship_data
           id: internship._id, // Add id field
           type: "internship",
+          status: internship.status,
           updated_at: internship.updated_at // Add type field
         }));
         // console.log("Internships with type:", internshipsWithType); // Debugging line
@@ -114,11 +115,11 @@ export default function InternshipDashboard() {
       setFilteredInterns(
         internships.filter(
           (intern) =>
-            intern.title.includes(searchPhrase) ||
-            intern.company_name.includes(searchPhrase) ||
-            intern.job_description.includes(searchPhrase) ||
+            intern.title.toLowerCase().includes(searchPhrase) ||
+            intern.company_name.toLowerCase().includes(searchPhrase) ||
+            intern.job_description.toLowerCase().includes(searchPhrase) ||
             intern.required_skills.includes(searchPhrase) ||
-            intern.internship_type.includes(searchPhrase)
+            intern.internship_type.toLowerCase().includes(searchPhrase)
         )
       );
     }
@@ -129,7 +130,9 @@ export default function InternshipDashboard() {
     if (token) {
       const payload = JSON.parse(atob(token.split(".")[1])); // Decode JWT payload
       console.log("Decoded JWT Payload:", payload); // Debugging line
-      setUserRole(!payload.student_user ? payload.role : "student"); // Assuming the payload has a 'role' field
+      const user = !payload.student_user ? payload.role : "student";
+      setUserRole(user);
+      user === "superadmin" || user === "admin" ? undefined : fetchSavedInternships(); // Assuming the payload has a 'role' field
     }
   }, []);
 
@@ -146,7 +149,6 @@ export default function InternshipDashboard() {
   };
 
   useEffect(() => {
-    fetchSavedInternships();
     console.log(savedInterns)
   }, []);
 

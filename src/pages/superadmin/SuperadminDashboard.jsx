@@ -32,7 +32,9 @@ const SuperAdminHome = () => {
         const internshipsWithType = response.data.internships.map((internship) => ({
           ...internship.internship_data, // Extract internship_data
           id: internship._id, // Add id field
+          status: internship.status, // Add status field
           type: "internship", // Add type field
+          updated_at: internship.updated_at // Add type field
         }));
         setInternships(internshipsWithType); // Set internships with type
         setFilteredInterns(internshipsWithType); // Update filtered internships
@@ -48,7 +50,9 @@ const SuperAdminHome = () => {
         const jobsWithType = response.data.jobs.map((job) => ({
           ...job.job_data, // Extract job_data
           id: job._id, // Add id field
+          status: job.status, // Add status field
           type: "job", // Add type field
+          updated_at: job.updated_at // Add updated_at field// Add type field
         }));
         setJobs(jobsWithType); // Set jobs with type
         setFilteredJobs(jobsWithType); // Update filtered jobs
