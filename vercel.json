@@ -1,6 +1,6 @@
 {
     "rewrites": [
-      { "source": "/api/:path*", "destination": "https://your-backend-on-render.com/:path*" }
+      { "source": "/api/:path*", "destination": "https://cce-backend-54k0.onrender.com/:path*" }
     ]
   }
   

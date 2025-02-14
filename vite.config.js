@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://your-backend-on-render.com', // Replace with your Render backend URL
+        target: 'https://cce-backend-54k0.onrender.com', // Replace with your Render backend URL
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
         secure: true,
