@@ -39,7 +39,7 @@ const Pagination = ({ currentPage, totalItems, itemsPerPage, onPageChange }) => 
   };
   
   return (
-    <div className="flex justify-center mt-8 items-center">
+    <div className="flex justify-center my-4 items-center ">
       <nav className="flex items-center space-x-1 select-none">
         {/* Previous button */}
         <button

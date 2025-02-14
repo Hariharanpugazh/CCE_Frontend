@@ -6,5 +6,5 @@
  */
 
 export default function InputField({ value, setter, args = {} }) {
-  return <input value={value} onChange={(e) => setter(e.target.value)} {...args} className="border-[1px] border-[#8C8C8C] rounded-xl p-3 w-full text-sm focus:outline-blue-400" />;
+  return <input value={value} onChange={(e) => setter(e.target.value)} {...args} className="border-[1px] border-[#8C8C8C] rounded-xl p-3 w-full text-sm focus:outline-yellow-400" />;
 }
