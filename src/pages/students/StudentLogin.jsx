@@ -41,7 +41,7 @@ export default function StudentLogin() {
         if (isLocked) return;
 
         try {
-            const response = await fetch("https://cce-backend-kw0b.onrender.com/api/stud/login/", {
+            const response = await fetch("https://cce-backend-54k0.onrender.com/api/stud/login/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -90,7 +90,7 @@ export default function StudentLogin() {
         const email = formData.email;
 
         try {
-            const response = await fetch("https://cce-backend-kw0b.onrender.com/api/student-forgot-password/", {
+            const response = await fetch("https://cce-backend-54k0.onrender.com/api/student-forgot-password/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -117,7 +117,7 @@ export default function StudentLogin() {
         const { email, token } = formData;
 
         try {
-            const response = await fetch("https://cce-backend-kw0b.onrender.com/api/student-verify-otp/", {
+            const response = await fetch("https://cce-backend-54k0.onrender.com/api/student-verify-otp/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -150,7 +150,7 @@ export default function StudentLogin() {
         }
 
         try {
-            const response = await fetch("https://cce-backend-kw0b.onrender.com/api/student-reset-password/", {
+            const response = await fetch("https://cce-backend-54k0.onrender.com/api/student-reset-password/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

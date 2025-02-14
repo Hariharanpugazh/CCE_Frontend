@@ -13,7 +13,7 @@ export default function SuperAchievementDashboard() {
   useEffect(() => {
     const fetchPublishedAchievements = async () => {
       try {
-        const response = await axios.get("https://cce-backend-kw0b.onrender.com/api/published-achievement/");
+        const response = await axios.get("https://cce-backend-54k0.onrender.com/api/published-achievement/");
         setAchievements(response.data.achievements);
       } catch (err) {
         console.error("Error fetching published achievements:", err);

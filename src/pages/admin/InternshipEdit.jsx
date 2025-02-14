@@ -13,7 +13,7 @@ const InternshipEdit = () => {
     const [userRole, setUserRole] = useState(null);
 
     useEffect(() => {
-        fetch(`https://cce-backend-kw0b.onrender.com/api/internship/${id}/`)
+        fetch(`https://cce-backend-54k0.onrender.com/api/internship/${id}/`)
             .then(response => response.json())
             .then(data => {
                 setInternship(data.internship.internship_data);
@@ -52,7 +52,7 @@ const InternshipEdit = () => {
             edited: role
         };
     
-        fetch(`https://cce-backend-kw0b.onrender.com/api/internship-edit/${id}/`, {
+        fetch(`https://cce-backend-54k0.onrender.com/api/internship-edit/${id}/`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -76,7 +76,7 @@ const InternshipEdit = () => {
 
     const handleDelete = () => {
         if (window.confirm("Are you sure you want to delete this internship?")) {
-            fetch(`https://cce-backend-kw0b.onrender.com/api/internship-delete/${id}/`, {
+            fetch(`https://cce-backend-54k0.onrender.com/api/internship-delete/${id}/`, {
                 method: 'DELETE'
             })
             .then(response => {

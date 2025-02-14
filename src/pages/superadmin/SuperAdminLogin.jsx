@@ -39,7 +39,7 @@ export default function SuperAdminLogin() {
         if (isLocked) return;
 
         try {
-            const response = await fetch("https://cce-backend-kw0b.onrender.com/api/superadmin_login/", {
+            const response = await fetch("https://cce-backend-54k0.onrender.com/api/superadmin_login/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

@@ -129,7 +129,7 @@ export default function JobPostForm() {
         return;
       }
       const response = await axios.post(
-        "https://cce-backend-kw0b.onrender.com/api/job_post/",
+        "https://cce-backend-54k0.onrender.com/api/job_post/",
         { ...formData, selectedCategory, selectedWorkType, userId , role : userRole },
       );
 

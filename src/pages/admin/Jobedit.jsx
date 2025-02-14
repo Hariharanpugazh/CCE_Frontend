@@ -19,7 +19,7 @@ const JobEdit = () => {
             setUserRole(payload.role); // Assuming the payload has a 'role' field
         }
 
-        fetch(`https://cce-backend-kw0b.onrender.com/api/job/${id}/`)
+        fetch(`https://cce-backend-54k0.onrender.com/api/job/${id}/`)
             .then(response => response.json())
             .then(data => {
                 setJob(data.job);
@@ -53,7 +53,7 @@ const JobEdit = () => {
         };
         console.log(updatedJobData);
 
-        fetch(`https://cce-backend-kw0b.onrender.com/api/job-edit/${id}/`, {
+        fetch(`https://cce-backend-54k0.onrender.com/api/job-edit/${id}/`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -70,7 +70,7 @@ const JobEdit = () => {
 
     const handleDelete = () => {
         if (window.confirm("Are you sure you want to delete this job?")) {
-            fetch(`https://cce-backend-kw0b.onrender.com/api/job-delete/${id}/`, {
+            fetch(`https://cce-backend-54k0.onrender.com/api/job-delete/${id}/`, {
                 method: 'DELETE'
             })
             .then(response => {

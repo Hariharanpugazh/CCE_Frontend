@@ -86,7 +86,7 @@ export default function InternshipDashboard() {
   useEffect(() => {
     const fetchPublishedInternships = async () => {
       try {
-        const response = await axios.get("https://cce-backend-kw0b.onrender.com/api/published-internship/");
+        const response = await axios.get("https://cce-backend-54k0.onrender.com/api/published-internship/");
         console.log("Response:", response.data); // Debugging line
 
         const internshipsWithType = response.data.internships.map((internship) => ({
@@ -140,7 +140,7 @@ export default function InternshipDashboard() {
     try {
       const token = Cookies.get("jwt");
       const userId = JSON.parse(atob(token.split(".")[1])).student_user;
-      const response = await axios.get(`https://cce-backend-kw0b.onrender.com/api/saved-internships/${userId}/`);
+      const response = await axios.get(`https://cce-backend-54k0.onrender.com/api/saved-internships/${userId}/`);
       setSavedInterns(response.data.internships.map(internship => internship._id));
       console.log(response.data.internships.map(internship => internship._id))
     } catch (err) {

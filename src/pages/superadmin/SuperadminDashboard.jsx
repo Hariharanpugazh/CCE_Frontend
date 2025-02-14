@@ -28,7 +28,7 @@ const SuperAdminHome = () => {
   useEffect(() => {
     const fetchPublishedInternships = async () => {
       try {
-        const response = await axios.get("https://cce-backend-kw0b.onrender.com/api/published-internship/");
+        const response = await axios.get("https://cce-backend-54k0.onrender.com/api/published-internship/");
         const internshipsWithType = response.data.internships.map((internship) => ({
           ...internship.internship_data, // Extract internship_data
           id: internship._id, // Add id field
@@ -46,7 +46,7 @@ const SuperAdminHome = () => {
 
     const fetchPublishedJobs = async () => {
       try {
-        const response = await axios.get("https://cce-backend-kw0b.onrender.com/api/published-jobs/");
+        const response = await axios.get("https://cce-backend-54k0.onrender.com/api/published-jobs/");
         const jobsWithType = response.data.jobs.map((job) => ({
           ...job.job_data, // Extract job_data
           id: job._id, // Add id field

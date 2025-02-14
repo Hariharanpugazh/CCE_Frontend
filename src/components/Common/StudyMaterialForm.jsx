@@ -33,7 +33,7 @@ export default function StudyMaterialForm() {
       }
 
       const response = await axios.post(
-        "https://cce-backend-kw0b.onrender.com/api/post-study-material/ ",
+        "https://cce-backend-54k0.onrender.com/api/post-study-material/ ",
         formData,
         {
           headers: {

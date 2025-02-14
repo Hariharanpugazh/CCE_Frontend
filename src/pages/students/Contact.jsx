@@ -33,7 +33,7 @@ const ContactForm = () => {
     setIsSending(true); // Set button to "Sending..."
 
     try {
-      const response = await axios.post("https://cce-backend-kw0b.onrender.com/api/contact-us/", formData, {
+      const response = await axios.post("https://cce-backend-54k0.onrender.com/api/contact-us/", formData, {
         headers: { "Content-Type": "application/json" },
       });
 

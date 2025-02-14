@@ -140,7 +140,7 @@ const InternPostForm = () => {
       };
 
       const response = await axios.post(
-        'https://cce-backend-kw0b.onrender.com/api/post-internship/',
+        'https://cce-backend-54k0.onrender.com/api/post-internship/',
         {...formattedData, userId , role : userRole },
         // {
         //   headers: {

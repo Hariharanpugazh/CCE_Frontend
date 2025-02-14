@@ -15,7 +15,7 @@ export default function ManagementHomePage() {
     useEffect(() => {
         const fetchAdminDetails = async () => {
             try {
-                const response = await axios.get("https://cce-backend-kw0b.onrender.com/api/admins-list/");
+                const response = await axios.get("https://cce-backend-54k0.onrender.com/api/admins-list/");
                 console.log("Fetched admins:", response.data.admins); // Debugging line
                 setAdmins(response.data.admins); // Set admin details
             } catch (err) {

@@ -18,7 +18,7 @@ export default function AchievementEdit() {
   useEffect(() => {
     const fetchAchievement = async () => {
       try {
-        const response = await fetch(`https://cce-backend-kw0b.onrender.com/api/get-achievement/${id}/`, {
+        const response = await fetch(`https://cce-backend-54k0.onrender.com/api/get-achievement/${id}/`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -89,7 +89,7 @@ export default function AchievementEdit() {
         reader.onloadend = async () => {
           updatedData.photo = reader.result.split(',')[1]; // Get only base64 part
 
-          const response = await fetch(`https://cce-backend-kw0b.onrender.com/api/edit-achievement/${id}/`, {
+          const response = await fetch(`https://cce-backend-54k0.onrender.com/api/edit-achievement/${id}/`, {
             method: 'PUT',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -107,7 +107,7 @@ export default function AchievementEdit() {
           setIsEditing(false);
         };
       } else {
-        const response = await fetch(`https://cce-backend-kw0b.onrender.com/api/edit-achievement/${id}/`, {
+        const response = await fetch(`https://cce-backend-54k0.onrender.com/api/edit-achievement/${id}/`, {
           method: 'PUT',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -132,7 +132,7 @@ export default function AchievementEdit() {
   const handleDelete = async () => {
     if (window.confirm("Are you sure you want to delete this achievement?")) {
       try {
-        const response = await fetch(`https://cce-backend-kw0b.onrender.com/api/delete-achievement/${id}/`, {
+        const response = await fetch(`https://cce-backend-54k0.onrender.com/api/delete-achievement/${id}/`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`,

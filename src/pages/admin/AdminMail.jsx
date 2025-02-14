@@ -28,7 +28,7 @@ export default function AdminMail() {
 
     const fetchData = async () => {
       try {
-        const response = await fetch('https://cce-backend-kw0b.onrender.com/api/mailjobs/', {
+        const response = await fetch('https://cce-backend-54k0.onrender.com/api/mailjobs/', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -55,7 +55,7 @@ export default function AdminMail() {
 
     const fetchReview = async () => {
       try {
-        const response = await fetch('https://cce-backend-kw0b.onrender.com/api/fetch-review/', {
+        const response = await fetch('https://cce-backend-54k0.onrender.com/api/fetch-review/', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
