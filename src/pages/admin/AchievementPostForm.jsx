@@ -124,7 +124,7 @@ export default function AchievementPostForm() {
       setMessage(response.data.message);
       setError("");
       setLoading(false);
-    } catch (err) {
+    } catch (err) { 
       setError(err.response?.data?.error || "Something went wrong");
       setMessage("");
       setLoading(false);
