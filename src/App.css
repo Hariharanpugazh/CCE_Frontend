@@ -45,16 +45,17 @@ input[type="range"]::-moz-range-thumb {
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-#salary-range::-webkit-slider-thumb{
+#salary-range::-webkit-slider-thumb {
   background-image: url('https://th.bing.com/th/id/R.1662eccac73004e4a655732bc22d0725?rik=XpBl49ML4cYgzQ&riu=http%3a%2f%2fclipart-library.com%2fimages_k%2fsign-transparent-background%2fsign-transparent-background-16.png&ehk=1Ahb6GbDvNHDog1xJLi7zOfqOJK3VzqBLt%2f2%2frnL6Gw%3d&risl=&pid=ImgRaw&r=0');
 }
 
-#experience-range::-webkit-slider-thumb{
+#experience-range::-webkit-slider-thumb {
   background-image: url('https://www.freeiconspng.com/uploads/calendar-icon-png--0.png');
 }
 
 input[type="checkbox"] {
-  accent-color: #fde047; /* Yellow-300 */
+  accent-color: #fde047;
+  /* Yellow-300 */
   cursor: pointer;
   border: none;
   outline: none;
@@ -81,7 +82,8 @@ input[type="checkbox"]:hover {
   width: 15px;
   margin-right: 10px;
   border-radius: 10px;
-  background-color: rgb(253, 199, 0); /* Updated accent color */
+  background-color: rgb(253, 199, 0);
+  /* Updated accent color */
   animation: pulse 1.5s infinite ease-in-out;
 }
 
@@ -104,19 +106,76 @@ input[type="checkbox"]:hover {
 @keyframes pulse {
   0% {
     transform: scale(0.8);
-    background-color: rgb(253, 199, 0); /* Updated */
-    box-shadow: 0 0 0 0 rgba(253, 199, 0, 0.7); /* Updated */
+    background-color: rgb(253, 199, 0);
+    /* Updated */
+    box-shadow: 0 0 0 0 rgba(253, 199, 0, 0.7);
+    /* Updated */
   }
 
   50% {
     transform: scale(1.2);
-    background-color: rgb(204, 160, 0); /* Darker shade for variation */
-    box-shadow: 0 0 0 10px rgba(253, 199, 0, 0); /* Updated */
+    background-color: rgb(204, 160, 0);
+    /* Darker shade for variation */
+    box-shadow: 0 0 0 10px rgba(253, 199, 0, 0);
+    /* Updated */
   }
 
   100% {
     transform: scale(0.8);
-    background-color: rgb(253, 199, 0); /* Updated */
-    box-shadow: 0 0 0 0 rgba(253, 199, 0, 0.7); /* Updated */
+    background-color: rgb(253, 199, 0);
+    /* Updated */
+    box-shadow: 0 0 0 0 rgba(253, 199, 0, 0.7);
+    /* Updated */
   }
+}
+
+.glass-lg {
+  background: rgba(255, 255, 255, 0.1);
+  /* Semi-transparent white */
+  backdrop-filter: blur(2px);
+  /* Blur effect */
+  -webkit-backdrop-filter: blur(10px);
+  /* Safari support */
+}
+
+.glass-sm {
+  background: rgba(255, 255, 255, 0.1);
+  /* Semi-transparent white */
+  backdrop-filter: blur(1px);
+  /* Blur effect */
+  -webkit-backdrop-filter: blur(10px);
+  /* Safari support */
+}
+
+.glass-xs {
+  background: rgba(255, 255, 255, 0.1);
+  /* Semi-transparent white */
+  backdrop-filter: blur(0.5px);
+  /* Blur effect */
+  -webkit-backdrop-filter: blur(10px);
+  /* Safari support */
+}
+
+.custom-justify {
+  text-align-last: justify;
+}
+
+.custom-border {
+  border-radius: 8px;
+  position: relative;
+  background-color: rgb(255, 255, 255);
+}
+
+.custom-border::after {
+  content: "";
+  border-radius: 10px;
+  position: absolute;
+  inset: var(--border-width, -2px);
+  z-index: -1;
+  background-image: var(--custom-gradient);
+}
+
+.custom-border::before {
+  filter: blur(1.5rem);
+  opacity: 0.5;
 }

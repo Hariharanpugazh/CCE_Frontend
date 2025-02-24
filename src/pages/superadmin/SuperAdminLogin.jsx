@@ -13,6 +13,7 @@ export default function SuperAdminLogin() {
     });
     const [isLocked, setIsLocked] = useState(false); // Track lockout state
     const [lockoutTime, setLockoutTime] = useState(0); // Track remaining lockout time
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
     // Clear cookies when entering the login page
@@ -37,7 +38,9 @@ export default function SuperAdminLogin() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (isLocked) return;
-
+    
+        setIsLoading(true);
+    
         try {
             const response = await fetch("https://cce-backend-54k0.onrender.com/api/superadmin_login/", {
                 method: "POST",
@@ -46,9 +49,9 @@ export default function SuperAdminLogin() {
                 },
                 body: JSON.stringify(formData),
             });
-
+    
             const data = await response.json();
-
+    
             if (response.ok) {
                 Cookies.set("jwt", data.tokens.jwt, { expires: 1, path: "/" });
                 Cookies.set("username", data.username, { expires: 1, path: "/" });
@@ -57,15 +60,17 @@ export default function SuperAdminLogin() {
             } else {
                 if (data.error.includes("Too many failed attempts")) {
                     setIsLocked(true);
-                    setLockoutTime(120); // 5-minute lockout
+                    setLockoutTime(120);
                 }
                 toast.error(data.error || "Login failed");
+                setIsLoading(false); // Ensure loading state is stopped
             }
         } catch (error) {
             console.error("Error during login:", error);
             toast.error("Something went wrong. Please try again.");
+            setIsLoading(false); // Ensure loading state is stopped
         }
-    };
+    };    
 
     return (
         <>
@@ -76,6 +81,7 @@ export default function SuperAdminLogin() {
                 onSubmit={handleSubmit}
                 isLocked={isLocked}
                 lockoutTime={lockoutTime}
+                isLoading={isLoading}
             />
             <ToastContainer position="top-right" autoClose={3000} />
         </>

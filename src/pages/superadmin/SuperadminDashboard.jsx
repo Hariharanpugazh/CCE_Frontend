@@ -3,104 +3,177 @@ import axios from "axios";
 import { FaListAlt, FaCheck, FaBook, FaTrophy, FaUserPlus, FaFilter } from "react-icons/fa";
 import SuperAdminPageNavbar from "../../components/SuperAdmin/SuperAdminNavBar";
 import ApplicationCard from "../../components/Students/ApplicationCard";
-import { FiSearch } from "react-icons/fi";
-import { AppPages, Departments } from "../../utils/constants";
+import Pagination from "../../components/Admin/pagination"; // Import Pagination component
 
 const SuperAdminHome = () => {
   const [internships, setInternships] = useState([]);
   const [jobs, setJobs] = useState([]);
   const [filter, setFilter] = useState("All");
-  const [deptFilter, setDeptFilter] = useState("All");
   const [error, setError] = useState("");
   const [searchPhrase, setSearchPhrase] = useState("");
   const [showFilterOptions, setShowFilterOptions] = useState(false);
   const [filteredJobs, setFilteredJobs] = useState([]);
   const [filteredInterns, setFilteredInterns] = useState([]);
+  const [currentJobPage, setCurrentJobPage] = useState(1);
+  const [currentInternPage, setCurrentInternPage] = useState(1);
+  const itemsPerPage = 3;
 
   const cardsData = [
     { title: "OverAll", count: jobs.length + internships.length, icon: <FaListAlt /> },
     { title: "Total Job Listings", count: jobs.length, icon: <FaCheck /> },
     { title: "Total Internship Listings", count: internships.length, icon: <FaBook /> },
-    { title: "Rejected Jobs", count: 2, icon: <FaTrophy /> },
-    { title: "Pending Approvals", count: 0, icon: <FaUserPlus /> },
+    { title: "Rejected Approvals",  count: jobs.filter(job => job.is_publish === false).length + internships.filter(internship => internship.is_publish === false).length, icon: <FaTrophy /> },
+    { title: "Pending Approvals", count: jobs.filter(job => job.is_publish === null).length, icon: <FaUserPlus /> },
   ];
 
   useEffect(() => {
-    const fetchPublishedInternships = async () => {
+    const fetchAllJobsAndInternships = async () => {
       try {
-        const response = await axios.get("https://cce-backend-54k0.onrender.com/api/published-internship/");
-        const internshipsWithType = response.data.internships.map((internship) => ({
-          ...internship.internship_data, // Extract internship_data
-          id: internship._id, // Add id field
-          status: internship.status, // Add status field
-          type: "internship", // Add type field
-          updated_at: internship.updated_at // Add type field
+        const response = await axios.get("https://cce-backend-54k0.onrender.com/api/all-jobs-internships/");
+        const { jobs, internships } = response.data;
+
+        // Map jobs data to the expected structure
+        const mappedJobs = jobs.map((job) => ({
+          ...job.job_data,
+          id: job._id,
+          status: job.status,
+          is_publish: job.is_publish,
+          type: "job",
+          updated_at: job.updated_at,
+          total_views: job.total_views // Ensure total_views is included
         }));
-        setInternships(internshipsWithType); // Set internships with type
-        setFilteredInterns(internshipsWithType); // Update filtered internships
+
+        // Map internships data to the expected structure
+        const mappedInternships = internships.map((internship) => ({
+          ...internship.internship_data,
+          id: internship._id,
+          status: internship.status,
+          is_publish: internship.is_publish,
+          type: "internship",
+          updated_at: internship.updated_at,
+          total_views: internship.total_views // Ensure total_views is included
+        }));
+
+        setJobs(mappedJobs);
+        setInternships(mappedInternships);
+        setFilteredJobs(mappedJobs);
+        setFilteredInterns(mappedInternships);
       } catch (err) {
-        console.error("Error fetching published internships:", err);
-        setError("Failed to load internships.");
+        console.error("Error fetching jobs and internships:", err);
+        setError("Failed to load data.");
       }
     };
 
-    const fetchPublishedJobs = async () => {
-      try {
-        const response = await axios.get("https://cce-backend-54k0.onrender.com/api/published-jobs/");
-        const jobsWithType = response.data.jobs.map((job) => ({
-          ...job.job_data, // Extract job_data
-          id: job._id, // Add id field
-          status: job.status, // Add status field
-          type: "job", // Add type field
-          updated_at: job.updated_at // Add updated_at field// Add type field
-        }));
-        setJobs(jobsWithType); // Set jobs with type
-        setFilteredJobs(jobsWithType); // Update filtered jobs
-      } catch (err) {
-        console.error("Error fetching published jobs:", err);
-        setError("Failed to load jobs.");
-      }
-    };
-
-    fetchPublishedInternships();
-    fetchPublishedJobs();
+    fetchAllJobsAndInternships();
   }, []);
 
   useEffect(() => {
-    if (searchPhrase === "") {
+    // Filter jobs and internships based on the selected filter
+    if (filter === "All") {
       setFilteredJobs(jobs);
       setFilteredInterns(internships);
+    } else if (filter === "Approved") {
+      setFilteredJobs(jobs.filter((job) => job.is_publish === true));
+      setFilteredInterns(internships.filter((internship) => internship.is_publish === true));
+    } else if (filter === "Rejected") {
+      setFilteredJobs(jobs.filter((job) => job.is_publish === false));
+      setFilteredInterns(internships.filter((internship) => internship.is_publish === false));
+    } else if (filter === "Pending Approvals") {
+      setFilteredJobs(jobs.filter((job) => job.is_publish === null));
+      setFilteredInterns(internships.filter((internship) => internship.is_publish === null));
+    } else if (filter === "Active Jobs") {
+      setFilteredJobs(jobs.filter((job) => job.status === "Active" ));
+      setFilteredInterns(internships.filter((internship) => internship.status === "Active" ));
+    } else if (filter === "Expired Jobs") {
+      setFilteredJobs(jobs.filter((job) => job.status === "expired"));
+      setFilteredInterns(internships.filter((internship) => internship.status === "expired" ));
+    }
+  }, [filter, jobs, internships]);
+
+  useEffect(() => {
+    if (searchPhrase === "") {
+      if (filter === "All") {
+        setFilteredJobs(jobs);
+        setFilteredInterns(internships);
+      } else if (filter === "Approved") {
+        setFilteredJobs(jobs.filter((job) => job.is_publish === true));
+        setFilteredInterns(internships.filter((internship) => internship.is_publish === true));
+      } else if (filter === "Rejected") {
+        setFilteredJobs(jobs.filter((job) => job.is_publish === false));
+        setFilteredInterns(internships.filter((internship) => internship.is_publish === false));
+      } else if (filter === "Pending Approvals") {
+        setFilteredJobs(jobs.filter((job) => job.is_publish === null));
+        setFilteredInterns(internships.filter((internship) => internship.is_publish === null));
+      } else if (filter === "Active Jobs") {
+        setFilteredJobs(jobs.filter((job) => job.status === "Active"));
+      } else if (filter === "Expired Jobs") {
+        setFilteredJobs(jobs.filter((job) => job.status === "expired"));
+      }
     } else {
-      setFilteredJobs(
-        jobs.filter(
-          (job) =>
-            job.title.includes(searchPhrase) ||
-            job.company_name.includes(searchPhrase) ||
-            job.job_description.includes(searchPhrase) ||
-            job.required_skills.includes(searchPhrase) ||
-            job.work_type.includes(searchPhrase)
-        )
+      const filteredJobsBySearch = jobs.filter((job) =>
+        job.title.toLocaleLowerCase().includes(searchPhrase) ||
+        job.company_name.toLocaleLowerCase().includes(searchPhrase) ||
+        job.job_description.toLocaleLowerCase().includes(searchPhrase) ||
+        job.required_skills.map(skill => skill.toLowerCase()).includes(searchPhrase.toLowerCase()) ||
+        job.selectedWorkType.toLocaleLowerCase().includes(searchPhrase)
       );
 
-      setFilteredInterns(
-        internships.filter(
-          (intern) =>
-            intern.title.includes(searchPhrase) ||
-            intern.company_name.includes(searchPhrase) ||
-            intern.job_description.includes(searchPhrase) ||
-            intern.required_skills.includes(searchPhrase) ||
-            intern.internship_type.includes(searchPhrase)
-        )
+      const filteredInternsBySearch = internships.filter((internship) =>
+        internship.title.toLocaleLowerCase().includes(searchPhrase) ||
+        internship.company_name.toLocaleLowerCase().includes(searchPhrase) ||
+        internship.job_description.toLocaleLowerCase().includes(searchPhrase) ||
+        internship.required_skills.map(skill => skill.toLowerCase()).includes(searchPhrase.toLowerCase())
       );
+
+      if (filter === "All") {
+        setFilteredJobs(filteredJobsBySearch);
+        setFilteredInterns(filteredInternsBySearch);
+      } else if (filter === "Approved") {
+        setFilteredJobs(filteredJobsBySearch.filter((job) => job.is_publish === true));
+        setFilteredInterns(filteredInternsBySearch.filter((internship) => internship.is_publish === true));
+      } else if (filter === "Rejected") {
+        setFilteredJobs(filteredJobsBySearch.filter((job) => job.is_publish === false));
+        setFilteredInterns(filteredInternsBySearch.filter((internship) => internship.is_publish === false));
+      } else if (filter === "Pending Approvals") {
+        setFilteredJobs(filteredJobsBySearch.filter((job) => job.is_publish === null));
+        setFilteredInterns(filteredInternsBySearch.filter((internship) => internship.is_publish === null));
+      } else if (filter === "Active Jobs") {
+        setFilteredJobs(filteredJobsBySearch.filter((job) => job.status === "Active"));
+      } else if (filter === "Expired Jobs") {
+        setFilteredJobs(filteredJobsBySearch.filter((job) => job.status === "expired"));
+      }
     }
-  }, [searchPhrase, jobs, internships]);
+  }, [searchPhrase, filter, jobs, internships]);
 
   const handleButtonClick = (status) => {
-    setFilter(status === "All" ? "All" : status);
+    setFilter(status);
+  };
+
+  const handleFilterClick = (status) => {
+    setFilter(status);
+    setShowFilterOptions(false); // Close the filter options after selecting
+  };
+
+  // Pagination logic for jobs
+  const indexOfLastJob = currentJobPage * itemsPerPage;
+  const indexOfFirstJob = indexOfLastJob - itemsPerPage;
+  const currentJobs = filteredJobs.slice(indexOfFirstJob, indexOfLastJob);
+
+  const handleJobPageChange = (pageNumber) => {
+    setCurrentJobPage(pageNumber);
+  };
+
+  // Pagination logic for internships
+  const indexOfLastIntern = currentInternPage * itemsPerPage;
+  const indexOfFirstIntern = indexOfLastIntern - itemsPerPage;
+  const currentInterns = filteredInterns.slice(indexOfFirstIntern, indexOfLastIntern);
+
+  const handleInternPageChange = (pageNumber) => {
+    setCurrentInternPage(pageNumber);
   };
 
   return (
-    <div className="flex flex-col w-full h-screen overflow-auto bg-[#FFFAFA]">
+    <div className="flex flex-col w-full h-screen overflow-auto bg-[#FFFAFA] ml-30">
       <SuperAdminPageNavbar />
 
       <header className="flex flex-col items-center justify-center py-14 container self-center">
@@ -108,31 +181,6 @@ const SuperAdminHome = () => {
         <p className="text-lg mt-2 text-center">
           Explore all the postings in all the existing fields around the globe.
         </p>
-
-        <div className="relative flex items-stretch w-[70%]">
-          <input
-            type="text"
-            value={searchPhrase}
-            onChange={(e) => setSearchPhrase(e.target.value)}
-            placeholder="Search postings"
-            className="w-full text-lg my-5 p-2 px-5 rounded-full bg-gray-100 border-transparent border-2 hover:bg-white hover:border-blue-200 outline-blue-400"
-          />
-          <div className="absolute right-2 h-full flex items-center">
-            <FiSearch className="text-blue-400 rounded-full text-white" style={{ color: "white", width: "35", height: "35", padding: "8px" }} />
-          </div>
-        </div>
-
-        <div className="flex space-x-2 flex-wrap w-[50%] justify-center">
-          {["All", ...Object.values(Departments)].map((department, key) => (
-            <p
-              key={key}
-              className={`${deptFilter === department ? "bg-[#000000] text-white" : ""} border-gray-700 border-[1px] py-1 px-[10px] rounded-full text-xs my-1 cursor-pointer`}
-              onClick={() => setDeptFilter(department)}
-            >
-              {department}
-            </p>
-          ))}
-        </div>
       </header>
 
       <div className="max-w-[80%] mx-auto">
@@ -145,7 +193,7 @@ const SuperAdminHome = () => {
                   <span className="font-normal text-sm text-[#a0aec0] font-sans">{card.title}</span>
                   <span className="text-md text-[#2d3748] font-sans text-4xl">{card.count}</span>
                 </div>
-                <div className="p-2 bg-gray-800 text-sm text-white rounded flex items-center justify-center shadow-sm">
+                <div className="p-2 bg-yellow-400 text-sm text-white rounded flex items-center justify-center shadow-sm">
                   {card.icon}
                 </div>
               </div>
@@ -181,7 +229,7 @@ const SuperAdminHome = () => {
                     <button
                       key={option}
                       className={`w-full px-4 py-2 cursor-pointer hover:bg-gray-100 ${filter === option ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:text-gray-900"}`}
-                      onClick={() => handleButtonClick(option)}
+                      onClick={() => handleFilterClick(option)}
                     >
                       {option}
                     </button>
@@ -193,33 +241,51 @@ const SuperAdminHome = () => {
         </div>
 
         {/* Render Job Cards */}
-        <div className="w-full self-center mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-stretch">
-          {error ? (
-            <p className="text-red-600">{error}</p>
-          ) : jobs.length === 0 ? (
-            <p className="text-gray-600">No jobs available at the moment.</p>
-          ) : filteredJobs.length === 0 ? (
-            <p className="alert alert-danger w-full col-span-full text-center">!! No Jobs Found !!</p>
-          ) : (
-            filteredJobs.map((job) => (
-              <ApplicationCard key={job.id} application={{ ...job }} />
-            ))
-          )}
+        <div className="w-full self-center mt-6">
+          <h2 className="text-2xl font-bold mb-4">Job Listings</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-stretch">
+            {error ? (
+              <p className="text-red-600">{error}</p>
+            ) : jobs.length === 0 ? (
+              <p className="text-gray-600">No jobs available at the moment.</p>
+            ) : currentJobs.length === 0 ? (
+              <p className="alert alert-danger w-full col-span-full text-center">!! No Jobs Found !!</p>
+            ) : (
+              currentJobs.map((job) => (
+                <ApplicationCard key={job.id} application={{ ...job, total_views: job.total_views }} />
+              ))
+            )}
+          </div>
+          <Pagination
+            currentPage={currentJobPage}
+            totalItems={filteredJobs.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={handleJobPageChange}
+          />
         </div>
 
         {/* Render Internship Cards */}
-        <div className="w-full self-center mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-stretch">
-          {error ? (
-            <p className="text-red-600">{error}</p>
-          ) : internships.length === 0 ? (
-            <p className="text-gray-600">No internships available at the moment.</p>
-          ) : filteredInterns.length === 0 ? (
-            <p className="alert alert-danger w-full col-span-full text-center">!! No Internships Found !!</p>
-          ) : (
-            filteredInterns.map((intern) => (
-              <ApplicationCard key={intern.id} application={{ ...intern }} />
-            ))
-          )}
+        <div className="w-full self-center mt-6">
+          <h2 className="text-2xl font-bold mb-4">Internship Listings</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-stretch">
+            {error ? (
+              <p className="text-red-600">{error}</p>
+            ) : internships.length === 0 ? (
+              <p className="text-gray-600">No internships available at the moment.</p>
+            ) : currentInterns.length === 0 ? (
+              <p className="alert alert-danger w-full col-span-full text-center">!! No Internships Found !!</p>
+            ) : (
+              currentInterns.map((intern) => (
+                <ApplicationCard key={intern.id} application={{ ...intern, total_views: intern.total_views }} />
+              ))
+            )}
+          </div>
+          <Pagination
+            currentPage={currentInternPage}
+            totalItems={filteredInterns.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={handleInternPageChange}
+          />
         </div>
       </div>
     </div>

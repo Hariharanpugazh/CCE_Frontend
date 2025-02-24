@@ -11,6 +11,7 @@ export default function AppliedJobs() {
   const [savedJobs, setSavedJobs] = useState([]);
   const [filteredJobs, setFilteredJobs] = useState([]);
   const [filter, setFilter] = useState("All");
+  const [searchPhrase, setSearchPhrase] = useState("");
   const [error, setError] = useState("");
   const [userRole, setUserRole] = useState(null);
 
@@ -101,17 +102,44 @@ export default function AppliedJobs() {
     setFilter(status);
   };
 
+  useEffect(() => {
+    console.log("Filtering jobs with search phrase:", searchPhrase);
+    const filtered = appliedJobs.filter(job => {
+      const jobTitle = job.title || job.job_data?.title; // Check both job and job_data for title
+      console.log("Checking job:", jobTitle);
+      return jobTitle?.toLowerCase().includes(searchPhrase.toLowerCase());
+    });
+    console.log("Filtered Jobs:", filtered); // Log filtered jobs for debugging
+    setFilteredJobs(filtered);
+  }, [searchPhrase, appliedJobs]);
+
   return (
     <div className="flex flex-col">
       {userRole === "student" && <StudentPageNavbar />}
-      <PageHeader
-        page={AppPages.jobDashboard}
-        filter={filter}
-        setFilter={setFilter}
-      />
+
+      <header className="flex flex-col items-center justify-center py-14 container self-center">
+        <p className="text-6xl tracking-[0.8px]">Applied Jobs</p>
+        <p className="text-lg mt-2 text-center">
+          Explore all the job opportunities in all the existing fields <br />around the globe.
+        </p>
+      </header>
+
+      {/* Search */}
+      <div className="flex items-stretch w-[90%] self-center mb-4">
+        <input
+          type="text"
+          value={searchPhrase}
+          onChange={(e) => setSearchPhrase(e.target.value)}
+          placeholder="Search Jobs"
+          className="w-full text-lg p-2 px-4 rounded-tl rounded-bl bg-white border border-r-[0px] hover:border-gray-400 outline-none"
+        />
+        <button className="px-5 bg-yellow-400 rounded-tr rounded-br border">
+          {" "}Search{" "}
+        </button>
+      </div>
 
       {/* Status-based filters */}
-      <div className="flex text-sm gap-4 w-[80%] self-center mb-2 px-1">
+      <div className="flex text-sm gap-2 w-[90%] self-center mb-1 px-1">
         {["All"].map((status) => (
           <button
             key={status}
@@ -128,7 +156,7 @@ export default function AppliedJobs() {
       </div>
 
       {/* Job cards */}
-      <div className="w-[80%] self-center mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 justify-stretch">
+      <div className="w-[90%] self-center mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 justify-stretch">
         {error ? (
           <p className="text-red-600">{error}</p>
         ) : appliedJobs.length === 0 ? (

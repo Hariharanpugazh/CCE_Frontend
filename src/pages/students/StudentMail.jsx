@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
-import { motion } from "framer-motion";  // Import Framer Motion
-import { FaEnvelope, FaForward, FaReply } from "react-icons/fa";
+import { motion } from "framer-motion";
+import { FaCheckDouble, FaCheck } from "react-icons/fa";
+import { Inbox } from "lucide-react";
 import StudentPageNavbar from "../../components/Students/StudentPageNavbar";
 
 const StudentMail = () => {
   const [messages, setMessages] = useState([]);
   const [error, setError] = useState(null);
+  const [newMessage, setNewMessage] = useState("");
+  const [status, setStatus] = useState(null);
+  const [studentId, setStudentId] = useState(null);
 
   useEffect(() => {
     const token = Cookies.get("jwt");
@@ -18,33 +22,98 @@ const StudentMail = () => {
 
     try {
       const decodedToken = jwtDecode(token);
-      const studentId = decodedToken.student_user;
-
-      if (!studentId) {
-        setError("Invalid token. No student ID found.");
-        return;
-      }
-
-      fetch(`https://cce-backend-54k0.onrender.com/api/get_student_messages/`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          setMessages(data.messages || []);
-        })
-        .catch((err) => {
-          console.error("Error fetching messages:", err);
-          setError("Failed to load messages.");
-        });
-    } catch (err) {
+      const extractedStudentId = decodedToken.student_user;
+      setStudentId(extractedStudentId); // Extract and set student ID
+      fetchMessages(extractedStudentId); // Fetch messages using student ID
+      markMessagesAsSeenByStudent(extractedStudentId); // Mark messages as seen
+    } catch (error) {
       setError("Invalid token format.");
     }
   }, []);
+
+  const fetchMessages = async (student_id) => {
+    try {
+      const response = await fetch(`https://cce-backend-54k0.onrender.com/api/get_student_messages/${student_id}/`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${Cookies.get("jwt")}`,
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      const data = await response.json();
+      setMessages(data.messages || []);
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+      setError("Failed to load messages.");
+    }
+  };
+
+  const markMessagesAsSeenByStudent = async (student_id) => {
+    try {
+      const response = await fetch(`https://cce-backend-54k0.onrender.com/api/mark_messages_as_seen_by_student/${student_id}/`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${Cookies.get("jwt")}`,
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        console.log("Messages marked as seen by student.");
+        fetchMessages(student_id); // Refresh messages to reflect the status change
+      } else {
+        console.error("Failed to mark messages as seen by student.");
+      }
+    } catch (error) {
+      console.error("Error marking messages as seen by student:", error);
+    }
+  };
+
+  const sendMessage = async () => {
+    if (!studentId) {
+      setStatus("Student ID not found.");
+      return;
+    }
+
+    const messageData = {
+      student_id: studentId,
+      content: newMessage,
+    };
+
+    try {
+      const response = await fetch("https://cce-backend-54k0.onrender.com/api/student_send_message/", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${Cookies.get("jwt")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(messageData),
+      });
+
+      if (response.ok) {
+        setStatus("Message sent successfully!");
+        setNewMessage(""); // Clear input field
+        fetchMessages(studentId); // Refresh chat
+      } else {
+        setStatus("Failed to send message.");
+      }
+    } catch (error) {
+      setStatus("Error sending message.");
+    }
+  };
+
+  const formatDate = (timestamp) => {
+    const today = new Date();
+    const messageDate = new Date(timestamp);
+    const diff = today.getDate() - messageDate.getDate();
+
+    if (diff === 0) return "Today";
+    if (diff === 1) return "Yesterday";
+    return messageDate.toLocaleDateString();
+  };
 
   return (
     <motion.div
@@ -52,9 +121,10 @@ const StudentMail = () => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
+      className="flex flex-col h-screen"
     >
       <StudentPageNavbar />
-      <section className="max-w-7xl mx-auto mt-10 p-6 bg-gray-50 rounded-lg shadow-md">
+      <section className="flex-1 flex flex-col p-6 w-4/5 mx-auto mt-4 rounded-lg shadow-lg overflow-y-auto custom-scrollbar">
         {/* Header Section */}
         <motion.div
           initial={{ y: -50, opacity: 0 }}
@@ -63,78 +133,123 @@ const StudentMail = () => {
           className="flex justify-between items-center mb-6"
         >
           <h2 className="text-3xl font-semibold text-gray-800 flex items-center">
-            <FaEnvelope className="mr-3 text-pink-600" />
-            Student Inbox
+            <Inbox className="mr-2" />
+            Inbox
           </h2>
         </motion.div>
 
         {/* Message Section */}
-        {error ? (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-red-500"
-          >
-            {error}
-          </motion.p>
-        ) : messages.length > 0 ? (
-          <div className="bg-white shadow-lg rounded-lg">
-            {messages.map((message, index) => (
-              <motion.div
-                key={index}
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: index * 0.1 }}
-                className="p-5 border-b last:border-none hover:bg-gray-100 transition duration-300 rounded-lg"
-              >
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-bold text-gray-800">
-                    From: Admin <br />
-                    <span className="text-sm font-medium text-gray-600">
-                      To: {window.localStorage.getItem("student.email")}
-                    </span>
-                  </h3>
-                  <p className="text-xs text-gray-500 italic">
-                    {new Date(message.timestamp).toLocaleString()}
-                  </p>
-                </div>
+        <div className="flex-1 overflow-y-auto space-y-4">
+          {error ? (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-red-500 text-center"
+            >
+              {error}
+            </motion.p>
+          ) : messages.length > 0 ? (
+            messages.map((message, index) => {
+              const dateLabel = formatDate(message.timestamp);
+              const shouldShowDate =
+                index === 0 || formatDate(messages[index - 1].timestamp) !== dateLabel;
 
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  className="mt-4 p-4 bg-blue-50 rounded-lg"
-                >
-                  <h4 className="text-md font-semibold text-blue-700 flex items-center">
-                    <FaForward className="mr-2" />
-                    Your message:
-                  </h4>
-                  <p className="text-gray-700 mt-2">{message.message}</p>
-                </motion.div>
+              return (
+                <React.Fragment key={index}>
+                  {shouldShowDate && (
+                    <div className="text-center text-gray-500 mb-2">
+                      {dateLabel}
+                    </div>
+                  )}
+                  <div className="flex items-start mb-4">
+                    <div
+                      className={`flex flex-col ${
+                        message.sender === "student" ? "items-end ml-auto" : "items-start mr-auto"
+                      }`}
+                    >
+                      <div
+                        className={`flex items-start ${
+                          message.sender === "student" ? "justify-end" : "justify-start"
+                        }`}
+                      >
+                        {message.sender !== "student" && (
+                          <div
+                            className={`w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-lg text-gray-700 mr-2`}
+                          >
+                            A
+                          </div>
+                        )}
+                        <motion.div
+                          initial={{ y: 20, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          transition={{ delay: index * 0.1 }}
+                          className={`p-3 rounded-lg w-xs ${
+                            message.sender === "student" ? "bg-blue-500 text-white" : "bg-gray-200"
+                          }`}
+                        >
+                          <p className="text-sm">{message.content}</p>
+                          <div className="flex justify-end items-center mt-1 text-xs">
+                            {message.sender === "student" && (
+                              <>
+                                <span className="mr-1 text-white">
+                                  {new Date(message.timestamp).toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  })}
+                                </span>
+                                {message.status === "seen" ? <FaCheckDouble /> : <FaCheck />}
+                              </>
+                            )}
+                            {message.sender !== "student" && (
+                              <span className="text-gray-500">
+                                {new Date(message.timestamp).toLocaleTimeString([], {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </span>
+                            )}
+                          </div>
+                        </motion.div>
+                        {message.sender === "student" && (
+                          <div
+                            className={`w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center text-lg ml-2`}
+                          >
+                            S
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </React.Fragment>
+              );
+            })
+          ) : (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center text-gray-500 italic"
+            >
+              No messages found.
+            </motion.p>
+          )}
+        </div>
 
-                {/* Reply Section */}
-                {message.reply_message && (
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    className="mt-4 p-4 bg-green-50 rounded-lg"
-                  >
-                    <h4 className="text-md font-semibold text-green-700 flex items-center">
-                      <FaReply className="mr-2" />
-                      Reply to you:
-                    </h4>
-                    <p className="text-green-700 mt-2">{message.reply_message}</p>
-                  </motion.div>
-                )}
-              </motion.div>
-            ))}
-          </div>
-        ) : (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center text-gray-500 italic"
+        {/* Input Section */}
+        <div className="flex items-center mt-4">
+          <input
+            type="text"
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="Type a message"
+            className="flex-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+          />
+          <button
+            onClick={sendMessage}
+            className="ml-2 p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300 shadow-sm"
           >
-            No messages found.
-          </motion.p>
-        )}
+            Send
+          </button>
+        </div>
       </section>
     </motion.div>
   );

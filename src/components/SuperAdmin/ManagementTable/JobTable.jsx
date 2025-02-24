@@ -1,17 +1,25 @@
 import React from "react";
 import { IoMdCheckmark } from "react-icons/io";
 import { FaXmark } from "react-icons/fa6";
-import { FaEye } from "react-icons/fa";
+import { FaCheck, FaEye } from "react-icons/fa";
 import { FaTrashAlt } from "react-icons/fa";
 import Pagination from "../../../components/Admin/pagination";
+import backIcon from '../../../assets/icons/back-icon.svg';
+import nextIcon from '../../../assets/icons/next-icon.svg';
+import { formatDate } from "date-fns";
 
 const JobTable = ({
   jobs,
+  toggleAutoApproval,
+  autoApproval,
   selectedJobs,
+  setVisibleSection,
   setSelectedJobs,
   handleAction,
   handleDelete,
   handleView,
+  handleBulkApprove, // Ensure this prop is received
+  handleBulkDelete, // Ensure this prop is received
   currentPage,
   itemsPerPage,
   handlePageChange,
@@ -21,52 +29,83 @@ const JobTable = ({
     return items.slice(startIndex, startIndex + itemsPerPage);
   };
 
+  const handleSelectAll = () => {
+    if (selectedJobs.length === jobs.length) {
+      setSelectedJobs([]);
+    } else {
+      setSelectedJobs(jobs.map((job) => job._id));
+    }
+  };
+
   return (
-    <div id="jobs-section" className="mt-4">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Job Approvals</h2>
-        <div className="flex items-center space-x-4">
+    <div id="jobs-section" className="mt-4 w-full flex-col">
+      <div className="flex justify-between items-center mb-6 w-full">
+        <div className="flex rounded-lg border border-gray-300 items-center">
+          <button className="p-2 border-r border-gray-300 opacity-50 rounded-l-lg" disabled> <img src={backIcon} alt="" className="w-5" /> </button>
+          <p className="px-3"> Job Approvals </p>
+          <button className="p-2 border-l border-gray-300 hover:bg-gray-50 cursor-pointer rounded-r-lg" onClick={() => setVisibleSection("internships")}> <img src={nextIcon} alt="" className="w-5" /> </button>
+        </div>
+        <div className="flex items-stretch space-x-4">
+
+          {/* auto approve */}
+          <div className="flex items-center space-x-2 p-2 rounded-md border border-gray-300">
+            <span className="text-gray-700 px-2">Auto-Approval</span>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={autoApproval}
+                onChange={toggleAutoApproval}
+                className="sr-only peer"
+              />
+              <div className="w-9 h-5 bg-gray-200 rounded-full peer-checked:bg-green-500 transition-colors"></div>
+              <span
+                className={`absolute left-1 top-1 h-3 w-3 bg-white rounded-full transition-transform ${autoApproval ? "translate-x-4" : ""
+                  }`}
+              ></span>
+            </label>
+          </div>
+
           <button
-            className="px-3 py-1 bg-green-500 text-white rounded"
-            onClick={() => handleBulkApprove("job")}
+            className="px-5 py-1 bg-[#00b69b] text-white rounded text-sm flex items-center space-x-2"
+            onClick={() => handleBulkApprove("job")} // Use the prop here
           >
-            Approve all
+            <p> Approve all </p>
+            <FaCheck />
           </button>
           <button
-            className="px-3 py-1 bg-red-500 text-white rounded"
-            onClick={() => handleBulkDelete("job")}
+            className="px-5 py-1 bg-[#ef3826] text-white rounded text-sm flex items-center space-x-2"
+            onClick={() => handleBulkDelete("job")} // Use the prop here
           >
-            Delete all
+            <p> Delete all </p>
+            <FaTrashAlt />
           </button>
-          <input
-            type="checkbox"
-            checked={selectedJobs.length === jobs.length}
-            onChange={() => handleSelectAll("job")}
-            className="form-checkbox h-5 w-5 text-blue-600"
-          />
-          <span className="ml-2">Select All</span>
         </div>
       </div>
       {jobs.length === 0 ? (
-        <p className="text-gray-600">No jobs to review.</p>
+        <p className="text-gray-600 text-sm">No jobs to review.</p>
       ) : (
-        <div className="overflow-x-auto bg-white shadow-md rounded-lg">
-          <table className="min-w-full">
-            <thead className="bg-gray-50">
+        <div className="overflow-x-auto border border-gray-200 rounded-lg">
+          <table className="min-w-full text-sm">
+            <thead className="">
               <tr>
-                <th className="px-4 py-2 border-b border-gray-200">Select</th>
-                <th className="px-4 py-2 border-b border-gray-200">Title</th>
-                <th className="px-4 py-2 border-b border-gray-200">Company</th>
-                <th className="px-4 py-2 border-b border-gray-200">Staff Name</th>
-                <th className="px-4 py-2 border-b border-gray-200">Deadline</th>
-                <th className="px-4 py-2 border-b border-gray-200">Status</th>
-                <th className="px-4 py-2 border-b border-gray-200">Actions</th>
+                <th className="py-3 border-b border-gray-200 flex justify-center items-center"> <input
+                  type="checkbox"
+                  checked={selectedJobs.length === jobs.length}
+                  onChange={handleSelectAll}
+                  className="form-checkbox h-4 w-4 text-blue-600 mr-2"
+                /> Select</th>
+                <th className="py-3 border-b border-gray-200">Title</th>
+                <th className="py-3 border-b border-gray-200">Company</th>
+                <th className="py-3 border-b border-gray-200">Staff Name</th>
+                <th className="py-3 border-b border-gray-200">Deadline</th>
+                <th className="py-3 border-b border-gray-200">Status</th>
+                <th className="py-3 border-b border-gray-200">Actions</th>
               </tr>
             </thead>
             <tbody>
               {getCurrentItems(jobs).map((job) => (
-                <tr key={job._id} className="border-b border-gray-200 hover:bg-gray-100">
-                  <td className="px-4 py-2">
+                <tr key={job._id} className="border-b border-gray-200 hover:bg-gray-50 py-3">
+                  <td className="text-center px-2 py-1">
                     <input
                       type="checkbox"
                       checked={selectedJobs.includes(job._id)}
@@ -77,52 +116,52 @@ const JobTable = ({
                             : [...prev, job._id]
                         )
                       }
-                      className="form-checkbox h-5 w-5 text-blue-600"
+                      className="form-checkbox h-4 w-4 text-blue-600"
                     />
                   </td>
-                  <td className="px-4 py-2">{job.job_data.title}</td>
-                  <td className="px-4 py-2">{job.job_data.company_name}</td>
-                  <td className="px-4 py-2">{job.admin_name}</td>
-                  <td className="px-4 py-2">{job.job_data.application_deadline}</td>
-                  <td className="px-4 py-2 font-semibold">
+                  <td className="text-center py-3 py-1">{job.job_data.title}</td>
+                  <td className="text-center py-3 py-1">{job.job_data.company_name}</td>
+                  <td className="text-center py-3 py-1">{job.admin_name}</td>
+                  <td className="text-center py-3 py-1">{job.job_data.application_deadline}</td>
+                  <td className="text-center py-3 py-1 font-semibold">
                     {job.is_publish === true ? (
-                      <span className="bg-green-200 text-green-800 px-2 py-1 rounded-full">
+                      <span className="text-green-800 px-1 py-0.5 rounded-full text-xs">
                         Approved
                       </span>
                     ) : job.is_publish === false ? (
-                      <span className="bg-red-200 text-red-800 px-2 py-1 rounded-full">
+                      <span className="text-red-800 px-1 py-0.5 rounded-full text-xs">
                         Rejected
                       </span>
                     ) : (
-                      <span className="bg-yellow-200 text-yellow-800 px-2 py-1 rounded-full">
+                      <span className="text-yellow-800 px-1 py-0.5 rounded-full text-xs">
                         Pending
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-2">
-                    <div className="flex space-x-2">
+                  <td className="text-center py-3 py-1">
+                    <div className="flex justify-center space-x-1">
                       {job.is_publish === null && (
                         <>
                           <IoMdCheckmark
                             className="text-green-500 cursor-pointer"
-                            size={20}
+                            size={16}
                             onClick={() => handleAction(job._id, "approve", "job")}
                           />
                           <FaXmark
                             className="text-red-500 cursor-pointer"
-                            size={20}
+                            size={16}
                             onClick={() => handleAction(job._id, "reject", "job")}
                           />
                         </>
                       )}
                       <FaEye
                         className="text-blue-500 cursor-pointer"
-                        size={20}
+                        size={16}
                         onClick={() => handleView(job._id, "job")}
                       />
                       <FaTrashAlt
                         className="text-red-500 cursor-pointer"
-                        size={20}
+                        size={16}
                         onClick={() => handleDelete(job._id, "job")}
                       />
                     </div>
@@ -131,14 +170,15 @@ const JobTable = ({
               ))}
             </tbody>
           </table>
-          <Pagination
-            currentPage={currentPage}
-            totalItems={jobs.length}
-            itemsPerPage={itemsPerPage}
-            onPageChange={handlePageChange}
-          />
+
         </div>
       )}
+      <Pagination
+        currentPage={currentPage}
+        totalItems={jobs.length}
+        itemsPerPage={itemsPerPage}
+        onPageChange={handlePageChange}
+      />
     </div>
   );
 };

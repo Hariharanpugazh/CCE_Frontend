@@ -14,25 +14,26 @@ import { FiBookmark, FiCircle, FiSearch, FiX } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import Filters from "../../components/Common/Filters";
 import SidePreview from "../../components/Common/SidePreview";
+import Pagination from "../../components/Admin/pagination"; // Import Pagination component
 
 export default function JobDashboard() {
   const [jobs, setJobs] = useState([]);
-  const [filteredJobs, setFilteredJobs] = useState([])
+  const [filteredJobs, setFilteredJobs] = useState([]);
   const [error, setError] = useState("");
   const [searchPhrase, setSearchPhrase] = useState("");
   const [userRole, setUserRole] = useState(null);
 
-  const [selectedJob, setSelectedJob] = useState()
+  const [selectedJob, setSelectedJob] = useState();
 
-  const [isSalaryOpen, setIsSalaryOpen] = useState(false)
-  const [isExperienceOpen, setIsExperienceOpen] = useState(false)
-  const [isEmployTypeOpen, setIsEmployTypeOpen] = useState(false)
-  const [isWorkModeOpen, setIsWorkModeOpen] = useState(false)
-  const [isSortOpen, setIsSortOpen] = useState(false)
+  const [isSalaryOpen, setIsSalaryOpen] = useState(false);
+  const [isExperienceOpen, setIsExperienceOpen] = useState(false);
+  const [isEmployTypeOpen, setIsEmployTypeOpen] = useState(false);
+  const [isWorkModeOpen, setIsWorkModeOpen] = useState(false);
+  const [isSortOpen, setIsSortOpen] = useState(false);
 
-  const [savedJobs, setSavedJobs] = useState([])
+  const [savedJobs, setSavedJobs] = useState([]);
 
-  const [salaryRangeIndex, setSalaryRangeIndex] = useState(0)
+  const [salaryRangeIndex, setSalaryRangeIndex] = useState(0);
 
   const [filters, setFilters] = useState({
     salaryRange: { min: 10000, max: 1000000 },
@@ -40,91 +41,45 @@ export default function JobDashboard() {
     employmentType: {
       onSite: false,
       remote: false,
-      hybrid: false
+      hybrid: false,
     },
     workingMode: {
       online: false,
       offline: false,
-      hybrid: false
+      hybrid: false,
     },
     sortBy: "Relevance",
   });
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+
   useEffect(() => {
-    let filtered = jobs;
+    // Set filteredJobs to all jobs without any filtering
+    setFilteredJobs(jobs);
+  }, [jobs]);
 
-    // Filter by salary range
-    filtered = filtered.filter((job) => {
-      const salary = parseInt(job.job_data.salary_range.replace(/,/g, ""), 10); // Convert "50,000" → 50000
-      return salary >= filters.salaryRange.min && salary <= filters.salaryRange.max;
-    });
-
-    // Filter by experience level
-    if (filters.experience.value !== 0) {
-      filtered = filtered.filter((job) => {
-        const jobExperience = parseInt(job.job_data.experience_level, 10);
-        if (filters.experience.category === "under") {
-          return jobExperience < filters.experience.value;
-        } else {
-          return jobExperience >= filters.experience.value;
-        }
-      });
-    }
-
-    // Filter by employment type
-    const { onSite, remote, hybrid } = filters.employmentType;
-    if (onSite || remote || hybrid) {
-      filtered = filtered.filter((job) => {
-        const workType = job.job_data.selectedWorkType.toLowerCase();
-        return (
-          (onSite && workType.includes("on-site")) ||
-          (remote && workType.includes("remote")) ||
-          (hybrid && workType.includes("hybrid"))
-        );
-      });
-    }
-
-    // Filter by working mode
-    const { online, offline, } = filters.workingMode;
-    if (online || offline) {
-      filtered = filtered.filter((job) => {
-        const workMode = job.job_data.work_type.toLowerCase();
-        return (
-          (online && workMode.includes("online")) ||
-          (offline && workMode.includes("offline"))
-        );
-      });
-    }
-
-    // Sorting logic
-    if (filters.sortBy === "Experience") {
-      filtered.sort((a, b) => parseInt(a.job_data.experience_level, 10) - parseInt(b.job_data.experience_level, 10));
-    } else if (filters.sortBy === "Salary") {
-      filtered.sort((a, b) => parseInt(a.job_data.salary_range.replace(/,/g, ""), 10) - parseInt(b.job_data.salary_range.replace(/,/g, ""), 10));
-    } else if (filters.sortBy === "Latest") {
-      filtered.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
-    }
-
-    setFilteredJobs(filtered);
-  }, [filters]);
 
   useEffect(() => {
     if (searchPhrase === "") {
-      clearFilters()
-      setFilteredJobs(jobs)
+      clearFilters();
+      setFilteredJobs(jobs);
     } else {
-      setFilteredJobs(jobs.filter((job) => job.job_data.title.toLowerCase().includes(searchPhrase)
-        ||
-        job.job_data.company_name.toLowerCase().includes(searchPhrase)
-        ||
-        job.job_data.job_description.toLowerCase().includes(searchPhrase)
-        ||
-        job.job_data.required_skills.filter((skill) => skill.toLowerCase().includes(searchPhrase)).length > 0
-        ||
-        job.job_data.work_type.toLowerCase().includes(searchPhrase)
-      ))
+      setFilteredJobs(
+        jobs.filter(
+          (job) =>
+            job.job_data.title.toLowerCase().includes(searchPhrase) ||
+            job.job_data.company_name.toLowerCase().includes(searchPhrase) ||
+            job.job_data.job_description.toLowerCase().includes(searchPhrase) ||
+            job.job_data.required_skills.some((skill) => skill.toLowerCase().includes(searchPhrase)) ||
+            job.job_data.work_type.toLowerCase().includes(searchPhrase)
+        )
+      );
     }
+    
+    setCurrentPage(1);
   }, [searchPhrase, jobs]);
+  
 
   const navigate = useNavigate(); // Initialize useNavigate for navigation
 
@@ -137,7 +92,7 @@ export default function JobDashboard() {
           ...job,
           type: "job",
           status: job.status, // Add status field
-          updated_at: job.updated_at // // Add type field
+          updated_at: job.updated_at, // // Add type field
         }));
         setJobs(jobsWithType); // Set jobs with type
         setFilteredJobs(jobsWithType); // Update filtered jobs
@@ -164,8 +119,8 @@ export default function JobDashboard() {
       const token = Cookies.get("jwt");
       const userId = JSON.parse(atob(token.split(".")[1])).student_user;
       const response = await axios.get(`https://cce-backend-54k0.onrender.com/api/saved-jobs/${userId}/`);
-      setSavedJobs(response.data.jobs.map(job => job._id));
-      console.log(response.data.jobs.map(job => job._id))
+      setSavedJobs(response.data.jobs.map((job) => job._id));
+      console.log(response.data.jobs.map((job) => job._id));
     } catch (err) {
       console.error("Error fetching saved jobs:", err);
     }
@@ -182,16 +137,16 @@ export default function JobDashboard() {
       employmentType: {
         onSite: false,
         remote: false,
-        hybrid: false
+        hybrid: false,
       },
       workingMode: {
         online: false,
         offline: false,
-        hybrid: false
+        hybrid: false,
       },
       sortBy: "Relevance",
-    })
-  }
+    });
+  };
 
   const filterArgs = {
     searchPhrase,
@@ -210,62 +165,113 @@ export default function JobDashboard() {
     setIsWorkModeOpen,
     isSortOpen,
     setIsSortOpen,
-  }
+  };
 
-  const borderColor = "border-gray-300"
+  const borderColor = "border-gray-300";
+
+  // Corrected Pagination logic
+  const indexOfLastJob = currentPage * itemsPerPage;
+  const indexOfFirstJob = indexOfLastJob - itemsPerPage;
+  const currentJobs = filteredJobs.slice(indexOfFirstJob, indexOfLastJob);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      [name]: value,
+    }));
+  };
 
   return (
-    <div className="flex flex-col">
+    <div className="flex">
       {userRole === "admin" && <AdminPageNavbar />}
       {userRole === "superadmin" && <SuperAdminPageNavbar />}
-      {userRole === "student" && <StudentPageNavbar />}
-      <header className="flex flex-col items-center justify-center py-14 container self-center">
-        <p className="text-6xl tracking-[0.8px]">
-          Jobs
-        </p>
-        <p className="text-lg mt-2 text-center">
-          Explore all the job opportunities
-          in all the existing fields <br />around the globe.
-        </p>
-      </header>
+      <div className="flex flex-col flex-1">
+        {userRole === "student" && <StudentPageNavbar />}
+        <header className="flex flex-col items-center justify-center py-14 container self-center">
+          <p className="text-6xl tracking-[0.8px]">Jobs</p>
+          <p className="text-lg mt-2 text-center">
+            Explore all the job opportunities in all the existing fields <br />around the globe.
+          </p>
+        </header>
 
-      <div className="flex px-10 space-x-5 items-start">
-        {/* filters */}
-        <Filters args={filterArgs} />
-
-        {/* Job cards */}
-        <div className="flex-1 max-w-[80%] flex flex-col space-y-3">
-          {/* search */}
-          <div className="flex items-stretch">
-            <input type="text" value={searchPhrase} onChange={(e) => setSearchPhrase(e.target.value.toLocaleLowerCase())} placeholder={`Search Jobs`} className={`w-full text-lg p-2 px-4 rounded-tl rounded-bl bg-white border border-r-[0px] hover:border-gray-400 outline-none ${borderColor}`} />
-            <button className={`px-5 bg-yellow-400 rounded-tr rounded-br ${borderColor} border`}> Search </button>
+        {/* search */}
+        <div className="sticky ml-10 top-0 z-10 bg-white flex border border-gray-300 mr-11 mb-5">
+          <input
+            type="text"
+            value={searchPhrase}
+            onChange={(e) => setSearchPhrase(e.target.value.toLocaleLowerCase())}
+            placeholder={`Search Jobs`}
+            className={`w-full text-lg p-2 px-4 bg-white hover:border-gray-400 outline-none ${borderColor}`}
+          />
+          <div className="flex mr-5 justify-center items-center space-x-4">
+            <select name="salaryRange" onChange={handleFilterChange} className="p-2 border-l border-gray-300">
+              <option value="">Salary</option>
+              <option value="10000-50000">10k-50k</option>
+              <option value="50000-100000">50k-100k</option>
+            </select>
+            <select name="experience" onChange={handleFilterChange} className="p-2 border-l border-gray-300">
+              <option value="">Experience</option>
+              <option value="0year-2year">0-2 years</option>
+              <option value="2year-5year">2-5 years</option>
+            </select>
+            <select name="employmentType" onChange={handleFilterChange} className="p-2 border-l border-gray-300">
+              <option value="">Employment Type</option>
+              <option value="Full-time">Full-Time</option>
+              <option value="Part-time">Part-Time</option>
+            </select>
           </div>
-
-          {/* jobs */}
-          <div className="w-full self-start grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-3">
-            {error ?
-              <p className="text-red-600">{error}</p>
-              : jobs.length === 0 ?
-                <p className="text-gray-600">No jobs available at the moment.</p>
-                :
-                filteredJobs.length === 0 ? <p className="alert alert-danger w-full col-span-full text-center">
-                  !! No Jobs Found !!
-                </p>
-                  :
-                  filteredJobs.map((job) => (
-                    <ApplicationCard application={{ ...job, ...job.job_data }} key={job._id} handleCardClick={() => { setSelectedJob(job); }} isSaved={userRole === "superadmin" || userRole === "admin" ? undefined : savedJobs.includes(job._id)} />
-                  ))
-            }
-          </div>
+          <button className={`px-13 bg-yellow-400 rounded-tr rounded-br ${borderColor} border`}> Search </button>
         </div>
 
-        {/* job preview */}
-        <SidePreview selectedItem={selectedJob}
-          handleViewItem={() => navigate(`/job-preview/${selectedJob._id}`)}
-          setSelectedItem={setSelectedJob}
-          isSaved={userRole === "superadmin" || userRole === "admin" ? undefined : savedJobs.includes(selectedJob?._id)}
-          fetchSavedJobs={fetchSavedJobs}
-        />
+        <div className="flex px-10 space-x-5 items-start">
+          {/* filters */}
+          {/* <Filters args={filterArgs} /> */}
+
+          {/* Job cards */}
+          <div className="flex-1 flex flex-col space-y-3">
+            {/* jobs */}
+            <div className="w-full self-start grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {error ? (
+                <p className="text-red-600">{error}</p>
+              ) : jobs.length === 0 ? (
+                <p className="text-gray-600">No jobs available at the moment.</p>
+              ) : currentJobs.length === 0 ? (
+                <p className="alert alert-danger w-full col-span-full text-center">!! No Jobs Found !!</p>
+              ) : (
+                currentJobs.map((job) => (
+                  <ApplicationCard
+                    application={{ ...job, ...job.job_data }}
+                    key={job._id}
+                    handleCardClick={() => {
+                      setSelectedJob(job);
+                    }}
+                    isSaved={userRole === "superadmin" || userRole === "admin" ? undefined : savedJobs.includes(job._id)}
+                  />
+                ))
+              )}
+            </div>
+            <Pagination
+              currentPage={currentPage}
+              totalItems={filteredJobs.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={handlePageChange}
+            />
+          </div>
+
+          {/* job preview */}
+          <SidePreview
+            selectedItem={selectedJob}
+            handleViewItem={() => navigate(`/job-preview/${selectedJob._id}`)}
+            setSelectedItem={setSelectedJob}
+            isSaved={userRole === "superadmin" || userRole === "admin" ? undefined : savedJobs.includes(selectedJob?._id)}
+            fetchSavedJobs={fetchSavedJobs}
+          />
+        </div>
       </div>
     </div>
   );

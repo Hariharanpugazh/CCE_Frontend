@@ -175,7 +175,7 @@ export default function SavedJobs() {
         )
       );
     }
-  }, [filter, savedJobs]);
+  }, [filter, savedJobs, currentSelected]);
 
   const handleStatusFilterChange = (status) => {
     setFilter(status);

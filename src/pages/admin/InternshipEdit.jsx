@@ -97,7 +97,7 @@ const InternshipEdit = () => {
     {/* Render appropriate navbar based on user role */}
     {userRole === "admin" && <AdminPageNavbar />}
     {userRole === "superadmin" && <SuperAdminPageNavbar />}
-        <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-8 my-10 border border-gray-200">
+        <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-8 my-10 ml-114 border border-gray-200">
             <div className="flex justify-between items-center mb-8">
                 <button
                     onClick={() => setIsEditing(!isEditing)}

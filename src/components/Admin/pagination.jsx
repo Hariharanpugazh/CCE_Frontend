@@ -1,93 +1,41 @@
-import React from 'react';
-
+import React from "react";
+import backIcon from '../../assets/icons/back-icon.svg';
+import nextIcon from '../../assets/icons/next-icon.svg';
 
 const Pagination = ({ currentPage, totalItems, itemsPerPage, onPageChange }) => {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
-  
-  // Calculate which page numbers to show
-  const getPageNumbers = () => {
-    const pageNumbers = [];
-    
-    if (totalPages <= 5) {
-      // Show all pages if 5 or fewer
-      for (let i = 1; i <= totalPages; i++) {
-        pageNumbers.push(i);
-      }
-    } else {
-      // Always show first page
-      pageNumbers.push(1);
+  const startItem = (currentPage - 1) * itemsPerPage + 1;
+  const endItem = Math.min(startItem + itemsPerPage - 1, totalItems);
 
-      if (currentPage <= 3) {
-        // Near the start
-        pageNumbers.push(2, 3, 4);
-        pageNumbers.push('ellipsis');
-        pageNumbers.push(totalPages);
-      } else if (currentPage >= totalPages - 2) {
-        // Near the end
-        pageNumbers.push('ellipsis');
-        pageNumbers.push(totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
-      } else {
-        // Middle
-        pageNumbers.push('ellipsis');
-        pageNumbers.push(currentPage - 1, currentPage, currentPage + 1);
-        pageNumbers.push('ellipsis');
-        pageNumbers.push(totalPages);
-      }
-    }
-    
-    return pageNumbers;
-  };
-  
   return (
-    <div className="flex justify-center my-4 items-center ">
-      <nav className="flex items-center space-x-1 select-none">
-        {/* Previous button */}
+    <div className="flex justify-between items-center mt-6">
+      {/* Displaying range info */}
+      <span className="text-gray-600 text-sm">
+        Showing {startItem.toString().padStart(2, "0")}-{endItem.toString().padStart(2, "0")} of {totalItems}
+      </span>
+
+      {/* Pagination buttons */}
+      <div className="flex items-center border border-gray-300 rounded-lg">
         <button
-          className="p-2 rounded-full hover:bg-gray-100 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none transition-colors"
+          className="p-1.5 px-3 border-r border-gray-300 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
           aria-label="Previous page"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-          </svg>
+          <img src={backIcon} alt="" className="w-4" />
         </button>
-        
-        {/* Page numbers */}
-        {getPageNumbers().map((page, index) => 
-          page === 'ellipsis' ? (
-            <span key={`ellipsis-${index}`} className="px-1">...</span>
-          ) : (
-            <button
-              key={page}
-              onClick={() => onPageChange(page)}
-              className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors focus:outline-none ${
-                currentPage === page
-                  ? "bg-yellow-400 font-bold text-black"
-                  : "hover:bg-gray-100 text-gray-700"
-              }`}
-            >
-              {page}
-            </button>
-          )
-        )}
 
-
-        {/* Next button */}
         <button
-          className="p-2 rounded-full hover:bg-gray-100 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none transition-colors"
+          className="p-1.5 px-3 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
           aria-label="Next page"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-          </svg>
+          <img src={nextIcon} alt="" className="w-4"/>
         </button>
-      </nav>
+      </div>
     </div>
   );
 };
-
 
 export default Pagination;

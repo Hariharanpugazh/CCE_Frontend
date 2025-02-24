@@ -68,7 +68,7 @@ const InternCard = ({ internship }) => {
 
     return (
         <div
-            className="flex flex-col p-3 border border-gray-200 rounded-lg justify-between cursor-pointer bg-[#FAF9F6]"
+            className="flex flex-col p-3 border border-gray-200 rounded-lg justify-between cursor-pointer bg-[#FAF9F6] "
             onClick={handleCardClick}
         >
             <div className="flex justify-between items-start">

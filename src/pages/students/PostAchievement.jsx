@@ -3,6 +3,8 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import StudentPageNavbar from "../../components/Students/StudentPageNavbar";
 
 export default function StudentAchievementPostForm() {
@@ -13,21 +15,20 @@ export default function StudentAchievementPostForm() {
     achievement_type: "",
     company_name: "",
     achievement_description: "",
-    batch:"",
+    batch: "",
     date_of_achievement: "",
     file: null, // Certificate/file
   });
 
   const [filePreview, setFilePreview] = useState(null);
   const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = Cookies.get("jwt");
     if (!token) {
-      setError("No token found. Please log in.");
+      toast.error("No token found. Please log in.");
       return;
     }
 
@@ -41,12 +42,10 @@ export default function StudentAchievementPostForm() {
           email: decodedToken.email || "",
         }));
       } else {
-        setError("You do not have permission to access this page.");
-        // Optionally, you can redirect the user to a different page
-        // navigate("/unauthorized");
+        toast.error("You do not have permission to access this page.");
       }
     } catch (err) {
-      setError("Invalid token.");
+      toast.error("Invalid token.");
     }
   }, [navigate]);
 
@@ -69,11 +68,48 @@ export default function StudentAchievementPostForm() {
     e.preventDefault();
     setLoading(true);
 
+    // Validation
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phonePattern = /^\d{10}$/;
+    const batchPattern = /^[a-zA-Z0-9\s]+$/;
+    const currentDate = new Date();
+    const selectedDate = new Date(formData.date_of_achievement);
+
+    if (!formData.name || !formData.email || !formData.phone_number || !formData.achievement_type || !formData.achievement_description || !formData.batch || !formData.date_of_achievement) {
+      toast.error("All fields are required.");
+      setLoading(false);
+      return;
+    }
+
+    if (!emailPattern.test(formData.email) || !formData.email.includes("@sns")) {
+      toast.error("Please enter a valid SNS domain email address.");
+      setLoading(false);
+      return;
+    }
+
+    if (!phonePattern.test(formData.phone_number)) {
+      toast.error("Phone number must be 10 digits.");
+      setLoading(false);
+      return;
+    }
+
+    if (!batchPattern.test(formData.batch)) {
+      toast.error("Batch should not contain special characters.");
+      setLoading(false);
+      return;
+    }
+
+    if (selectedDate > currentDate) {
+      toast.error("Date of achievement cannot be in the future.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const token = Cookies.get("jwt");
 
       if (!token) {
-        setError("No token found. Please log in.");
+        toast.error("No token found. Please log in.");
         setLoading(false);
         return;
       }
@@ -102,19 +138,13 @@ export default function StudentAchievementPostForm() {
         }
       );
 
-      setMessage(response.data.message);
-      setError("");
+      toast.success(response.data.message);
       setLoading(false);
     } catch (err) {
-      setError(err.response?.data?.error || "Something went wrong");
-      setMessage("");
+      toast.error(err.response?.data?.error || "Something went wrong");
       setLoading(false);
     }
   };
-
-  if (error) {
-    return <div className="text-red-600">{error}</div>;
-  }
 
   return (
     <div className="max-w-1xl mx-auto p-6 bg-white shadow-lg rounded-lg">
@@ -265,6 +295,9 @@ export default function StudentAchievementPostForm() {
           {loading ? "Submitting..." : "Submit Achievement"}
         </button>
       </form>
+
+      {/* Toast Container */}
+      <ToastContainer />
     </div>
   );
 }

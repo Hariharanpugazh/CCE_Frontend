@@ -20,6 +20,7 @@ export default function AdminLogin() {
     const [isResetPassword, setIsResetPassword] = useState(false);
     const [isLocked, setIsLocked] = useState(false);
     const [lockoutTime, setLockoutTime] = useState(0);
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
     // Clear cookies when entering the login page
@@ -43,6 +44,8 @@ export default function AdminLogin() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (isLocked) return;
+    
+        setIsLoading(true);
     
         try {
             const response = await fetch("https://cce-backend-54k0.onrender.com/api/login/", {
@@ -70,12 +73,14 @@ export default function AdminLogin() {
                     setLockoutTime(120); // ⏳ 5-minute lockout
                 }
                 toast.error(data.error || "Login failed");
+                setIsLoading(false); // Ensure loading state is stopped
             }
         } catch (error) {
             console.error("Error during login:", error);
             toast.error("Something went wrong. Please try again.");
+            setIsLoading(false); // Ensure loading state is stopped
         }
-    };
+    };    
     
 
     const handleForgotPassword = () => {
@@ -207,6 +212,7 @@ export default function AdminLogin() {
                 onResetPassword={handleResetPassword}
                 isLocked={isLocked}
                 lockoutTime={lockoutTime}
+                isLoading={isLoading}
             />
             <ToastContainer position="top-right" autoClose={3000} />
         </>

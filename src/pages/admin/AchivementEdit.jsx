@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import AdminPageNavbar from '../../components/Admin/AdminNavBar';
+import SuperAdminPageNavbar from "../../components/SuperAdmin/SuperAdminNavBar";
 
 export default function AchievementEdit() {
   const { id } = useParams();
@@ -14,6 +15,7 @@ export default function AchievementEdit() {
   const [newImage, setNewImage] = useState(null);
   const token = Cookies.get("jwt");
   const navigate = useNavigate();
+  const [userRole, setUserRole] = useState(null);
 
   useEffect(() => {
     const fetchAchievement = async () => {
@@ -78,6 +80,15 @@ export default function AchievementEdit() {
       photo: null, // Remove existing image from backend
     }));
   };
+
+      useEffect(() => {
+          const token = Cookies.get("jwt");
+          if (token) {
+              const payload = JSON.parse(atob(token.split(".")[1])); // Decode JWT payload
+              console.log("Decoded JWT Payload:", payload); // Debugging line
+              setUserRole(payload.role); // Assuming the payload has a 'role' field
+          }
+      }, []);
 
   const handleSave = async () => {
     try {
@@ -146,12 +157,20 @@ export default function AchievementEdit() {
         }
   
         alert("Achievement deleted successfully!");
-        navigate('/superadmin-manage-jobs'); // Redirect after deletion
+  
+        // Navigate based on user role
+        if (userRole === "admin") {
+          navigate('/manage-jobs');
+        } else if (userRole === "superadmin") {
+          navigate('/superadmin-manage-jobs');
+        }
+        
       } catch (error) {
         setError(error.message);
       }
     }
-  };  
+  };
+    
 
   if (loading) {
     return <div className="text-center text-gray-500">Loading...</div>;
@@ -162,122 +181,126 @@ export default function AchievementEdit() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
-      <AdminPageNavbar />
-      <div className="flex-1 p-6">
-        <h2 className="text-2xl font-semibold mb-4 text-gray-700">Edit Achievement</h2>
-        {achievement && (
-          <div className="bg-white shadow-md rounded-md p-6">
-            <div className="flex justify-between items-center mb-4">
-              <button
-                onClick={() => setIsEditing(!isEditing)}
-                className="bg-blue-600 text-white px-4 py-2 rounded"
-              >
-                {isEditing ? "Cancel" : "Edit"}
-              </button>
-              {isEditing && (
+    <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-8 my-10 ml-114 border border-gray-200">
+      {/* <div className="flex flex-col min-h-screen bg-gray-100"> */}
+      {userRole === "admin" && <AdminPageNavbar />}
+      {userRole === "superadmin" && <SuperAdminPageNavbar />}
+        <div className="flex-1 p-6">
+          <h2 className="text-2xl font-semibold mb-4 text-gray-700">Edit Achievement</h2>
+          {achievement && (
+            <div className="bg-white shadow-md rounded-md p-6">
+              <div className="flex justify-between items-center mb-4">
                 <button
-                  onClick={handleSave}
-                  className="bg-green-600 text-white px-4 py-2 rounded ml-2"
+                  onClick={() => setIsEditing(!isEditing)}
+                  className="bg-blue-600 text-white px-4 py-2 rounded"
                 >
-                  Save
+                  {isEditing ? "Cancel" : "Edit"}
                 </button>
-              )}
-              <button
-                onClick={handleDelete}
-                className="bg-red-600 text-white px-4 py-2 rounded ml-2"
-              >
-                Delete
-              </button>
-            </div>
-            <form>
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">Name</label>
-                <input type="text" name="name" value={editedAchievement.name} onChange={handleChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">Achievement Type</label>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    name="achievement_type"
-                    value={editedAchievement.achievement_type}
-                    onChange={handleChange}
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  />
-                ) : (
-                  <p>{achievement.achievement_type}</p>
-                )}
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">Company Name</label>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    name="company_name"
-                    value={editedAchievement.company_name}
-                    onChange={handleChange}
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  />
-                ) : (
-                  <p>{achievement.company_name}</p>
-                )}
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">Date of Achievement</label>
-                {isEditing ? (
-                  <input
-                    type="date"
-                    name="date_of_achievement"
-                    value={editedAchievement.date_of_achievement}
-                    onChange={handleChange}
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  />
-                ) : (
-                  <p>{achievement.date_of_achievement}</p>
-                )}
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">Batch</label>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    name="batch"
-                    value={editedAchievement.batch}
-                    onChange={handleChange}
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  />
-                ) : (
-                  <p>{achievement.batch}</p>
-                )}
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">Achievement Description</label>
-                <textarea name="achievement_description" value={editedAchievement.achievement_description} onChange={handleChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">Upload New Image</label>
-                {imagePreview && (
-                  <div className="mb-2">
-                    <img src={imagePreview} alt="Achievement Preview" className="w-32 h-32 object-cover rounded-md" />
-                    {isEditing && (
-                      <button onClick={handleRemoveImage} className="bg-red-500 text-white px-2 py-1 rounded mt-2">Remove Image</button>
-                    )}
-                  </div>
-                )}
                 {isEditing && (
-                  <input type="file" accept="image/*" onChange={handleImageChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+                  <button
+                    onClick={handleSave}
+                    className="bg-green-600 text-white px-4 py-2 rounded ml-2"
+                  >
+                    Save
+                  </button>
                 )}
+                <button
+                  onClick={handleDelete}
+                  className="bg-red-600 text-white px-4 py-2 rounded ml-2"
+                >
+                  Delete
+                </button>
               </div>
-            </form>
-          </div>
-        )}
-      </div>
+              <form>
+                <div className="mb-4">
+                  <label className="block text-gray-700 text-sm font-bold mb-2">Name</label>
+                  <input type="text" name="name" value={editedAchievement.name} onChange={handleChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+                </div>
+                <div className="mb-4">
+                  <label className="block text-gray-700 text-sm font-bold mb-2">Achievement Type</label>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      name="achievement_type"
+                      value={editedAchievement.achievement_type}
+                      onChange={handleChange}
+                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    />
+                  ) : (
+                    <p>{achievement.achievement_type}</p>
+                  )}
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-gray-700 text-sm font-bold mb-2">Company Name</label>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      name="company_name"
+                      value={editedAchievement.company_name}
+                      onChange={handleChange}
+                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    />
+                  ) : (
+                    <p>{achievement.company_name}</p>
+                  )}
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-gray-700 text-sm font-bold mb-2">Date of Achievement</label>
+                  {isEditing ? (
+                    <input
+                      type="date"
+                      name="date_of_achievement"
+                      value={editedAchievement.date_of_achievement}
+                      onChange={handleChange}
+                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    />
+                  ) : (
+                    <p>{achievement.date_of_achievement}</p>
+                  )}
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-gray-700 text-sm font-bold mb-2">Batch</label>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      name="batch"
+                      value={editedAchievement.batch}
+                      onChange={handleChange}
+                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    />
+                  ) : (
+                    <p>{achievement.batch}</p>
+                  )}
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-gray-700 text-sm font-bold mb-2">Achievement Description</label>
+                  <textarea name="achievement_description" value={editedAchievement.achievement_description} onChange={handleChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-gray-700 text-sm font-bold mb-2">Upload New Image</label>
+                  {imagePreview && (
+                    <div className="mb-2">
+                      <img src={imagePreview} alt="Achievement Preview" className="w-32 h-32 object-cover rounded-md" />
+                      {isEditing && (
+                        <button onClick={handleRemoveImage} className="bg-red-500 text-white px-2 py-1 rounded mt-2">Remove Image</button>
+                      )}
+                    </div>
+                  )}
+                  {isEditing && (
+                    <input type="file" accept="image/*" onChange={handleImageChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+                  )}
+                </div>
+              </form>
+            </div>
+          )}
+        </div>
+      {/* </div> */}
     </div>
+
   );
 }

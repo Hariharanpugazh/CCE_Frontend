@@ -1,20 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import SuperAdminPageNavbar from "../../components/SuperAdmin/SuperAdminNavBar";
-import { FaEye } from "react-icons/fa";
-import { FaTrashAlt } from "react-icons/fa";
 import JobTable from "../../components/SuperAdmin/ManagementTable/JobTable";
 import AchievementTable from "../../components/SuperAdmin/ManagementTable/AchievementTable";
 import InternshipTable from "../../components/SuperAdmin/ManagementTable/InternshipTable";
+import { LoaderContext } from "../../components/Common/Loader"; // Import Loader Context
+import { toast, ToastContainer } from "react-toastify";
 
 export default function MailPage() {
   const [jobs, setJobs] = useState([]);
   const [achievements, setAchievements] = useState([]);
   const [internships, setInternships] = useState([]);
-  const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
   const [selectedJobs, setSelectedJobs] = useState([]);
   const [selectedAchievements, setSelectedAchievements] = useState([]);
   const [selectedInternships, setSelectedInternships] = useState([]);
@@ -25,9 +23,10 @@ export default function MailPage() {
   const [rejectedItemType, setRejectedItemType] = useState(null);
   const [visibleSection, setVisibleSection] = useState("jobs");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 8;
   const navigate = useNavigate();
   const token = Cookies.get("jwt"); // Retrieve JWT from cookies
+  const { isLoading, setIsLoading } = useContext(LoaderContext); // Use Loader Context
 
   // Decode JWT to check user role
   useEffect(() => {
@@ -50,6 +49,7 @@ export default function MailPage() {
   // Fetch jobs, achievements, and internships from backend
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true); // Show loader when fetching data
       try {
         const config = {
           headers: {
@@ -68,12 +68,14 @@ export default function MailPage() {
         setInternships(internshipsRes.data.internships);
       } catch (err) {
         console.error("Error fetching data:", err);
-        setError("Failed to load data.");
+        toast.error("Failed to load data.");
+      } finally {
+        setIsLoading(false); // Hide loader after data fetch
       }
     };
 
     fetchData();
-  }, [token]);
+  }, [token, setIsLoading]);
 
   // Fetch auto-approval status
   useEffect(() => {
@@ -123,8 +125,8 @@ export default function MailPage() {
         type === "job"
           ? `https://cce-backend-54k0.onrender.com/api/review-job/${id}/`
           : type === "achievement"
-          ? `https://cce-backend-54k0.onrender.com/api/review-achievement/${id}/`
-          : `https://cce-backend-54k0.onrender.com/api/review-internship/${id}/`;
+            ? `https://cce-backend-54k0.onrender.com/api/review-achievement/${id}/`
+            : `https://cce-backend-54k0.onrender.com/api/review-internship/${id}/`;
 
       const response = await axios.post(
         endpoint,
@@ -136,7 +138,7 @@ export default function MailPage() {
           },
         }
       );
-      setMessage(response.data.message);
+      toast.success(response.data.message);
 
       if (type === "job") {
         setJobs((prev) =>
@@ -163,7 +165,7 @@ export default function MailPage() {
       }
     } catch (err) {
       console.error(`Error updating ${type}:`, err);
-      setError(`Failed to update ${type} status.`);
+      toast.error(`Failed to update ${type} status.`);
     }
   };
 
@@ -174,15 +176,15 @@ export default function MailPage() {
         type === "job"
           ? `https://cce-backend-54k0.onrender.com/api/job-delete/${id}/`
           : type === "achievement"
-          ? `https://cce-backend-54k0.onrender.com/api/delete-achievement/${id}/`
-          : `https://cce-backend-54k0.onrender.com/api/internship-delete/${id}/`;
+            ? `https://cce-backend-54k0.onrender.com/api/delete-achievement/${id}/`
+            : `https://cce-backend-54k0.onrender.com/api/internship-delete/${id}/`;
 
       const response = await axios.delete(endpoint, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      setMessage(response.data.message);
+      toast.success(response.data.message);
 
       if (type === "job") {
         setJobs((prev) => prev.filter((job) => job._id !== id));
@@ -193,7 +195,7 @@ export default function MailPage() {
       }
     } catch (err) {
       console.error(`Error deleting ${type}:`, err);
-      setError(`Failed to delete ${type}.`);
+      toast.error(`Failed to delete ${type}.`);
     }
   };
 
@@ -208,60 +210,74 @@ export default function MailPage() {
     }
   };
 
-  // Handle Select All action
+  // Handle Select All action with debugging logs
   const handleSelectAll = (type) => {
+    console.log(`Select all clicked for ${type}`);
     if (type === "job") {
-      setSelectedJobs((prev) => (prev.length === jobs.length ? [] : jobs.map((job) => job._id)));
+      setSelectedJobs((prev) => {
+        const newSelected = prev.length === jobs.length ? [] : jobs.map((job) => job._id);
+        console.log(`Selected jobs: ${newSelected}`);
+        return newSelected;
+      });
     } else if (type === "achievement") {
-      setSelectedAchievements((prev) =>
-        prev.length === achievements.length ? [] : achievements.map((achievement) => achievement._id)
-      );
+      setSelectedAchievements((prev) => {
+        const newSelected = prev.length === achievements.length ? [] : achievements.map((achievement) => achievement._id);
+        console.log(`Selected achievements: ${newSelected}`);
+        return newSelected;
+      });
     } else {
-      setSelectedInternships((prev) =>
-        prev.length === internships.length ? [] : internships.map((internship) => internship._id)
-      );
+      setSelectedInternships((prev) => {
+        const newSelected = prev.length === internships.length ? [] : internships.map((internship) => internship._id);
+        console.log(`Selected internships: ${newSelected}`);
+        return newSelected;
+      });
     }
   };
 
-  // Handle Bulk Approve action
+  // Handle Bulk Approve action with debugging logs
   const handleBulkApprove = async (type) => {
     const ids =
       type === "job"
         ? selectedJobs
         : type === "achievement"
-        ? selectedAchievements
-        : selectedInternships;
+          ? selectedAchievements
+          : selectedInternships;
+
+    console.log(`Bulk approve clicked for ${type} with IDs:`, ids);
 
     try {
       const promises = ids.map((id) => handleAction(id, "approve", type));
       await Promise.all(promises);
-      setMessage(`All selected ${type}s have been approved.`);
+      toast.success(`All selected ${type}s have been approved.`);
     } catch (err) {
       console.error(`Error bulk approving ${type}s:`, err);
-      setError(`Failed to bulk approve ${type}s.`);
+      toast.error(`Failed to bulk approve ${type}s.`);
     }
   };
 
-  // Handle Bulk Delete action
+  // Handle Bulk Delete action with debugging logs
   const handleBulkDelete = async (type) => {
     const ids =
       type === "job"
         ? selectedJobs
         : type === "achievement"
-        ? selectedAchievements
-        : selectedInternships;
+          ? selectedAchievements
+          : selectedInternships;
+
+    console.log(`Bulk delete clicked for ${type} with IDs:`, ids);
 
     if (window.confirm(`Are you sure you want to delete all selected ${type}s?`)) {
       try {
         const promises = ids.map((id) => handleDelete(id, type));
         await Promise.all(promises);
-        setMessage(`All selected ${type}s have been deleted.`);
+        toast.success(`All selected ${type}s have been deleted.`);
       } catch (err) {
         console.error(`Error bulk deleting ${type}s:`, err);
-        setError(`Failed to bulk delete ${type}s.`);
+        toast.error(`Failed to bulk delete ${type}s.`);
       }
     }
   };
+
 
   // Handle Feedback Submission
   const handleFeedbackSubmit = async () => {
@@ -280,7 +296,7 @@ export default function MailPage() {
           },
         }
       );
-      setMessage(response.data.message);
+      toast.success(response.data.message);
       setShowModal(false);
       setFeedback("");
       setRejectedItemId(null);
@@ -312,7 +328,7 @@ export default function MailPage() {
       }
     } catch (err) {
       console.error("Error submitting feedback:", err);
-      setError("Failed to submit feedback.");
+      toast.error("Failed to submit feedback.");
     }
   };
 
@@ -322,101 +338,80 @@ export default function MailPage() {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="flex">
       <SuperAdminPageNavbar />
-      <h1 className="text-2xl font-semibold text-gray-800 mb-4">Manage Jobs</h1>
+      <div className="flex flex-col flex-1 p-6">
+        <h1 className="text-1xl font-semibold pt-4 text-gray-800 mb-4">
+          Manage
+          {` ${["jobs", "achievements", "internships"].find((option) => option === visibleSection).replace(
+            /\w\S*/g,
+            text => text.charAt(0).toUpperCase() + text.substring(1).toLowerCase()
+          )}`}
+        </h1>
 
-      <div className="mb-4 flex items-center space-x-4">
-        {/* Navigation Buttons */}
-        <button
-          className={`px-4 py-2 rounded ${visibleSection === "jobs" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
-          onClick={() => setVisibleSection("jobs")}
-        >
-          Jobs
-        </button>
-        <button
-          className={`px-4 py-2 rounded ${visibleSection === "achievements" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
-          onClick={() => setVisibleSection("achievements")}
-        >
-          Achievements
-        </button>
-        <button
-          className={`px-4 py-2 rounded ${visibleSection === "internships" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
-          onClick={() => setVisibleSection("internships")}
-        >
-          Internships
-        </button>
+        <ToastContainer />
 
-        {/* Auto-Approval Toggle */}
-        <div className="flex items-center space-x-2 ml-auto">
-          <span className="text-gray-700">Auto-Approval</span>
-          <label className="relative inline-flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              checked={autoApproval}
-              onChange={toggleAutoApproval}
-              className="sr-only peer"
-            />
-            <div className="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-green-500 transition-colors"></div>
-            <span
-              className={`absolute left-1 top-1 h-4 w-4 bg-white rounded-full transition-transform ${
-                autoApproval ? "translate-x-5" : ""
-              }`}
-            ></span>
-          </label>
-        </div>
+        {visibleSection === "jobs" && (
+          <JobTable
+            jobs={jobs}
+            toggleAutoApproval={toggleAutoApproval}
+            autoApproval={autoApproval}
+            selectedJobs={selectedJobs}
+            setSelectedJobs={setSelectedJobs}
+            handleAction={handleAction}
+            handleDelete={handleDelete}
+            setVisibleSection={setVisibleSection}
+            handleView={handleView}
+            currentPage={currentPage}
+            itemsPerPage={itemsPerPage}
+            handlePageChange={handlePageChange}
+            handleBulkApprove={handleBulkApprove}
+            handleBulkDelete={handleBulkDelete}
+            handleSelectAll={handleSelectAll}
+          />
+        )}
+
+        {visibleSection === "achievements" && (
+          <AchievementTable
+            achievements={achievements}
+            selectedAchievements={selectedAchievements}
+            setSelectedAchievements={setSelectedAchievements}
+            handleAction={handleAction}
+            handleDelete={handleDelete}
+            handleView={handleView}
+            currentPage={currentPage}
+            setVisibleSection={setVisibleSection}
+            itemsPerPage={itemsPerPage}
+            handlePageChange={handlePageChange}
+            toggleAutoApproval={toggleAutoApproval}
+            autoApproval={autoApproval}
+            handleBulkApprove={handleBulkApprove}
+            handleBulkDelete={handleBulkDelete}
+            handleSelectAll={handleSelectAll}
+          />
+        )}
+
+        {visibleSection === "internships" && (
+          <InternshipTable
+            internships={internships}
+            selectedInternships={selectedInternships}
+            setSelectedInternships={setSelectedInternships}
+            handleAction={handleAction}
+            toggleAutoApproval={toggleAutoApproval}
+            autoApproval={autoApproval}
+            handleDelete={handleDelete}
+            handleView={handleView}
+            setVisibleSection={setVisibleSection}
+            currentPage={currentPage}
+            itemsPerPage={itemsPerPage}
+            handlePageChange={handlePageChange}
+            handleBulkApprove={handleBulkApprove}
+            handleBulkDelete={handleBulkDelete}
+            handleSelectAll={handleSelectAll}
+          />
+        )}
       </div>
 
-      {visibleSection === "jobs" && (
-        <JobTable
-          jobs={jobs}
-          selectedJobs={selectedJobs}
-          setSelectedJobs={setSelectedJobs}
-          handleAction={handleAction}
-          handleDelete={handleDelete}
-          handleView={handleView}
-          currentPage={currentPage}
-          itemsPerPage={itemsPerPage}
-          handlePageChange={handlePageChange}
-          handleBulkApprove={handleBulkApprove}
-          handleBulkDelete={handleBulkDelete}
-          handleSelectAll={handleSelectAll}
-        />
-      )}
-
-      {visibleSection === "achievements" && (
-        <AchievementTable
-          achievements={achievements}
-          selectedAchievements={selectedAchievements}
-          setSelectedAchievements={setSelectedAchievements}
-          handleAction={handleAction}
-          handleDelete={handleDelete}
-          handleView={handleView}
-          currentPage={currentPage}
-          itemsPerPage={itemsPerPage}
-          handlePageChange={handlePageChange}
-          handleBulkApprove={handleBulkApprove}
-          handleBulkDelete={handleBulkDelete}
-          handleSelectAll={handleSelectAll}
-        />
-      )}
-
-      {visibleSection === "internships" && (
-        <InternshipTable
-          internships={internships}
-          selectedInternships={selectedInternships}
-          setSelectedInternships={setSelectedInternships}
-          handleAction={handleAction}
-          handleDelete={handleDelete}
-          handleView={handleView}
-          currentPage={currentPage}
-          itemsPerPage={itemsPerPage}
-          handlePageChange={handlePageChange}
-          handleBulkApprove={handleBulkApprove}
-          handleBulkDelete={handleBulkDelete}
-          handleSelectAll={handleSelectAll}
-        />
-      )}
 
       {/* Feedback Modal */}
       {showModal && (

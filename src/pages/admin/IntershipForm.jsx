@@ -11,25 +11,33 @@ import AdminPageNavbar from "../../components/Admin/AdminNavBar";
 import SuperAdminPageNavbar from "../../components/SuperAdmin/SuperAdminNavBar";
 
 const InternPostForm = () => {
+  // Load AI-generated internship data from sessionStorage
+  const storedInternshipData = sessionStorage.getItem("internshipData");
+  const initialInternshipData = storedInternshipData ? JSON.parse(storedInternshipData) : {};
+
   const [formData, setFormData] = useState({
-    title: '',
-    company_name: '',
-    location: '',
-    duration: '',
-    stipend: '',
-    application_deadline: null,
-    skills_required: [],
-    job_description: '',
-    company_website: '',
-    internship_type: '',
-    job_link: '',
-    education_requirements: '' // Added optional field
+    title: initialInternshipData.title || '',
+    company_name: initialInternshipData.company_name || '',
+    location: initialInternshipData.job_location || '',
+    duration: initialInternshipData.duration || '',
+    stipend: initialInternshipData.salary_range || '',
+    application_deadline: initialInternshipData.application_deadline && !isNaN(Date.parse(initialInternshipData.application_deadline))
+      ? new Date(initialInternshipData.application_deadline)
+      : null,
+    skills_required: initialInternshipData.required_skills || [],
+    job_description: initialInternshipData.job_description || '',
+    company_website: initialInternshipData.company_website || '',
+    internship_type: initialInternshipData.work_type || '',
+    job_link: initialInternshipData.job_link || '',
+    education_requirements: initialInternshipData.education_requirements || '' // Added optional field
   });
 
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [isTypeOpen, setIsTypeOpen] = useState(false);
+  const [urlError, setUrlError] = useState('');
+  const [deadlineError, setDeadlineError] = useState('');
   const navigate = useNavigate();
   const [userRole, setUserRole] = useState(null);
   const [userId, setUserId] = useState(null);
@@ -42,6 +50,21 @@ const InternPostForm = () => {
     'Volunteer',
   ];
 
+  const validateUrl = (url) => {
+    const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+    return urlPattern.test(url);
+  };
+
+  const validateDeadline = (date) => {
+    const currentDate = new Date();
+    if (date < currentDate) {
+      setDeadlineError('Application deadline must be a future date.');
+      return false;
+    } else {
+      setDeadlineError('');
+      return true;
+    }
+  };
 
   useEffect(() => {
     const token = Cookies.get('jwt');
@@ -62,17 +85,12 @@ const InternPostForm = () => {
     }
     if (token) {
       const payload = JSON.parse(atob(token.split(".")[1])); // Decode JWT payload
-      console.log("Decoded JWT Payload:", payload); // Debugging line
       setUserRole(payload.role); // Assuming the payload has a 'role' field
-      if (payload.role === "admin") 
-        {
-          setUserId(payload.admin_user); // Assuming the payload has an 'id' field
-        }
-      else if (payload.role === "superadmin")
-        {
-          setUserId(payload.superadmin_user); // Assuming the payload has an 'id' field
-        }
-
+      if (payload.role === "admin") {
+        setUserId(payload.admin_user); // Assuming the payload has an 'id' field
+      } else if (payload.role === "superadmin") {
+        setUserId(payload.superadmin_user); // Assuming the payload has an 'id' field
+      }
     }
   }, [navigate]);
 
@@ -82,6 +100,14 @@ const InternPostForm = () => {
       ...formData,
       [name]: value,
     });
+
+    if (name === 'company_website') {
+      if (value && !validateUrl(value)) {
+        setUrlError('Invalid URL');
+      } else {
+        setUrlError('');
+      }
+    }
   };
 
   const handleTypeChange = (type) => {
@@ -97,6 +123,7 @@ const InternPostForm = () => {
       ...formData,
       application_deadline: date,
     });
+    validateDeadline(date);
   };
 
   const handleSkillsChange = (e) => {
@@ -122,6 +149,18 @@ const InternPostForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate URL
+    if (formData.company_website && !validateUrl(formData.company_website)) {
+      setUrlError('Invalid URL');
+      return;
+    }
+
+    // Validate application deadline
+    if (!validateDeadline(formData.application_deadline)) {
+      return;
+    }
+
     setIsSubmitting(true);
     setMessage('');
 
@@ -133,7 +172,6 @@ const InternPostForm = () => {
         return;
       }
 
-      // Format the application_deadline to YYYY-MM-DD
       const formattedData = {
         ...formData,
         application_deadline: formData.application_deadline.toISOString().split('T')[0],
@@ -141,14 +179,7 @@ const InternPostForm = () => {
 
       const response = await axios.post(
         'https://cce-backend-54k0.onrender.com/api/post-internship/',
-        {...formattedData, userId , role : userRole },
-        // {
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //     Authorization: `Bearer ${token}`,
-        //   },
-        //   withCredentials: true,
-        // }
+        { ...formattedData, userId, role: userRole },
       );
       setMessage(response.data.message);
       setError('');
@@ -165,23 +196,13 @@ const InternPostForm = () => {
     return <div className="text-red-600">{error}</div>;
   }
 
-    // Fetch user role from JWT token in cookies
-    useEffect(() => {
-      const token = Cookies.get("jwt");
-      if (token) {
-        const payload = JSON.parse(atob(token.split(".")[1])); // Decode JWT payload
-        setUserRole(payload.role); // Assuming the payload has a 'role' field
-      }
-    }, []);
-
   return (
     <motion.div
-      className="max-w mx-auto p-8 bg-white shadow-xl rounded-2xl relative"
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8 }}
+      className="max-w mx-auto p-8 bg-white shadow-xl rounded-2xl relative ml-50"
+      // initial={{ opacity: 0, y: 30 }}
+      // animate={{ opacity: 1, y: 0 }}
+      // transition={{ duration: 0.8 }}
     >
-      {/* Render appropriate navbar based on user role */}
       {userRole === "admin" && <AdminPageNavbar />}
       {userRole === "superadmin" && <SuperAdminPageNavbar />}
       <h2 className="text-3xl pt-4 font-bold mb-4 text-gray-800 text-center">Post an Internship</h2>
@@ -206,6 +227,9 @@ const InternPostForm = () => {
                   className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition-shadow"
                   placeholder={`Enter ${field.replace(/_/g, ' ')}`}
                 />
+                {field === 'company_website' && urlError && (
+                  <p className="text-red-600 text-sm mt-1">{urlError}</p>
+                )}
               </div>
             );
           }
@@ -307,6 +331,9 @@ const InternPostForm = () => {
               className="absolute left-3 top-3 text-gray-500 cursor-pointer"
             />
           </div>
+          {deadlineError && (
+            <p className="text-red-600 text-sm mt-1">{deadlineError}</p>
+          )}
         </div>
 
         <motion.button

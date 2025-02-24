@@ -10,14 +10,11 @@ import Cookies from 'js-cookie';
 const StudentProfile = () => {
   const navigate = useNavigate();
   const [editMode, setEditMode] = useState(false);
-  const [selectedImage, setSelectedImage] = useState("harlee.png"); // Default Image
   const [student, setStudent] = useState(null);
   const [savedJobs, setSavedJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editedName, setEditedName] = useState(""); // Editable name field
-  // List of predefined images
-  const availableImages = ["boy-1.png", "boy-2.png", "boy-3.png", "boy-4.png", "boy-5.png", "boy-6.png", "Girl-1.png", "Girl-2.png", "Girl-3.png", "Girl-4.png", "Girl-5.png",];
 
   useEffect(() => {
     const fetchStudentProfile = async () => {
@@ -38,12 +35,6 @@ const StudentProfile = () => {
         const jobTitles = jobDetails.map(job => job.data.job.job_data.title);
         setSavedJobs(jobTitles);
         setLoading(false);
-
-        // Set the selected image from backend if available
-        if (studentData.profile_image) {
-          setSelectedImage(studentData.profile_image);
-        }
-        setLoading(false);
       } catch (err) {
         console.error("Error fetching student profile:", err);
         setError("Failed to load student profile.");
@@ -61,13 +52,12 @@ const StudentProfile = () => {
 
       const updatedData = {
         name: editedName, // Save the edited name
-        profile_image: selectedImage, // Send image filename only
       };
 
       await axios.put(`https://cce-backend-54k0.onrender.com/api/update-profile/${userId}/`, updatedData);
       
       setEditMode(false);
-      alert("Profile updated successfully!");
+      window.location.reload();
     } catch (error) {
       console.error("Error updating profile:", error);
       alert("Failed to update profile.");
@@ -93,24 +83,10 @@ const StudentProfile = () => {
         >
           <div className="p-8 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white text-center rounded-t-3xl">
             <div className="flex flex-col items-center relative">
-              <img
-                src={`../../src/assets/animoji/${selectedImage}`} // Corrected image path (serving from public/profile/)
-                alt="Student Profile"
-                className="w-32 h-32 rounded-full border-4 border-white mb-4 shadow-lg"
-              />
-              {editMode && (
-                <select 
-                  value={selectedImage} 
-                  onChange={(e) => setSelectedImage(e.target.value)}
-                  className="mt-3 p-2 rounded-lg text-gray-800 bg-white"
-                >
-                  {availableImages.map((img, index) => (
-                    <option key={index} value={img}>
-                      {img}
-                    </option>
-                  ))}
-                </select>
-              )}
+            <div className="w-32 h-32 rounded-full border-4 border-white mb-4 shadow-lg flex items-center justify-center bg-white text-7xl font-bold text-yellow-500">
+            {student.name.charAt(0).toUpperCase()}
+              </div>
+
               {/* Editable Name Field */}
               {editMode ? (
                 <input
@@ -152,7 +128,7 @@ const StudentProfile = () => {
 
           <div className="p-6 bg-gray-100 text-center rounded-b-3xl">
             <Button
-              className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg shadow-md mr-4"
+              className="bg-yellow-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg shadow-md mr-4"
               onClick={() => {
                 if (editMode) {
                   handleSaveChanges();
