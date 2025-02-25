@@ -14,10 +14,24 @@ export function InputField({ value, label, setter, args = {}, required = false }
   </div>
 }
 
+export function FormInputField({ value, label, setter, args = {}, required = false }) {
+  return <div className="space-y-1 w-full flex flex-col">
+    <label htmlFor={label} className="text-sm">{label} { required && <span className="text-rose-400"> * </span>} </label>
+    <input value={value} onChange={(e) => setter(e.target.value)} {...args} className="rounded-md p-2 border border-gray-400 text-xs outline-transparent focus:outline-yellow-300" />
+  </div>
+}
+
 export function TextAreaField({ value, label, setter, args = {} }) {
   return <div className="space-y-1 w-full flex flex-col">
     <label htmlFor={label} className="text-sm">{label}</label>
     <textarea value={value} onChange={(e) => setter(e.target.value)} rows={5} {...args} className="bg-gray-200 rounded-md p-2 border-none text-xs outline-transparent focus:outline-yellow-300" />
+  </div>
+}
+
+export function FormTextAreaField({ value, label, setter, args = {} }) {
+  return <div className="space-y-1 w-full flex flex-col">
+    <label htmlFor={label} className="text-sm">{label}</label>
+    <textarea value={value} onChange={(e) => setter(e.target.value)} rows={5} {...args} className="rounded-md p-2 border border-gray-400 text-xs outline-transparent focus:outline-yellow-300" />
   </div>
 }
 

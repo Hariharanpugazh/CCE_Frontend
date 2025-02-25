@@ -64,7 +64,7 @@ const SuperAdminProfile = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-300">
-      <div className="flex items-center justify-center p-6 ml-55">
+      <div className="flex items-center justify-center p-6">
         <motion.div
           className="max-w-3xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden"
           initial={{ opacity: 0, y: 50 }}

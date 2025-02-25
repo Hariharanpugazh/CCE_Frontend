@@ -5,6 +5,7 @@ import { FaXmark } from "react-icons/fa6";
 import Pagination from "../../../components/Admin/pagination";
 import backIcon from "../../../assets/icons/back-icon.svg";
 import nextIcon from "../../../assets/icons/next-icon.svg";
+import { format } from "date-fns";
 
 const InternshipTable = ({
   internships,
@@ -141,7 +142,9 @@ const InternshipTable = ({
                     <td className="text-center py-3">{data.company_name || "N/A"}</td>
                     <td className="text-center py-3">{internship.admin_name || "N/A"}</td>
                     <td className="text-center py-3">
-                      {data.application_deadline ?data.application_deadline : "N/A"}
+                      {data.application_deadline
+                        ? format(new Date(data.application_deadline), "yyyy-MM-dd")
+                        : "N/A"}
                     </td>
                     <td className="text-center py-3">{data.duration || "N/A"}</td>
                     <td className="text-center py-3 font-semibold">

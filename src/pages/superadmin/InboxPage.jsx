@@ -6,12 +6,14 @@ import { Mail, Briefcase, GraduationCap, BookOpen, Trophy, Search, X } from "luc
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { FaCheckDouble, FaCheck } from "react-icons/fa";
+import { set } from "date-fns";
 
 const InboxPage = () => {
   const [students, setStudents] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [messages, setMessages] = useState([]);
   const [reply, setReply] = useState("");
+  const [studentName, setStudentName] = useState("S");
   const [adminId, setAdminId] = useState(null);
   const [achievements, setAchievements] = useState([]);
   const [jobs, setJobs] = useState([]);
@@ -262,6 +264,7 @@ const InboxPage = () => {
                     const response = await axios.get(`https://cce-backend-54k0.onrender.com/api/profile/${item.student_id}/`);
                     const data = response.data;
                     item.name = data.data.name;
+                    setStudentName(item.name[0]);
                     setIsChatOpen(true);
                   } else {
                     setSelectedItem(item);
@@ -344,7 +347,7 @@ const InboxPage = () => {
                           <div
                             className={`w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center text-lg mr-2`}
                           >
-                            S
+                            {studentName}
                           </div>
                         )}
                         <motion.div
@@ -570,7 +573,7 @@ const InboxPage = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen ml-55">
+    <div className="flex">
       <SuperAdminPageNavbar />
       <div className="flex flex-1 p-4 space-x-4">
         <div className="w-1/4 max-w-[20%] space-y-4 shadow-md rounded-lg p-4 bg-white">

@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import AdminPageNavbar from "../../components/Admin/AdminNavBar";
+import Cookies from 'js-cookie';
+import AdminPageNavbar from '../../components/Admin/AdminNavBar';
+import SuperAdminPageNavbar from "../../components/SuperAdmin/SuperAdminNavBar";
 import Pagination from "../../components/Admin/pagination";
 
 const StudentManagement = () => {
@@ -12,6 +14,7 @@ const StudentManagement = () => {
   const [editMode, setEditMode] = useState(false);
   const [editableStudent, setEditableStudent] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [userRole, setUserRole] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const itemsPerPage = 10;
 
@@ -37,6 +40,14 @@ const StudentManagement = () => {
     return matchesFilter && matchesStatus;
   });
 
+  useEffect(() => {
+    const token = Cookies.get("jwt");
+    if (token) {
+      const payload = JSON.parse(atob(token.split(".")[1])); // Decode JWT payload
+      setUserRole(!payload.student_user ? payload.role : "student"); // Assuming the payload has a 'role' field
+    }
+  }, []);
+
   const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);
 
   useEffect(() => {
@@ -45,20 +56,32 @@ const StudentManagement = () => {
     }
   }, [filter, statusFilter, totalPages]);
 
-  const handleDeleteStudent = (id) => {
-    setStudents(students.filter((student) => student._id !== id));
-    setSelectedStudent(null);
-    setShowDeleteConfirm(false);
+  const handleDeleteStudent = async (id) => {
+    try {
+      await axios.delete(`https://cce-backend-54k0.onrender.com/api/students/${id}/delete/`);
+      setStudents(students.filter((student) => student._id !== id));
+      setSelectedStudent(null);
+      setShowDeleteConfirm(false);
+    } catch (error) { 
+      console.error("Error deleting student:", error.response ? error.response.data : error);
+      alert("Failed to delete student. Please try again.");
+    }
   };
+  
 
-  const handleToggleStatus = (student) => {
+  const handleToggleStatus = async (student) => {
     const updatedStatus = student.status === "active" ? "inactive" : "active";
-    setStudents(
-      students.map((s) =>
-        s._id === student._id ? { ...s, status: updatedStatus } : s
-      )
-    );
-    setSelectedStudent(null);
+    try {
+      await axios.put(`https://cce-backend-54k0.onrender.com/api/students/${student._id}/update/`, { status: updatedStatus });
+      setStudents(
+        students.map((s) =>
+          s._id === student._id ? { ...s, status: updatedStatus } : s
+        )
+      );
+      setSelectedStudent(null);
+    } catch (error) {
+      console.error("Error updating student status:", error);
+    }
   };
 
   const handleEditProfile = () => {
@@ -108,42 +131,52 @@ const StudentManagement = () => {
 
   return (
     <div>
-      <AdminPageNavbar />
-      <div className="p-8 bg-gray-100 min-h-screen ml-55">
-        <h1 className="text-4xl font-bold text-center mb-8">Student Management</h1>
+      {/* <div className="flex flex-col min-h-screen bg-gray-100"> */}
+      {userRole === "admin" && <AdminPageNavbar />}
+      {userRole === "superadmin" && <SuperAdminPageNavbar />}
+      <div className="p-8  min-h-screen ml-62 mr-5">
+        <h1 className="text-4xl font-bold  mb-3">Student Management</h1>
 
-        <div className="flex flex-wrap items-center mb-6 gap-4">
-          <input
-            type="text"
-            placeholder="Search by name or email..."
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="flex-1 p-3 border rounded-lg"
-          />
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="p-3 border rounded-lg"
-          >
-            <option value="">Filter by Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
-          <button
-            className={`${buttonStyles} bg-green-600 hover:bg-green-700`}
-            onClick={() => navigate("/student-signup")}
-          >
-            Create Student
-          </button>
+        <div className="flex flex-wrap items-center py-5 mb-6 gap-4">
+          <div className="flex flex-1 items-center border rounded-lg border-gray-400   ">
+            <input
+              type="text"
+              placeholder="Search "
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="flex-1 px-3 outline-none"
+            />
+            <button className="px-10  py-2 bg-yellow-400 rounded-tr rounded-br border-l border-gray-500">
+             <strong> Search</strong> 
+            </button>
+          </div>
+
+          <div className="flex  items-center ml-60  border rounded-lg border-gray-500">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="flex-1 p-3 border-r px-3  py-2 mr-3  rounded-l-lg  appearance-none"
+            >
+              <option value=""><center>Filter by Status ⮟</center></option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+            <button
+              className="text-black px-5"
+              onClick={() => navigate("/student-signup")}
+            >
+              Create Student <strong>＋</strong> 
+            </button>
+          </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow overflow-x-auto">
-          <table className="min-w-full table-auto">
-            <thead className="bg-gray-200">
+        <div className="bg-white rounded-lg overflow-x-auto border border-gray-500">
+          <table className="min-w-full  table-auto ">
+            <thead className=" border-b border-gray-500">
               <tr>
                 <th className="text-center p-4 ">Name</th>
                 <th className="text-center p-4 ">Department</th>
-                <th className="text-center p-4 ">Email</th>
+                <th className="text-left w-1/4  p-4 ">Email Address</th>
                 <th className="text-center p-4 ">Status</th>
               </tr>
             </thead>
@@ -152,17 +185,17 @@ const StudentManagement = () => {
                 <tr
                   key={student._id}
                   onClick={() => setSelectedStudent(student)}
-                  className="cursor-pointer hover:bg-gray-100"
+                  className="cursor-pointer hover:bg-gray-100 border-b  border-gray-300"
                 >
                   <td className="text-center p-4">{student.name}</td>
-                  <td className="text-center p-4">{student.department}</td>
-                  <td className="text-center p-4">{student.email}</td>
+                  <td className="text-center px-4">{student.department}</td>
+                  <td className="text-left p-4 w-2/9">{student.email}</td>
                   <td className="text-center p-4">
                     <span
-                      className={`inline-block text-center w-24 px-3 py-1 rounded-full text-m font-semibold ${
+                      className={`inline-block text-center w-24 px-3 py-1 rounded-lg text-m font-semibold ${
                         student.status === "active"
-                          ? "text-green-800"
-                          : "text-red-900"
+                          ? "bg-green-100 text-green-500"
+                          : "bg-red-100 text-red-500"
                       }`}
                     >
                       {student.status.charAt(0).toUpperCase() + student.status.slice(1)}
@@ -197,14 +230,14 @@ const StudentManagement = () => {
               </button>
               <h2 className="text-2xl font-bold mb-6">Student Details</h2>
               <div className="grid grid-cols-2 gap-4">
-                {["name", "email", "department", "year", "college_name"].map((field) => (
+                {["name", "email",    "department", "year", "college_name"].map((field) => (
                   <div key={field} className="bg-gray-100 p-4 rounded-lg">
                     <strong className="block text-sm font-semibold">
                       {field.replace("_", " ").toUpperCase()}:
                     </strong>
                     {editMode && field !== "email" ? ( // Make email non-editable
                       <input
-                        type="text"
+                        type="text" 
                         name={field}
                         value={editableStudent[field] || ""}
                         onChange={handleInputChange}

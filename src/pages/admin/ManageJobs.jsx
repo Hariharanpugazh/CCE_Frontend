@@ -4,7 +4,9 @@ import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import AdminPageNavbar from "../../components/Admin/AdminNavBar";
 import Pagination from "../../components/Admin/pagination";
-import Sidebar from "../../components/Admin/Sidebar";
+import backIcon from "../../assets/icons/back-icon.svg";
+import nextIcon from "../../assets/icons/next-icon.svg";
+
 import {
   Briefcase,
   GraduationCap,
@@ -20,6 +22,85 @@ import {
   MapPin,
   FileText,
 } from "lucide-react";
+import { FaCheck, FaClock, FaCross, FaEye, FaMinus } from "react-icons/fa";
+
+const ItemCard = ({ item, type }) => {
+  const navigate = useNavigate();
+  const itemId = item._id;
+
+  let title, company, description, jobLocation, selectedCategory, status, previewPath;
+  if (type === "jobs") {
+    title = item.job_data?.title || "No Title";
+    company = item.job_data?.company_name || "Unknown Company";
+    jobLocation = item.job_data?.job_location || "Not Specified";
+    status = item.is_publish;
+    selectedCategory = item.job_data?.selectedCategory || "No Category required";
+    previewPath = `/job-preview/${itemId}`;
+
+  } else if (type === "study materials") {
+    title = item.study_material_data?.title || "No Title";
+    company = item.study_material_data?.category || "Unknown Category";
+    status = item.is_publish;
+    previewPath = `/study-material/${itemId}`;
+
+  } else if (type === "internships") {
+    title = item.internship_data?.title || "No Title";
+    company = item.internship_data?.company_name || "Unknown Company";
+    status = item.is_publish;
+    jobLocation = item.internship_data?.location || "Not Specified";
+    selectedCategory = item.internship_data?.selectedCategory || "Internship";
+    previewPath = `/internship-preview/${itemId}`;
+
+  } else {
+    title = item.name || "No Title";
+    company = item.company_name || "No Company";
+    description = item.achievement_description || "No Skills required";
+    previewPath = `/achievement-preview/${itemId}`;
+  }
+
+  return (
+    <div className="border rounded-xl p-4 shadow-sm flex items-center justify-between bg-white">
+      <div>
+        <h3 className="font-semibold text-lg mb-0.5">{title}</h3>
+        <p className="text-sm text-gray-700 flex space-x-3">
+          <span className="font-semibold">Company: <span className="font-normal"> {company} &nbsp;  </span> </span>
+          <span className="font-semibold">Location: <span className="font-normal"> {jobLocation} &nbsp; </span> </span>
+          <span className="font-semibold">Category: <span className="font-normal"> {selectedCategory}  </span> </span>
+        </p>
+      </div>
+      <div className="flex gap-2">
+        {(status === true) && (
+          <span className="bg-teal-500 text-white px-4 py-2 rounded-lg text-sm flex items-center">
+            <FaCheck className="mr-2 text-xs" /> Approved
+          </span>
+        )}
+        {(status === false) && (
+          <span className="bg-red-400 text-white px-4 py-2 rounded-lg text-sm flex items-center">
+            <FaCross className="mr-2 text-xs" /> Rejected
+          </span>
+        )}
+        {(status === null) && (
+          <span className="bg-yellow-400 text-white px-4 py-2 rounded-lg text-sm flex items-center">
+            <FaClock className="mr-2 text-xs" /> Pending
+          </span>
+        )}
+        <button
+          onClick={() => {
+            if (itemId) {
+              navigate(previewPath);
+            } else {
+              alert("Error: Invalid ObjectId. Please check backend response.");
+            }
+          }}
+          className="text-black border px-3 py-1 rounded-lg text-sm flex items-center gap-1"
+        >
+          View
+          <FaEye size={14} />
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const ManageJobs = () => {
   const [jobs, setJobs] = useState([]);
@@ -27,7 +108,6 @@ const ManageJobs = () => {
   const [internships, setInternships] = useState([]);
   const [achievements, setAchievements] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("Jobs");
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
   const navigate = useNavigate();
@@ -47,11 +127,9 @@ const ManageJobs = () => {
         if (response.data && Array.isArray(response.data[key])) {
           setState(response.data[key]);
         } else {
-          console.warn(`Invalid data received for ${key}:`, response.data);
           setState([]);
         }
       } catch (error) {
-        console.error(`Error fetching ${key}:`, error);
         setState([]);
       }
     };
@@ -72,10 +150,10 @@ const ManageJobs = () => {
       type === "job"
         ? `/job-edit/${id}`
         : type === "study"
-        ? `/study-edit/${id}`
-        : type === "internship"
-        ? `/internship-edit/${id}`
-        : `/achievement-edit/${id}`
+          ? `/study-edit/${id}`
+          : type === "internship"
+            ? `/internship-edit/${id}`
+            : `/achievement-edit/${id}`
     );
   };
 
@@ -103,160 +181,78 @@ const ManageJobs = () => {
     };
   };
 
-  const sidebarCategories = [
-    { name: "Jobs", icon: Briefcase },
-    { name: "Internships", icon: GraduationCap },
-    { name: "Study Materials", icon: BookOpen },
-    { name: "Achievements", icon: Trophy },
-  ];
-
-  const renderCard = (item, type) => {
-    if (!item) return null;
-
-    let title, company, description, jobLocation, selectedCategory;
-    if (type === "job") {
-      title = item.job_data?.title || "No Title";
-      company = item.job_data?.company_name || "Unknown Company";
-      jobLocation = item.job_data?.job_location || "Not Specified";
-      selectedCategory =
-        item.job_data?.selectedCategory || "No Category required";
-    } else if (type === "study") {
-      title = item.study_material_data?.title || "No Title";
-      company = item.study_material_data?.category || "Unknown Category";
-    } else if (type === "internship") {
-      title = item.internship_data?.title || "No Title";
-      company = item.internship_data?.company_name || "Unknown Company";
-      jobLocation = item.internship_data?.location || "Not Specified";
-      selectedCategory = item.internship_data?.selectedCategory || "Internship";
-    } else {
-      title = item.name || "No Title";
-      company = item.company_name || "No Company";
-      description = item.achievement_description || "No Skills required";
-    }
-
-    const status = getStatusStyle(item.is_publish);
-    const StatusIcon = status.icon;
-
-    return (
-      <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden border border-gray-100">
-        <div className="p-6">
-          <div className="flex justify-between items-start mb-4">
-            <h2 className="text-xl font-semibold text-gray-800 line-clamp-2">
-              {title}
-            </h2>
-            <span
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium ${status.bg} ${status.text}`}
-            >
-              <StatusIcon className="h-4 w-4" />
-              {status.label}
-            </span>
-          </div>
-          <div className="space-y-3">
-            <div className="flex items-center text-gray-600">
-              {type === "study" ? (
-                <Folder className="h-4 w-4 mr-2" />
-              ) : (
-                <Building2 className="h-4 w-4 mr-2" />
-              )}
-              <span className="font-medium">
-                {type === "study" ? "Category:" : "Company:"}
-              </span>
-              <span className="text-gray-700 ml-1">{company}</span>
-            </div>
-            {type === "achievement" && (
-              <>
-                <div className="flex items-center text-gray-600">
-                  <Trophy className="h-4 w-4 mr-2" />
-                  <span className="font-medium">Type:</span>
-                  <span className="text-gray-700 ml-1">
-                    {item.achievement_type}
-                  </span>
-                </div>
-                <div className="flex items-center text-gray-600">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  <span className="font-medium">Date:</span>
-                  <span className="text-gray-700 ml-1">
-                    {item.date_of_achievement}
-                  </span>
-                </div>
-              </>
-            )}
-            {(type === "job" || type === "internship") && (
-              <>
-                <div className="flex items-center text-gray-600">
-                  <MapPin className="h-4 w-4 mr-2" />
-                  <span className="font-medium">Location:</span>
-                  <span className="text-gray-700 ml-1">{jobLocation}</span>
-                </div>
-                <div className="flex items-center text-gray-600">
-                  <FileText className="h-4 w-4 mr-2" />
-                  <span className="font-medium">Category:</span>
-                  <span className="text-gray-700 ml-1">{selectedCategory}</span>
-                </div>
-              </>
-            )}
-          </div>
-          <button
-            onClick={() => handleEditClick(item._id, type)}
-            className="mt-6 w-full inline-flex items-center justify-center px-4 py-2 border border-yellow-500 text-black rounded-lg hover:bg-yellow-200 transition-colors duration-200"
-          >
-            <View className="h-4 w-4 mr-2" />
-            View
-          </button>
-        </div>
-      </div>
-    );
-  };
-
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 ml-58">
+    <div className="flex min-h-screen bg-gray-50">
       <AdminPageNavbar />
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar
-          isOpen={sidebarOpen}
-          categories={sidebarCategories}
-          selectedCategory={selectedCategory}
-          onCategorySelect={setSelectedCategory}
-        />
-        <main className="flex-1 overflow-y-auto">
-          <div className="max-w-7xl mx-50 mr-12 p-8">
-            <header className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900">
-                Manage {selectedCategory}
-              </h1>
-            </header>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 ">
-              {selectedCategory === "Jobs" &&
-                paginate(jobs).map((job) => renderCard(job, "job"))}
-              {selectedCategory === "Internships" &&
-                paginate(internships).map((internship) =>
-                  renderCard(internship, "internship")
-                )}
-              {selectedCategory === "Study Materials" &&
-                paginate(studyMaterials).map((study) =>
-                  renderCard(study, "study")
-                )}
-              {selectedCategory === "Achievements" &&
-                paginate(achievements).map((achievement) =>
-                  renderCard(achievement, "achievement")
-                )}
-            </div>
-            <Pagination
-              currentPage={currentPage}
-              totalItems={
-                selectedCategory === "Jobs"
-                  ? jobs.length
-                  : selectedCategory === "Internships"
-                  ? internships.length
-                  : selectedCategory === "Study Materials"
-                  ? studyMaterials.length
-                  : achievements.length
-              }
-              itemsPerPage={itemsPerPage}
-              onPageChange={setCurrentPage}
-            />
+      <div className="flex-1 flex flex-col items-stretch">
+        <section className="flex flex-col">
+          <div className="flex rounded-lg border border-gray-300 items-center  my-10 mx-6 max-w-55">
+            <button
+              className={`p-2 border-r border-gray-300  rounded-l-lg ${selectedCategory === "Jobs" ? "opacity-50" : "cursor-pointer"}`}
+              onClick={() => {
+                switch (selectedCategory) {
+                  case "Jobs": {
+                    return;
+                  }
+                  case "Internships": {
+                    setSelectedCategory("Jobs");
+                    return;
+                  }
+                  case "Achievements": {
+                    setSelectedCategory("Internships");
+                    return;
+                  }
+                  case "Study Materials": {
+                    setSelectedCategory("Achievements");
+                    return;
+                  }
+                  default: {
+                    return;
+                  }
+                }
+              }}
+            >
+              <img src={backIcon} alt="Back" className="w-5" />
+            </button>
+            <p className="px-3 flex-1 text-center">{selectedCategory}</p>
+            <button
+              className={`p-2 border-l border-gray-300 hover:bg-gray-50 rounded-r-lg ${selectedCategory === "Study Materials" ? "opacity-50" : "cursor-pointer"}`}
+              onClick={() => {
+                switch (selectedCategory) {
+                  case "Jobs": {
+                    setSelectedCategory("Internships");
+                    return;
+                  }
+                  case "Internships": {
+                    setSelectedCategory("Achievements");
+                    return;
+                  }
+                  case "Achievements": {
+                    setSelectedCategory("Study Materials");
+                    return;
+                  }
+                  case "Study Materials": {
+                    return;
+                  }
+                  default: {
+                    return;
+                  }
+                }
+              }}
+            >
+              <img src={nextIcon} alt="Next" className="w-5" />
+            </button>
           </div>
-        </main>
+
+          <div className="flex-1 px-6 flex flex-col space-y-3">
+            {paginate({ Jobs: jobs, Internships: internships, Achievements: achievements, 'Study Materials': studyMaterials }[selectedCategory]).map((achievement, key) => (
+              <ItemCard item={{ ...achievement }} type={selectedCategory.toLowerCase()} key={key} />
+            ))}
+          </div>
+        </section>
+        <div className="px-6">
+          <Pagination currentPage={currentPage} itemsPerPage={itemsPerPage} totalItems={{ Jobs: jobs.length, Internships: internships.length, Achievements: achievements.length, StudyMaterials: studyMaterials.length }[selectedCategory]} onPageChange={setCurrentPage} />
+        </div>
       </div>
     </div>
   );

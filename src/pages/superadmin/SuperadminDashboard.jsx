@@ -22,9 +22,34 @@ const SuperAdminHome = () => {
     { title: "OverAll", count: jobs.length + internships.length, icon: <FaListAlt /> },
     { title: "Total Job Listings", count: jobs.length, icon: <FaCheck /> },
     { title: "Total Internship Listings", count: internships.length, icon: <FaBook /> },
-    { title: "Rejected Approvals",  count: jobs.filter(job => job.is_publish === false).length + internships.filter(internship => internship.is_publish === false).length, icon: <FaTrophy /> },
+    { title: "Rejected Approvals", count: jobs.filter(job => job.is_publish === false).length + internships.filter(internship => internship.is_publish === false).length, icon: <FaTrophy /> },
     { title: "Pending Approvals", count: jobs.filter(job => job.is_publish === null).length, icon: <FaUserPlus /> },
   ];
+
+  useEffect(() => {
+    const fetchChats = async () => {
+      try {
+        const response = await fetch("https://cce-backend-54k0.onrender.com/api/get_all_student_chats/", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        setChats(data); // Store data in state
+        console.log("Chats fetched successfully:", data);
+      } catch (error) {
+        console.error("Failed to fetch chats:", error);
+      }
+    };
+
+    fetchChats();
+  }, []);
 
   useEffect(() => {
     const fetchAllJobsAndInternships = async () => {
@@ -82,11 +107,11 @@ const SuperAdminHome = () => {
       setFilteredJobs(jobs.filter((job) => job.is_publish === null));
       setFilteredInterns(internships.filter((internship) => internship.is_publish === null));
     } else if (filter === "Active Jobs") {
-      setFilteredJobs(jobs.filter((job) => job.status === "Active" ));
-      setFilteredInterns(internships.filter((internship) => internship.status === "Active" ));
+      setFilteredJobs(jobs.filter((job) => job.status === "Active"));
+      setFilteredInterns(internships.filter((internship) => internship.status === "Active"));
     } else if (filter === "Expired Jobs") {
       setFilteredJobs(jobs.filter((job) => job.status === "expired"));
-      setFilteredInterns(internships.filter((internship) => internship.status === "expired" ));
+      setFilteredInterns(internships.filter((internship) => internship.status === "expired"));
     }
   }, [filter, jobs, internships]);
 
@@ -173,122 +198,122 @@ const SuperAdminHome = () => {
   };
 
   return (
-    <div className="flex flex-col w-full h-screen overflow-auto bg-[#FFFAFA] ml-30">
+    <div className="flex bg-[#FFFAFA]">
       <SuperAdminPageNavbar />
 
-      <header className="flex flex-col items-center justify-center py-14 container self-center">
-        <p className="text-6xl tracking-[0.8px]">SuperAdmin Dashboard</p>
-        <p className="text-lg mt-2 text-center">
-          Explore all the postings in all the existing fields around the globe.
-        </p>
-      </header>
+      <div className="flex flex-col flex-1 px-6 pb-14">
+        <header className="flex flex-col items-center justify-center py-14 self-center">
+          <p className="text-6xl tracking-[0.8px]">SuperAdmin Dashboard</p>
+          <p className="text-lg mt-2 text-center">
+            Explore all the postings in all the existing fields around the globe.
+          </p>
+        </header>
 
-      <div className="max-w-[80%] mx-auto">
-        {/* Stats Cards Section */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 bg-[#FFFAFA] lg:grid-cols-5 gap-4 mb-8">
-          {cardsData.map((card, index) => (
-            <div key={index} className="bg-white rounded-lg shadow-sm">
-              <div className="p-4 flex items-start justify-between">
-                <div className="flex flex-col gap-1">
-                  <span className="font-normal text-sm text-[#a0aec0] font-sans">{card.title}</span>
-                  <span className="text-md text-[#2d3748] font-sans text-4xl">{card.count}</span>
-                </div>
-                <div className="p-2 bg-yellow-400 text-sm text-white rounded flex items-center justify-center shadow-sm">
-                  {card.icon}
+          {/* Stats Cards Section */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 bg-[#FFFAFA] lg:grid-cols-5 gap-4 mb-8">
+            {cardsData.map((card, index) => (
+              <div key={index} className="bg-white rounded-lg shadow-sm">
+                <div className="p-4 flex items-start justify-between">
+                  <div className="flex flex-col gap-1">
+                    <span className="font-normal text-sm text-[#a0aec0] font-sans">{card.title}</span>
+                    <span className="text-md text-[#2d3748] font-sans text-4xl">{card.count}</span>
+                  </div>
+                  <div className="p-2 bg-yellow-400 text-sm text-white rounded flex items-center justify-center shadow-sm">
+                    {card.icon}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Filter Section */}
-        <div className="flex justify-between items-center mb-14">
-          <div className="flex text-sm gap-4">
-            {['All', 'Approved', 'Rejected', 'Pending Approvals'].map((status) => (
-              <button
-                key={status}
-                className={`px-4 rounded-[10000px] py-1 ${filter === status ? "text-blue-400 underline" : "text-gray-600 hover:text-gray-900"}`}
-                onClick={() => handleButtonClick(status)}
-              >
-                {status}
-              </button>
             ))}
           </div>
 
-          {/* Search and Filter Icon */}
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <FaFilter
-                size={24}
-                className="cursor-pointer text-gray-600 hover:text-gray-900"
-                onClick={() => setShowFilterOptions(!showFilterOptions)}
-              />
-              {showFilterOptions && (
-                <div className="absolute top-8 right-0 bg-white shadow-md rounded-md w-40 p-2 space-y-2">
-                  {['Active Jobs', 'Expired Jobs'].map((option) => (
-                    <button
-                      key={option}
-                      className={`w-full px-4 py-2 cursor-pointer hover:bg-gray-100 ${filter === option ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:text-gray-900"}`}
-                      onClick={() => handleFilterClick(option)}
-                    >
-                      {option}
-                    </button>
-                  ))}
-                </div>
-              )}
+          {/* Filter Section */}
+          <div className="flex justify-between items-center mb-14">
+            <div className="flex text-sm gap-4">
+              {['All', 'Approved', 'Rejected', 'Pending Approvals'].map((status) => (
+                <button
+                  key={status}
+                  className={`px-4 rounded-[10000px] py-1 ${filter === status ? "text-blue-400 underline" : "text-gray-600 hover:text-gray-900"}`}
+                  onClick={() => handleButtonClick(status)}
+                >
+                  {status}
+                </button>
+              ))}
+            </div>
+
+            {/* Search and Filter Icon */}
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <FaFilter
+                  size={24}
+                  className="cursor-pointer text-gray-600 hover:text-gray-900"
+                  onClick={() => setShowFilterOptions(!showFilterOptions)}
+                />
+                {showFilterOptions && (
+                  <div className="absolute top-8 right-0 bg-white shadow-md rounded-md w-40 p-2 space-y-2">
+                    {['Active Jobs', 'Expired Jobs'].map((option) => (
+                      <button
+                        key={option}
+                        className={`w-full px-4 py-2 cursor-pointer hover:bg-gray-100 ${filter === option ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:text-gray-900"}`}
+                        onClick={() => handleFilterClick(option)}
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Render Job Cards */}
-        <div className="w-full self-center mt-6">
-          <h2 className="text-2xl font-bold mb-4">Job Listings</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-stretch">
-            {error ? (
-              <p className="text-red-600">{error}</p>
-            ) : jobs.length === 0 ? (
-              <p className="text-gray-600">No jobs available at the moment.</p>
-            ) : currentJobs.length === 0 ? (
-              <p className="alert alert-danger w-full col-span-full text-center">!! No Jobs Found !!</p>
-            ) : (
-              currentJobs.map((job) => (
-                <ApplicationCard key={job.id} application={{ ...job, total_views: job.total_views }} />
-              ))
-            )}
+          {/* Render Job Cards */}
+          <div className="w-full self-center mt-6">
+            <h2 className="text-2xl font-bold mb-4">Job Listings</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-stretch">
+              {error ? (
+                <p className="text-red-600">{error}</p>
+              ) : jobs.length === 0 ? (
+                <p className="text-gray-600">No jobs available at the moment.</p>
+              ) : currentJobs.length === 0 ? (
+                <p className="alert alert-danger w-full col-span-full text-center">!! No Jobs Found !!</p>
+              ) : (
+                currentJobs.map((job) => (
+                  <ApplicationCard key={job.id} application={{ ...job, total_views: job.total_views }} />
+                ))
+              )}
+            </div>
+            <Pagination
+              currentPage={currentJobPage}
+              totalItems={filteredJobs.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={handleJobPageChange}
+            />
           </div>
-          <Pagination
-            currentPage={currentJobPage}
-            totalItems={filteredJobs.length}
-            itemsPerPage={itemsPerPage}
-            onPageChange={handleJobPageChange}
-          />
-        </div>
 
-        {/* Render Internship Cards */}
-        <div className="w-full self-center mt-6">
-          <h2 className="text-2xl font-bold mb-4">Internship Listings</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-stretch">
-            {error ? (
-              <p className="text-red-600">{error}</p>
-            ) : internships.length === 0 ? (
-              <p className="text-gray-600">No internships available at the moment.</p>
-            ) : currentInterns.length === 0 ? (
-              <p className="alert alert-danger w-full col-span-full text-center">!! No Internships Found !!</p>
-            ) : (
-              currentInterns.map((intern) => (
-                <ApplicationCard key={intern.id} application={{ ...intern, total_views: intern.total_views }} />
-              ))
-            )}
+          {/* Render Internship Cards */}
+          <div className="w-full self-center mt-6">
+            <h2 className="text-2xl font-bold mb-4">Internship Listings</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-stretch">
+              {error ? (
+                <p className="text-red-600">{error}</p>
+              ) : internships.length === 0 ? (
+                <p className="text-gray-600">No internships available at the moment.</p>
+              ) : currentInterns.length === 0 ? (
+                <p className="alert alert-danger w-full col-span-full text-center">!! No Internships Found !!</p>
+              ) : (
+                currentInterns.map((intern) => (
+                  <ApplicationCard key={intern.id} application={{ ...intern, total_views: intern.total_views }} />
+                ))
+              )}
+            </div>
+            <Pagination
+              currentPage={currentInternPage}
+              totalItems={filteredInterns.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={handleInternPageChange}
+            />
           </div>
-          <Pagination
-            currentPage={currentInternPage}
-            totalItems={filteredInterns.length}
-            itemsPerPage={itemsPerPage}
-            onPageChange={handleInternPageChange}
-          />
         </div>
       </div>
-    </div>
   );
 };
 

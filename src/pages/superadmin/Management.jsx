@@ -6,7 +6,7 @@ import SuperAdminPageNavbar from "../../components/SuperAdmin/SuperAdminNavBar";
 import JobTable from "../../components/SuperAdmin/ManagementTable/JobTable";
 import AchievementTable from "../../components/SuperAdmin/ManagementTable/AchievementTable";
 import InternshipTable from "../../components/SuperAdmin/ManagementTable/InternshipTable";
-import { LoaderContext } from "../../components/Common/Loader"; // Import Loader Context
+import { LoaderContext } from "../../components/Common/Loader";
 import { toast, ToastContainer } from "react-toastify";
 
 export default function MailPage() {
@@ -25,20 +25,19 @@ export default function MailPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
   const navigate = useNavigate();
-  const token = Cookies.get("jwt"); // Retrieve JWT from cookies
-  const { isLoading, setIsLoading } = useContext(LoaderContext); // Use Loader Context
+  const token = Cookies.get("jwt");
+  const { isLoading, setIsLoading } = useContext(LoaderContext);
 
-  // Decode JWT to check user role
   useEffect(() => {
     if (!token) {
-      navigate("/login"); // Redirect if no token
+      navigate("/login");
       return;
     }
 
     try {
-      const payload = JSON.parse(atob(token.split(".")[1])); // Decode JWT payload
+      const payload = JSON.parse(atob(token.split(".")[1]));
       if (payload.role !== "superadmin") {
-        navigate("/"); // Redirect if not superadmin
+        navigate("/");
       }
     } catch (err) {
       console.error("Invalid token:", err);
@@ -46,10 +45,9 @@ export default function MailPage() {
     }
   }, [token, navigate]);
 
-  // Fetch jobs, achievements, and internships from backend
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true); // Show loader when fetching data
+      setIsLoading(true);
       try {
         const config = {
           headers: {
@@ -70,14 +68,13 @@ export default function MailPage() {
         console.error("Error fetching data:", err);
         toast.error("Failed to load data.");
       } finally {
-        setIsLoading(false); // Hide loader after data fetch
+        setIsLoading(false);
       }
     };
 
     fetchData();
   }, [token, setIsLoading]);
 
-  // Fetch auto-approval status
   useEffect(() => {
     const fetchAutoApproval = async () => {
       try {
@@ -92,7 +89,6 @@ export default function MailPage() {
     fetchAutoApproval();
   }, [token]);
 
-  // Handle Auto-Approval Toggle
   const toggleAutoApproval = async () => {
     try {
       await axios.post(
@@ -111,7 +107,6 @@ export default function MailPage() {
     }
   };
 
-  // Handle Approve/Reject action for Jobs, Achievements, and Internships
   const handleAction = async (id, action, type) => {
     if (action === "reject") {
       setRejectedItemId(id);
@@ -169,7 +164,6 @@ export default function MailPage() {
     }
   };
 
-  // Handle Delete action for Jobs, Achievements, and Internships
   const handleDelete = async (id, type) => {
     try {
       const endpoint =
@@ -199,7 +193,6 @@ export default function MailPage() {
     }
   };
 
-  // Handle View action for Jobs, Achievements, and Internships
   const handleView = (id, type) => {
     if (type === "job") {
       navigate(`/job-edit/${id}`);
@@ -210,7 +203,6 @@ export default function MailPage() {
     }
   };
 
-  // Handle Select All action with debugging logs
   const handleSelectAll = (type) => {
     console.log(`Select all clicked for ${type}`);
     if (type === "job") {
@@ -234,7 +226,6 @@ export default function MailPage() {
     }
   };
 
-  // Handle Bulk Approve action with debugging logs
   const handleBulkApprove = async (type) => {
     const ids =
       type === "job"
@@ -255,7 +246,6 @@ export default function MailPage() {
     }
   };
 
-  // Handle Bulk Delete action with debugging logs
   const handleBulkDelete = async (type) => {
     const ids =
       type === "job"
@@ -278,8 +268,6 @@ export default function MailPage() {
     }
   };
 
-
-  // Handle Feedback Submission
   const handleFeedbackSubmit = async () => {
     try {
       const response = await axios.post(
@@ -302,7 +290,6 @@ export default function MailPage() {
       setRejectedItemId(null);
       setRejectedItemType(null);
 
-      // Update the state to reflect the rejection
       if (rejectedItemType === "job") {
         setJobs((prev) =>
           prev.map((job) =>
@@ -332,7 +319,6 @@ export default function MailPage() {
     }
   };
 
-  // Pagination handler
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
@@ -388,6 +374,7 @@ export default function MailPage() {
             handleBulkApprove={handleBulkApprove}
             handleBulkDelete={handleBulkDelete}
             handleSelectAll={handleSelectAll}
+            setAchievements={setAchievements} // Pass setAchievements here
           />
         )}
 
@@ -412,8 +399,6 @@ export default function MailPage() {
         )}
       </div>
 
-
-      {/* Feedback Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg w-full max-w-md">

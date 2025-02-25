@@ -12,6 +12,7 @@ const StudentMail = () => {
   const [newMessage, setNewMessage] = useState("");
   const [status, setStatus] = useState(null);
   const [studentId, setStudentId] = useState(null);
+  const studentName = Cookies.get("username")
 
   useEffect(() => {
     const token = Cookies.get("jwt");
@@ -214,7 +215,7 @@ const StudentMail = () => {
                           <div
                             className={`w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center text-lg ml-2`}
                           >
-                            S
+                            {studentName[0]}
                           </div>
                         )}
                       </div>

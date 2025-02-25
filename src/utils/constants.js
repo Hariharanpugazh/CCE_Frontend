@@ -25,6 +25,12 @@ const AppPages = {
     displayName: "Internships",
   },
 
+  studymaterialPage:{
+    route: "/study-material",
+    name: "studyMaterial",
+    displayName: "Study Material",
+  },
+
   jobDashboard: {
     route: "/jobs",
     name: "StudentJobDashboard",
@@ -60,6 +66,7 @@ const AppPages = {
     name: "resetPassword",
     displayName: "Reset Password",
   },
+  
 };
 
 const apiEndpoints = {

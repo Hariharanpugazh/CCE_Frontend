@@ -156,77 +156,78 @@ const AdminHome = () => {
   };
 
   return (
-    <div className="flex flex-col w-full h-screen overflow-auto bg-gray-100 ml-26">
+    <div className="flex w-full h-screen overflow-auto bg-gray-100">
       <AdminPageNavbar />
-      <header className="flex flex-col items-center justify-center py-6 container self-center">
-        <p className="text-4xl font-bold tracking-[0.8px]">Admin Dashboard</p>
-        <p className="text-lg mt-2 text-center text-gray-600">
-          Explore all the Postings in all the existing fields around the globe.
-        </p>
-      </header>
-      <div className="w-[80%] mx-auto">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
-          {cardsData.map((card, index) => (
-            <div key={index} className="bg-white rounded-lg shadow-sm p-4">
-              <div className="flex items-start justify-between">
-                <div className="flex flex-col gap-1">
-                  <span className="font-normal text-sm text-gray-500">{card.title}</span>
-                  <span className="text-2xl font-semibold text-gray-800">{card.count}</span>
-                </div>
-                <div className="p-2 bg-yellow-500 text-white rounded flex items-center justify-center shadow-sm">
-                  {card.icon}
+      <div className="flex-1 flex flex-col">
+        <header className="flex flex-col items-center justify-center py-10 container self-center">
+          <p className="text-4xl font-bold tracking-[0.8px]">Admin Dashboard</p>
+          <p className="text-lg mt-2 text-center text-gray-600">
+            Explore all the Postings in all the existing fields around the globe.
+          </p>
+        </header>
+        <div className="px-10 pb-14">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+            {cardsData.map((card, index) => (
+              <div key={index} className="bg-white rounded-lg shadow-sm p-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex flex-col gap-1">
+                    <span className="font-normal text-sm text-gray-500">{card.title}</span>
+                    <span className="text-2xl font-semibold text-gray-800">{card.count}</span>
+                  </div>
+                  <div className="p-2 bg-yellow-500 text-white rounded flex items-center justify-center shadow-sm">
+                    {card.icon}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Filter Section with Yellow Navigation */}
-        <div className="flex justify-between items-center my-6">
-          <div className="flex text-sm gap-4">
-            {["All", "Approved", "Rejected", "Pending Approvals", "Jobs", "Internships"].map((status) => (
-              <button
-                key={status}
-                className={`px-4 rounded-full py-1 ${
-                  filter === status ? "bg-yellow-500 text-white" : "bg-gray-200 text-gray-600 hover:bg-gray-300"
-                }`}
-                onClick={() => setFilter(status)}
-              >
-                {status}
-              </button>
             ))}
           </div>
-        </div>
 
-        {/* Displaying the Cards */}
-        <div className="w-full self-center mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 justify-stretch">
-          {getPaginatedData(filteredJobs).map((job) => (
-            <ApplicationCard
-              key={job._id}
-              application={{ ...job, ...job.job_data, total_views: job.total_views }}
-              handleCardClick={() => {}}
-              isSaved={undefined}
-            />
-          ))}
-        </div>
-        <div className="w-full self-center mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 justify-stretch">
-          {getPaginatedData(filteredInterns).map((internship) => (
-            <ApplicationCard
-              key={internship._id}
-              application={{ ...internship, ...internship.internship_data, total_views: internship.total_views }}
-              handleCardClick={() => {}}
-              isSaved={undefined}
-            />
-          ))}
-        </div>
+          {/* Filter Section with Yellow Navigation */}
+          <div className="flex justify-between items-center my-6">
+            <div className="flex text-sm gap-4">
+              {["All", "Approved", "Rejected", "Pending Approvals", "Jobs", "Internships"].map((status) => (
+                <button
+                  key={status}
+                  className={`px-4 rounded-full py-1 ${filter === status ? "bg-yellow-500 text-white" : "bg-gray-200 text-gray-600 hover:bg-gray-300"
+                    }`}
+                  onClick={() => setFilter(status)}
+                >
+                  {status}
+                </button>
+              ))}
+            </div>
+          </div>
 
-        {/* Pagination */}
-        <Pagination
-          currentPage={currentPage}
-          totalItems={filteredJobs.length + filteredInterns.length}
-          itemsPerPage={itemsPerPage}
-          onPageChange={setCurrentPage}
-        />
+          {/* Displaying the Cards */}
+          <div className="w-full self-center mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 justify-stretch">
+            {getPaginatedData(filteredJobs).map((job) => (
+              <ApplicationCard
+                key={job._id}
+                application={{ ...job, ...job.job_data, total_views: job.total_views }}
+                handleCardClick={() => { }}
+                isSaved={undefined}
+              />
+            ))}
+          </div>
+          <div className="w-full self-center mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 justify-stretch">
+            {getPaginatedData(filteredInterns).map((internship) => (
+              <ApplicationCard
+                key={internship._id}
+                application={{ ...internship, ...internship.internship_data, total_views: internship.total_views }}
+                handleCardClick={() => { }}
+                isSaved={undefined}
+              />
+            ))}
+          </div>
+
+          {/* Pagination */}
+          <Pagination
+            currentPage={currentPage}
+            totalItems={filteredJobs.length + filteredInterns.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setCurrentPage}
+          />
+        </div>
       </div>
     </div>
   );

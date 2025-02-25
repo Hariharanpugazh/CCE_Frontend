@@ -6,12 +6,153 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { FaCalendarAlt } from 'react-icons/fa';
+import { FaClipboardList, FaFileSignature, FaRegFileAlt, FaSuitcase } from 'react-icons/fa';
 import AdminPageNavbar from "../../components/Admin/AdminNavBar";
 import SuperAdminPageNavbar from "../../components/SuperAdmin/SuperAdminNavBar";
+import { FormInputField, FormTextAreaField } from '../../components/Common/InputField';
+
+const InternshipDetails = ({ formData, setFormData }) => {
+  return (
+    <>
+      <div className='flex flex-col space-y-2'>
+        <FormInputField
+          label={"Internship Title"}
+          args={{ placeholder: "Enter Internship Title", value: formData.title }}
+          setter={(val) => setFormData(prev => ({ ...prev, title: val }))}
+        />
+        <FormInputField
+          label={"Internship Location"}
+          args={{ placeholder: "Enter Internship Location", value: formData.location }}
+          setter={(val) => setFormData(prev => ({ ...prev, location: val }))}
+        />
+        <FormInputField
+          label={"Industry Type"}
+          args={{ placeholder: "Enter Industry Type", value: formData.industry_type }}
+          setter={(val) => setFormData(prev => ({ ...prev, industry_type: val }))}
+        />
+        <FormInputField
+          label={"Internship Type"}
+          args={{ placeholder: "Enter Internship Type", value: formData.internship_type }}
+          setter={(val) => setFormData(prev => ({ ...prev, internship_type: val }))}
+        />
+        <FormInputField
+          label={"Company Name"}
+          args={{ placeholder: "Enter Company Name", value: formData.company_name }}
+          setter={(val) => setFormData(prev => ({ ...prev, company_name: val }))}
+        />
+      </div>
+
+      <div className='flex flex-col space-y-2'>
+        <FormTextAreaField
+          label={"Internship Description"}
+          args={{ placeholder: "Enter a brief description of the internship", value: formData.job_description }}
+          setter={(val) => setFormData(prev => ({ ...prev, job_description: val }))}
+        />
+        <FormInputField
+          label={"Company Website"}
+          args={{ placeholder: "Enter Company Website URL", value: formData.company_website }}
+          setter={(val) => setFormData(prev => ({ ...prev, company_website: val }))}
+        />
+        <FormInputField
+          label={"Duration"}
+          args={{ placeholder: "Enter Duration (e.g., 3 months)", value: formData.duration }}
+          setter={(val) => setFormData(prev => ({ ...prev, duration: val }))}
+        />
+        <FormInputField
+          label={"Stipend Range"}
+          args={{ placeholder: "Enter Stipend Range (e.g., $500 - $1000)", value: formData.stipend }}
+          setter={(val) => setFormData(prev => ({ ...prev, stipend: val }))}
+        />
+      </div>
+    </>
+  );
+};
+
+const InternshipRequirements = ({ formData, setFormData }) => {
+  return (
+    <>
+      <div className='flex flex-col space-y-2'>
+        <FormInputField
+          label={"Technical Skills Required"}
+          args={{ placeholder: "Enter Technical Skills (comma-separated)", value: formData.technical_skills.join(',') }}
+          setter={(val) => setFormData(prev => ({ ...prev, technical_skills: val.split(',') }))}
+        />
+        <FormInputField
+          label={"Soft Skills Required"}
+          args={{ placeholder: "Enter Soft Skills (comma-separated)", value: formData.soft_skills.join(',') }}
+          setter={(val) => setFormData(prev => ({ ...prev, soft_skills: val.split(',') }))}
+        />
+        <FormInputField
+          label={"Educational Requirement"}
+          args={{ placeholder: "Enter Educational Requirement (e.g., Bachelor's Degree)", value: formData.education_requirements }}
+          setter={(val) => setFormData(prev => ({ ...prev, education_requirements: val }))}
+        />
+      </div>
+
+      <div className='flex flex-col space-y-2'>
+        <FormTextAreaField
+          label={"Documents Required"}
+          args={{ placeholder: "List required documents (e.g., Resume, Cover Letter)", value: formData.documents_required }}
+          setter={(val) => setFormData(prev => ({ ...prev, documents_required: val }))}
+        />
+        <FormInputField
+          label={"Additional Skills"}
+          args={{ placeholder: "Enter Additional Skills (comma-separated)", value: formData.additional_skills.join(',') }}
+          setter={(val) => setFormData(prev => ({ ...prev, additional_skills: val.split(',') }))}
+        />
+      </div>
+    </>
+  );
+};
+
+const ApplicationProcess = ({ formData, setFormData }) => {
+  return (
+    <>
+      <div className='flex flex-col space-y-2'>
+        <FormInputField
+          label={"Internship Posting Date"}
+          args={{ placeholder: "Enter Posting Date (YYYY-MM-DD)", type: "date", value: formData.internship_posting_date }}
+          setter={(val) => setFormData(prev => ({ ...prev, internship_posting_date: val }))}
+        />
+        <FormInputField
+          label={"Application Deadline"}
+          args={{ placeholder: "Enter Application Deadline (YYYY-MM-DD)", type: "date", value: formData.application_deadline }}
+          setter={(val) => setFormData(prev => ({ ...prev, application_deadline: val }))}
+        />
+        <FormInputField
+          label={"Interview Start Date (If Applicable)"}
+          args={{ placeholder: "Enter Interview Start Date (YYYY-MM-DD)", type: "date", value: formData.interview_start_date }}
+          setter={(val) => setFormData(prev => ({ ...prev, interview_start_date: val }))}
+        />
+        <FormTextAreaField
+          label={"Steps to Apply"}
+          args={{ placeholder: "Describe the steps candidates need to take to apply", value: formData.steps_to_apply }}
+          setter={(val) => setFormData(prev => ({ ...prev, steps_to_apply: val }))}
+        />
+      </div>
+
+      <div className='flex flex-col space-y-2'>
+        <FormInputField
+          label={"Interview End Date (If Applicable)"}
+          args={{ placeholder: "Enter Interview End Date (YYYY-MM-DD)", type: "date", value: formData.interview_end_date }}
+          setter={(val) => setFormData(prev => ({ ...prev, interview_end_date: val }))}
+        />
+        <FormInputField
+          label={"Internship Link"}
+          args={{ placeholder: "Enter the application link", value: formData.internship_link }}
+          setter={(val) => setFormData(prev => ({ ...prev, internship_link: val }))}
+        />
+        <FormTextAreaField
+          label={"Selection Process"}
+          args={{ placeholder: "Describe the selection process for applicants", value: formData.selection_process }}
+          setter={(val) => setFormData(prev => ({ ...prev, selection_process: val }))}
+        />
+      </div>
+    </>
+  );
+};
 
 const InternPostForm = () => {
-  // Load AI-generated internship data from sessionStorage
   const storedInternshipData = sessionStorage.getItem("internshipData");
   const initialInternshipData = storedInternshipData ? JSON.parse(storedInternshipData) : {};
 
@@ -19,6 +160,8 @@ const InternPostForm = () => {
     title: initialInternshipData.title || '',
     company_name: initialInternshipData.company_name || '',
     location: initialInternshipData.job_location || '',
+    industry_type: initialInternshipData.industry_type || '',
+    internship_type: initialInternshipData.work_type || '',
     duration: initialInternshipData.duration || '',
     stipend: initialInternshipData.salary_range || '',
     application_deadline: initialInternshipData.application_deadline && !isNaN(Date.parse(initialInternshipData.application_deadline))
@@ -27,20 +170,43 @@ const InternPostForm = () => {
     skills_required: initialInternshipData.required_skills || [],
     job_description: initialInternshipData.job_description || '',
     company_website: initialInternshipData.company_website || '',
-    internship_type: initialInternshipData.work_type || '',
     job_link: initialInternshipData.job_link || '',
-    education_requirements: initialInternshipData.education_requirements || '' // Added optional field
+    education_requirements: initialInternshipData.education_requirements || '',
+    technical_skills: initialInternshipData.technical_skills || [],
+    soft_skills: initialInternshipData.soft_skills || [],
+    documents_required: initialInternshipData.documents_required || '',
+    additional_skills: initialInternshipData.additional_skills || [],
+    internship_posting_date: initialInternshipData.internship_posting_date && !isNaN(Date.parse(initialInternshipData.internship_posting_date))
+      ? new Date(initialInternshipData.internship_posting_date)
+      : null,
+    interview_start_date: initialInternshipData.interview_start_date && !isNaN(Date.parse(initialInternshipData.interview_start_date))
+      ? new Date(initialInternshipData.interview_start_date)
+      : null,
+    interview_end_date: initialInternshipData.interview_end_date && !isNaN(Date.parse(initialInternshipData.interview_end_date))
+      ? new Date(initialInternshipData.interview_end_date)
+      : null,
+    internship_link: initialInternshipData.internship_link || '',
+    selection_process: initialInternshipData.selection_process || '',
+    steps_to_apply: initialInternshipData.steps_to_apply || ''
   });
 
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [toastMessage, setToastMessage] = useState('');
   const [isTypeOpen, setIsTypeOpen] = useState(false);
   const [urlError, setUrlError] = useState('');
   const [deadlineError, setDeadlineError] = useState('');
   const navigate = useNavigate();
   const [userRole, setUserRole] = useState(null);
   const [userId, setUserId] = useState(null);
+
+  const [categories, setCategories] = useState({
+    "Internship Details": { status: "active", icon: <FaSuitcase /> },
+    "Internship Requirements": { status: "unvisited", icon: <FaClipboardList /> },
+    "Application Process": { status: "unvisited", icon: <FaFileSignature /> },
+    "Summary": { status: "unvisited", icon: <FaRegFileAlt /> }
+  });
 
   const internshipTypes = [
     'Full-time',
@@ -84,12 +250,12 @@ const InternPostForm = () => {
       setError('You do not have permission to access this page.');
     }
     if (token) {
-      const payload = JSON.parse(atob(token.split(".")[1])); // Decode JWT payload
-      setUserRole(payload.role); // Assuming the payload has a 'role' field
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      setUserRole(payload.role);
       if (payload.role === "admin") {
-        setUserId(payload.admin_user); // Assuming the payload has an 'id' field
+        setUserId(payload.admin_user);
       } else if (payload.role === "superadmin") {
-        setUserId(payload.superadmin_user); // Assuming the payload has an 'id' field
+        setUserId(payload.superadmin_user);
       }
     }
   }, [navigate]);
@@ -150,202 +316,222 @@ const InternPostForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate URL
     if (formData.company_website && !validateUrl(formData.company_website)) {
-      setUrlError('Invalid URL');
-      return;
+        setUrlError('Invalid URL');
+        return;
     }
 
-    // Validate application deadline
+    // Validate Deadline
     if (!validateDeadline(formData.application_deadline)) {
-      return;
+        return;
     }
 
     setIsSubmitting(true);
     setMessage('');
+    setError('');
 
     try {
-      const token = Cookies.get('jwt');
-      if (!token) {
-        setError('No token found. Please log in.');
-        setIsSubmitting(false);
-        return;
-      }
+        const token = Cookies.get('jwt');
+        if (!token) {
+            setError('No token found. Please log in.');
+            setIsSubmitting(false);
+            return;
+        }
 
-      const formattedData = {
-        ...formData,
-        application_deadline: formData.application_deadline.toISOString().split('T')[0],
-      };
+        // Replace empty fields with "NA"
+        const formattedData = Object.keys(formData).reduce((acc, key) => {
+          acc[key] = formData[key] === '' ? 'NA' : formData[key];
+          return acc;
+        }, {});
 
-      const response = await axios.post(
-        'https://cce-backend-54k0.onrender.com/api/post-internship/',
-        { ...formattedData, userId, role: userRole },
-      );
-      setMessage(response.data.message);
-      setError('');
-      window.location.href = `${window.location.origin}/internships`;
+        // Ensure application_deadline is properly formatted
+        formattedData.application_deadline =
+            formattedData.application_deadline instanceof Date
+            ? formattedData.application_deadline.toISOString().split('T')[0]
+            : formattedData.application_deadline; // If it's already a string, use it as is
+
+        console.log("Sending data to API:", formattedData); // Debugging
+
+        // API Call
+        const response = await axios.post(
+            'https://cce-backend-54k0.onrender.com/api/post-internship/',
+            { ...formattedData, userId, role: userRole },
+            {
+                headers: { Authorization: `Bearer ${token}` }, // Ensure auth header
+            }
+        );
+
+        console.log("API Response:", response.data); // Debugging
+
+        setMessage(response.data.message);
+        window.location.href = `${window.location.origin}/internships`;
     } catch (error) {
-      setError(`Error: ${error.response?.data?.error || 'Something went wrong'}`);
-      setMessage('');
+        console.error("API Error:", error); // Debugging
+        setError(`Error: ${error.response?.data?.error || 'Something went wrong'}`);
+        setToastMessage(`Error: ${error.response?.data?.error || 'Something went wrong'}`);
     } finally {
-      setIsSubmitting(false);
+        setIsSubmitting(false);
     }
-  };
+};
+
+  useEffect(() => {
+    if (toastMessage) {
+      const timer = setTimeout(() => {
+        setToastMessage('');
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toastMessage]);
+
+  useEffect(() => {
+    if (toastMessage) {
+      const timer = setTimeout(() => {
+        setToastMessage('');
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toastMessage]);
 
   if (error) {
     return <div className="text-red-600">{error}</div>;
   }
 
+  const categoryKeys = Object.keys(categories);
+  const activeIndex = categoryKeys.findIndex(key => categories[key].status === "active");
+
+  const handleNavigation = (direction) => {
+    setCategories(prevCategories => {
+      const updatedCategories = { ...prevCategories };
+
+      if (activeIndex !== -1) {
+        const currentKey = categoryKeys[activeIndex];
+        const nextIndex = direction === "next" ? activeIndex + 1 : activeIndex - 1;
+
+        if (nextIndex >= 0 && nextIndex < categoryKeys.length) {
+          const nextKey = categoryKeys[nextIndex];
+
+          if (direction === "next") {
+            updatedCategories[currentKey] = { ...updatedCategories[currentKey], status: "completed" };
+          }
+
+          updatedCategories[nextKey] = { ...updatedCategories[nextKey], status: "active" };
+
+          if (direction === "prev") {
+            for (let i = nextIndex + 1; i < categoryKeys.length; i++) {
+              updatedCategories[categoryKeys[i]] = { ...updatedCategories[categoryKeys[i]], status: "unvisited" };
+            }
+          }
+        }
+      }
+
+      return updatedCategories;
+    });
+  };
+
   return (
-    <motion.div
-      className="max-w mx-auto p-8 bg-white shadow-xl rounded-2xl relative ml-50"
-      // initial={{ opacity: 0, y: 30 }}
-      // animate={{ opacity: 1, y: 0 }}
-      // transition={{ duration: 0.8 }}
-    >
+    <motion.div className="flex bg-gray-100 min-h-screen">
       {userRole === "admin" && <AdminPageNavbar />}
       {userRole === "superadmin" && <SuperAdminPageNavbar />}
-      <h2 className="text-3xl pt-4 font-bold mb-4 text-gray-800 text-center">Post an Internship</h2>
 
-      {message && <p className="text-green-600 mb-4 text-center">{message}</p>}
-
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 pr-4 pl-4 gap-6">
-        {Object.keys(formData).map((field) => {
-          if (field !== 'application_deadline' && field !== 'skills_required' && field !== 'internship_type') {
-            return (
-              <div key={field} className="col-span-1">
-                <label className="block text-sm font-semibold mb-2 capitalize">
-                  {field.replace(/_/g, ' ')} {field !== 'job_link' && field !== 'education_requirements' && <span className="text-red-600">*</span>}
-                </label>
-                <motion.input
-                  type={field.includes('email') ? 'email' : field.includes('phone') ? 'tel' : 'text'}
-                  name={field}
-                  value={formData[field]}
-                  onChange={handleChange}
-                  required={field !== 'job_link' && field !== 'education_requirements'}
-                  whileHover={{ backgroundColor: '#e0f2ff' }}
-                  className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition-shadow"
-                  placeholder={`Enter ${field.replace(/_/g, ' ')}`}
-                />
-                {field === 'company_website' && urlError && (
-                  <p className="text-red-600 text-sm mt-1">{urlError}</p>
-                )}
-              </div>
-            );
-          }
-          return null;
-        })}
-
-        <div className="col-span-1">
-          <label className="block text-sm font-semibold mb-2 capitalize">
-            Skills Required <span className="text-red-600">*</span>
-          </label>
-          <motion.input
-            type="text"
-            name="skills_required"
-            onKeyDown={handleSkillsChange}
-            whileHover={{ backgroundColor: '#e0f2ff' }}
-            className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition-shadow"
-            placeholder="Enter required skills and press Enter"
-          />
-          <div className="mt-2 flex flex-wrap gap-2">
-            {formData.skills_required.map((skill, index) => (
-              <div key={index} className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm flex items-center gap-2">
-                <span>{skill}</span>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveSkill(skill)}
-                  className="text-blue-600 hover:text-blue-800"
-                >
-                  x
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="col-span-1 relative">
-          <label className="block text-sm font-semibold mb-2 capitalize">
-            Internship Type <span className="text-red-600">*</span>
-          </label>
-          <motion.div
-            className="cursor-pointer w-full border border-gray-300 p-2.5 rounded-lg flex justify-between items-center transition-all duration-300"
-            onClick={() => setIsTypeOpen(!isTypeOpen)}
-            whileHover={{
-              backgroundColor: '#D1E7FF',
-              borderColor: '#3B82F6',
-            }}
-            style={{
-              borderColor: isTypeOpen ? '#3B82F6' : '#D1D5DB',
-              backgroundColor: isTypeOpen ? '#D1E7FF' : 'white',
-            }}
-          >
-            <span className="text-sm text-gray-700">
-              {formData.internship_type || 'Select Internship Type'}
-            </span>
-            <motion.span
-              whileHover={{
-                scale: 1.2,
-              }}
-              className="text-sm text-gray-700"
+      <div className='flex-1 flex items-center justify-center p-6'>
+        <div className='flex-1 p-8 bg-white rounded-xl flex flex-col h-[80%]'>
+          <div className='flex justify-between items-center text-2xl pb-4 border-b border-gray-300'>
+            <p> Post an Internship </p>
+            <button
+              className='px-3 p-1.5 border rounded-lg text-sm'
+              onClick={() => navigate('/internshipselection')}
             >
-              {isTypeOpen ? '▲' : '▼'}
-            </motion.span>
-          </motion.div>
+              Cancel
+            </button>
+          </div>
 
-          {isTypeOpen && (
-            <div className="absolute z-10 mt-2 space-y-2 p-3 border border-gray-300 rounded-lg w-full bg-white shadow-lg">
-              {internshipTypes.map((type) => (
-                <div key={type} className="flex items-center">
-                  <input
-                    type="radio"
-                    name="internship_type"
-                    value={type}
-                    checked={formData.internship_type === type}
-                    onChange={() => handleTypeChange(type)}
-                    className="mr-2"
-                  />
-                  <span>{type}</span>
-                </div>
-              ))}
+          {toastMessage && (
+            <div className="fixed top-4 right-4 bg-red-500 text-white p-2 rounded shadow">
+              {toastMessage}
             </div>
           )}
-        </div>
 
-        <div className="col-span-1">
-          <label className="block text-sm font-semibold mb-2 capitalize">
-            Application Deadline <span className="text-red-600">*</span>
-          </label>
-          <div className="relative">
-            <DatePicker
-              selected={formData.application_deadline}
-              onChange={handleDateChange}
-              dateFormat="yyyy-MM-dd"
-              className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition-shadow pl-10"
-              placeholderText="Select a date"
-            />
-            <FaCalendarAlt
-              onClick={(e) => {
-                e.target.previousSibling.focus();
-              }}
-              className="absolute left-3 top-3 text-gray-500 cursor-pointer"
-            />
+          <div className='flex items-stretch'>
+            <div className='w-1/4 border-r border-gray-300 flex flex-col p-4'>
+              <div className='border-y border-r border-gray-300 flex flex-col rounded-lg'>
+                {
+                  Object.entries(categories).map(([category, prop], key, array) =>
+                    <div
+                      key={category}
+                      className={`border-l-6 flex items-center p-2 border-b border-gray-300
+                        ${key === 0 ? "rounded-tl-lg" : ""}
+                        ${key === array.length - 1 ? "rounded-bl-lg border-b-transparent" : ""}
+                        ${prop.status === "active" ? "border-l-yellow-400" : prop.status === "completed" ? "border-l-[#00B69B]" : "border-l-gray-300"}`}
+                      onClick={() => {
+                        setCategories(prevCategories => {
+                          const updatedCategories = {};
+                          let foundActive = false;
+
+                          Object.keys(prevCategories).forEach(k => {
+                            if (k === category) {
+                              updatedCategories[k] = { ...prevCategories[k], status: "active" };
+                              foundActive = true;
+                            } else if (foundActive) {
+                              updatedCategories[k] = { ...prevCategories[k], status: "unvisited" };
+                            } else {
+                              updatedCategories[k] = { ...prevCategories[k], status: prevCategories[k].status === "active" ? "completed" : prevCategories[k].status };
+                            }
+                          });
+
+                          return updatedCategories;
+                        });
+                      }}
+                    >
+                      <p className='text-gray-900 p-2 inline-block'>{prop.icon}</p>
+                      <p>{category}</p>
+                    </div>
+                  )
+                }
+              </div>
+
+              <div className='flex justify-between mt-4'>
+                <button
+                  className='px-3 p-1 border rounded text-sm cursor-pointer'
+                  disabled={activeIndex === 0}
+                  onClick={() => handleNavigation("prev")}
+                >
+                  Previous
+                </button>
+
+                {activeIndex === categoryKeys.length - 1 ? (
+                  <button
+                    className="rounded bg-green-500 text-sm px-5 p-1 cursor-pointer"
+                    onClick={handleSubmit}
+                  >
+                    Finish
+                  </button>
+                ) : (
+                  <button
+                    className="rounded bg-yellow-400 text-sm px-5 p-1 cursor-pointer"
+                    disabled={activeIndex === categoryKeys.length - 1}
+                    onClick={() => handleNavigation("next")}
+                  >
+                    Next
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className='flex-1 p-4 grid grid-cols-2 gap-4 items-stretch h-full'>
+              {
+                {
+                  "Internship Details": <InternshipDetails formData={formData} setFormData={setFormData} />,
+                  "Internship Requirements": <InternshipRequirements formData={formData} setFormData={setFormData} />,
+                  "Application Process": <ApplicationProcess formData={formData} setFormData={setFormData} />,
+                  "Summary": <InternshipDetails formData={formData} setFormData={setFormData} />,
+                }[
+                  Object.entries(categories).find(([_, prop]) => prop.status === "active")?.[0]
+                ]
+              }
+            </div>
           </div>
-          {deadlineError && (
-            <p className="text-red-600 text-sm mt-1">{deadlineError}</p>
-          )}
         </div>
-
-        <motion.button
-          type="submit"
-          disabled={isSubmitting}
-          className="col-span-2 bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition-transform shadow-lg"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          {isSubmitting ? 'Submitting...' : 'Post Internship'}
-        </motion.button>
-      </form>
+      </div>
     </motion.div>
   );
 };

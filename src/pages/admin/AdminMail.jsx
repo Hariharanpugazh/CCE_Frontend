@@ -377,7 +377,7 @@ export default function AdminMail() {
   };
 
   return (
-    <div className="flex flex-col h-screen ml-55">
+    <div className="flex flex-col h-screen">
       <AdminPageNavbar />
       <div className="flex flex-1 p-4 space-x-4">
         {/* Sidebar */}

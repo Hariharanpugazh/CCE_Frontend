@@ -32,14 +32,16 @@ export default function ManagementHomePage() {
 
     // Filter and sort admins
     const filteredAdmins = admins
-        .filter((admin) =>
-            (admin.name && admin.name.toLowerCase().includes(filter.toLowerCase())) ||
-            (admin.email && admin.email.toLowerCase().includes(filter.toLowerCase())) ||
-            (admin.status && admin.status.toLowerCase().includes(filter.toLowerCase())) ||
-            (admin.created_at && new Date(admin.created_at).toLocaleString().includes(filter)) ||
-            (admin.last_login && new Date(admin.last_login).toLocaleString().includes(filter))
-        )
-        .filter((admin) => !statusFilter || admin.status === statusFilter)
+        .filter((admin) => {
+            const matchesFilter =
+                (admin.name && admin.name.toLowerCase().includes(filter.toLowerCase())) ||
+                (admin.email && admin.email.toLowerCase().includes(filter.toLowerCase())) ||
+                (admin.status && admin.status.toLowerCase().includes(filter.toLowerCase())) ||
+                (admin.created_at && new Date(admin.created_at).toLocaleString().includes(filter)) ||
+                (admin.last_login && new Date(admin.last_login).toLocaleString().includes(filter));
+            const matchesStatus = !statusFilter || admin.status.toLowerCase() === statusFilter.toLowerCase();
+            return matchesFilter && matchesStatus;
+        })
         .sort((a, b) => {
             if (!sortConfig.key) return 0;
 
@@ -99,9 +101,9 @@ export default function ManagementHomePage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50/50 ml-55">
+        <div className="flex">
             <SuperAdminPageNavbar />
-            <main className="p-8">
+            <main className="p-8 flex-1">
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold mb-6">Admin Management</h1>
 
@@ -122,66 +124,73 @@ export default function ManagementHomePage() {
                     </div>
 
                     {/* Filters */}
-                    <div className="flex items-center space-x-2 mb-6">
-                        <input
-                            type="text"
-                            placeholder="Search admins..."
-                            value={filter}
-                            onChange={(e) => setFilter(e.target.value)}
-                            className="border p-2 rounded w-1/3"
-                        />
-                        <select
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
-                            className="border p-2 rounded"
-                        >
-                            <option value="">All Status</option>
-                            <option value="Active">Active</option>
-                            <option value="Inactive">Inactive</option>
-                        </select>
-                        <button
-                            onClick={handleCreateUser}
-                            className="bg-blue-500 text-white px-4 py-2 rounded ml-auto"
-                        >
-                            Create New Admin
-                        </button>
-                    </div>
+                    <div className="flex flex-wrap items-center mb-10 gap-4">
+                        <div className="flex flex-1 items-center border rounded-lg border-gray-500 w-full">
+                            <input
+                                type="text"
+                                placeholder=" Search..."
+                                value={filter}
+                                onChange={(e) => setFilter(e.target.value)}
+                                className="flex-1 px-3 outline-none w-full"
+                            />
+                            <button className="px-10 py-2 bg-yellow-400 rounded-tr rounded-br border-l border-gray-500">
+                                <strong>Search</strong>
+                            </button>
+                        </div>
 
+                        <div className="flex items-center ml-60 border rounded-lg">
+                            <select
+                                value={statusFilter}
+                                onChange={(e) => setStatusFilter(e.target.value)}
+                                className="flex-1 p-3 border-r px-3  py-2 ml-1 mr-3  rounded-l-lg  appearance-none"
+                            >
+                                <option value="">Filter by Status  ⮟ </option>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                            <button
+                                onClick={handleCreateUser}
+                                className=" text-black px-4 py-2 rounded ml-auto"
+                            >
+                                Create Admin +
+                            </button>
+                        </div>
+                    </div>
                     {/* Table */}
                     {error ? (
                         <p className="text-red-600 text-center">{error}</p>
                     ) : filteredAdmins.length === 0 ? (
                         <p className="text-gray-600 text-center">No admin details match your search.</p>
                     ) : (
-                        <div className="rounded-lg border border-gray-300 bg-white overflow-x-auto">
+                        <div className="rounded-lg border border-gray-300 bg-white overflow-x-auto border border-gray-500">
                             <table className="min-w-full">
                                 <thead>
                                     <tr>
                                         <th
-                                            className="py-2 px-4 border-b border-gray-300 text-left cursor-pointer"
+                                            className="py-3 px-4  border-b  border-gray-500 text-left cursor-pointer"
                                             onClick={() => requestSort('name')}
                                         >
                                             Name {sortConfig.key === 'name' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
                                         </th>
                                         <th
-                                            className="py-2 px-4 border-b border-gray-300 text-left cursor-pointer"
+                                            className="py-2 px-4 border-b border-gray-500 text-left cursor-pointer"
                                             onClick={() => requestSort('email')}
                                         >
-                                            Email {sortConfig.key === 'email' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
+                                            Email Address{sortConfig.key === 'email' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
                                         </th>
                                         <th
-                                            className="py-2 px-4 border-b border-gray-300 text-left cursor-pointer"
+                                            className="py-2 px-4 border-b border-gray-500 text-left cursor-pointer"
                                             onClick={() => requestSort('created_at')}
                                         >
                                             Date Created {sortConfig.key === 'created_at' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
                                         </th>
                                         <th
-                                            className="py-2 px-4 border-b border-gray-300 text-left cursor-pointer"
+                                            className="py-2 px-4 border-b border-gray-500 text-left cursor-pointer"
                                             onClick={() => requestSort('last_login')}
                                         >
-                                            Last Login {sortConfig.key === 'last_login' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
+                                            Last Logged in {sortConfig.key === 'last_login' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
                                         </th>
-                                        <th className="py-2 px-4 border-b border-gray-300 text-left">Status</th>
+                                        <th className="py-2 px-4 border-b border-gray-500 text-center">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -197,9 +206,8 @@ export default function ManagementHomePage() {
                                             <td className="py-2 px-4 border-b border-gray-300">{admin.last_login ? new Date(admin.last_login).toLocaleString() : "N/A"}</td>
                                             <td className="py-2 px-4 border-b border-gray-300">
                                                 <span
-                                                    className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-                                                        admin.status === "Active" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                                                    }`}
+                                                    className={`inline-block text-center w-30 px-5 py-1  ml-12 rounded-lg text-m font-semibold ${admin.status === "Active" ? "bg-green-100 text-green-500" : "bg-red-100 text-red-500"
+                                                        }`}
                                                 >
                                                     {admin.status || 'N/A'}
                                                 </span>

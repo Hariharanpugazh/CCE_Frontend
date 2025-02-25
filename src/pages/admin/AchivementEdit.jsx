@@ -81,14 +81,13 @@ export default function AchievementEdit() {
     }));
   };
 
-      useEffect(() => {
-          const token = Cookies.get("jwt");
-          if (token) {
-              const payload = JSON.parse(atob(token.split(".")[1])); // Decode JWT payload
-              console.log("Decoded JWT Payload:", payload); // Debugging line
-              setUserRole(payload.role); // Assuming the payload has a 'role' field
-          }
-      }, []);
+  useEffect(() => {
+      const token = Cookies.get("jwt");
+      if (token) {
+          const payload = JSON.parse(atob(token.split(".")[1])); // Decode JWT payload
+          setUserRole(payload.role); // Assuming the payload has a 'role' field
+      }
+  }, []);
 
   const handleSave = async () => {
     try {

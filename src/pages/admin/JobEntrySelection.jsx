@@ -14,7 +14,6 @@ const JobEntrySelection = () => {
   const [jobData, setJobData] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [userRole, setUserRole] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const token = Cookies.get("jwt");
@@ -56,6 +55,7 @@ const JobEntrySelection = () => {
     } catch (err) {
       console.error("Error uploading image:", err);
       setError("Failed to process image. Try again.");
+    } finally {
       setUploading(false);
     }
   };
@@ -92,106 +92,94 @@ const JobEntrySelection = () => {
     multiple: false,
   });
 
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
-
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 px-4">
+    <div className="min-h-screen flex bg-gray-100 ">
       {userRole === "admin" && <AdminPageNavbar />}
       {userRole === "superadmin" && <SuperAdminPageNavbar />}
 
-      <div className="border-2 border-dashed border-gray-500 rounded-lg ml-20 p-10 bg-white shadow-lg flex flex-col items-center space-y-6">
-      <h1 className="text-2xl font-bold mb-6 text-center">How do you want to enter job details?</h1>
+      <div className="flex-1 flex justify-center items-center">
+      <div className="border-gray-700 rounded-lg p-10 bg-white shadow-lg flex flex-col items-center space-y-6 w-full max-w-md">
+        <h1 className="text-2xl font-bold mb-6 text-center">
+          Select your job uploading option
+        </h1>
+        <p className="text-center mb-4">
+          Choose your Preferred method to add the job Details
+        </p>
 
-      <div className="w-full max-w-md flex flex-col items-center space-y-6">
-        {/* Hide Manual Entry if uploading or AI processing is done */}
-        {!uploading && !jobData && (
+        {/* Dropzone for file upload */}
+        {!selectedFile && (
+          <div
+            {...getRootProps()}
+            className={`w-full border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-all ${
+              isDragActive ? "border-blue-500 bg-blue-100" : "border-gray-300"
+            }`}
+          >
+            <input {...getInputProps()} />
+            <p className="text-gray-700">
+              Drag & Drop an Image here, or Click to select a File
+            </p>
+          </div>
+        )}
+
+        {/* Display uploaded file details */}
+        {selectedFile && (
+          <div className="w-full border-2 border-dashed rounded-lg p-6 text-center">
+            <p className="text-gray-700 font-semibold">{selectedFile.name}</p>
+            <button onClick={removeFile} className="text-red-500 mt-2 text-sm hover:underline">
+              Remove File
+            </button>
+          </div>
+        )}
+
+        {/* Separator Line */}
+        {!uploading && !selectedFile && (
+          <p className="text-gray-600">────────────── OR ──────────────</p>
+        )}
+
+        {/* Manual Entry Button - Conditionally rendered */}
+        {!uploading && !selectedFile && (
           <button
             onClick={handleManualEntry}
-            className="w-full bg-[#111933] text-white text-lg px-6 py-3 rounded-lg shadow-lg hover:bg-[#111933] transition-all"
+            className="w-full bg-yellow-500 text-black text-lg px-6 py-3 rounded-lg shadow-lg hover:bg-yellow-600 transition-all mt-4"
           >
             Manual Entry
           </button>
         )}
 
-        {/* Button to Open Modal */}
-        <button
-          onClick={openModal}
-          className="w-full bg-[#ffcc00] text-white text-lg px-6 py-3 rounded-lg shadow-lg hover:bg-[#ffcc00] transition-all"
-        >
-          Upload File
-        </button>
+        {error && <p className="text-red-500 mt-4 text-center">{error}</p>}
 
-        {/* Modal for File Upload */}
-        {isModalOpen && (
-          <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold">Upload File</h2>
-                <button onClick={closeModal} className="text-gray-600 hover:text-gray-800">
-                  &times;
-                </button>
-              </div>
-
+        {/* Conditional rendering for upload progress */}
+        {uploading && (
+          <div className="w-full max-w-md mt-8 flex flex-col items-center">
+            <p className="text-lg text-gray-700 font-semibold mb-2">Processing Image...</p>
+            <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden relative">
               <div
-                {...getRootProps()}
-                className={`w-full border-2 ${
-                  isDragActive ? "border-[#ffcc00] bg-[#fff3cd] shadow-md scale-105" : "border-gray-300"
-                } border-dashed rounded-lg p-6 text-center cursor-pointer transition-all hover:border-[#ffcc00] hover:bg-[#fff3cd]`}
-              >
-                <input {...getInputProps()} />
-                {selectedFile ? (
-                  <div className="flex flex-col items-center">
-                    <p className="text-gray-700 font-semibold">{selectedFile.name}</p>
-                    <button onClick={removeFile} className="text-red-500 mt-2 text-sm hover:underline">
-                      Remove File
-                    </button>
-                  </div>
-                ) : isDragActive ? (
-                  <p className="text-[#ffcc00] font-semibold">Drop the file here...</p>
-                ) : (
-                  <p className="text-gray-700">Drag & drop an image here, or click to select a file</p>
-                )}
-              </div>
-
-              {/* Progress Bar UI */}
-              {uploading && (
-                <div className="w-full max-w-md mt-8 flex flex-col items-center">
-                  <p className="text-lg text-gray-700 font-semibold mb-2">Processing Image...</p>
-                  <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden relative">
-                    <div
-                      className="bg-gradient-to-r from-[#ffcc00] to-[#e6b800] h-full transition-all duration-500 ease-in-out"
-                      style={{ width: `${progress}%` }}
-                    ></div>
-                  </div>
-                  <p className="text-sm text-gray-600 mt-2">{progress}% Completed</p>
-                </div>
-              )}
-
-              {/* AI Processing Complete Message */}
-              {progress === 100 && (
-                <div className="text-green-600 text-lg font-semibold text-center mt-4">
-                  AI Processing Complete!
-                </div>
-              )}
-
-              {/* Confirm & Proceed Button (Only Show When Processing is Done) */}
-              {jobData && (
-                <button
-                  onClick={() => navigate("/jobpost")}
-                  className="w-full bg-[#ffcc00] text-white text-lg px-6 py-3 rounded-lg shadow-lg hover:bg-[#e6b800] transition-all"
-                >
-                  Confirm & Proceed
-                </button>
-              )}
-
-              {/* Error Message */}
-              {error && <p className="text-red-500 mt-4 text-center">{error}</p>}
+                className="bg-gradient-to-r from-yellow-500 to-yellow-700 h-full transition-all duration-500 ease-in-out"
+                style={{ width: `${progress}%` }}
+              ></div>
             </div>
+            <p className="text-sm text-gray-600 mt-2">{progress}% Completed</p>
           </div>
         )}
+
+        {/* Conditional rendering for job data */}
+        {progress === 100 && (
+          <div className="text-green-600 text-lg font-semibold text-center mt-4">
+            AI Processing Completed!
+          </div>
+        )}
+
+        {/* Confirm & Proceed Button */}
+        {jobData && (
+          <button
+            onClick={() => navigate("/jobpost")}
+            className="w-full bg-yellow-500 text-black text-lg px-6 py-3 rounded-lg shadow-lg hover:bg-yellow-600 transition-all mt-4"
+          >
+            Confirm & Proceed
+          </button>
+        )}
       </div>
-    </div>
+      </div>
     </div>
   );
 };
