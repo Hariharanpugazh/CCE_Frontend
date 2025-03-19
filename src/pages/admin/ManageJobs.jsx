@@ -7,8 +7,8 @@ import Pagination from "../../components/Admin/pagination";
 import backIcon from "../../assets/icons/back-icon.svg";
 import nextIcon from "../../assets/icons/next-icon.svg";
 import approvedIcon from "../../assets/icons/Approved 1.png";
-import rejectedIcon from "../../assets/icons/rejected 1.png";
-import pendingIcon from "../../assets/icons/pending 1.png"; // Corrected import for pending icon
+import rejectedIcon from "../../assets/icons/Rejected 1.png";
+import pendingIcon from "../../assets/icons/Pending 1.png"; // Corrected import for pending icon
 import NoListing from "../../assets/images/NoListing.svg";
 
 import {
