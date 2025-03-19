@@ -37,7 +37,7 @@
 //   const fetchMessages = async (student_id) => {
 //     try {
 //       const response = await fetch(
-//         `http://localhost:8000/api/get_student_messages/${student_id}/`,
+//         `https://cce-backend-54k0.onrender.com/api/get_student_messages/${student_id}/`,
 //         {
 //           method: "GET",
 //           headers: {
@@ -59,7 +59,7 @@
 //   const markMessagesAsSeenByStudent = async (student_id) => {
 //     try {
 //       const response = await fetch(
-//         `http://localhost:8000/api/mark_messages_as_seen_by_student/${student_id}/`,
+//         `https://cce-backend-54k0.onrender.com/api/mark_messages_as_seen_by_student/${student_id}/`,
 //         {
 //           method: "POST",
 //           headers: {
@@ -94,7 +94,7 @@
 
 //     try {
 //       const response = await fetch(
-//         "http://localhost:8000/api/student_send_message/",
+//         "https://cce-backend-54k0.onrender.com/api/student_send_message/",
 //         {
 //           method: "POST",
 //           headers: {
@@ -325,7 +325,7 @@ const StudentMail = () => {
   const fetchMessages = async (student_id) => {
     try {
       const response = await fetch(
-        `http://localhost:8000/api/get_student_messages/${student_id}/`,
+        `https://cce-backend-54k0.onrender.com/api/get_student_messages/${student_id}/`,
         {
           method: "GET",
           headers: {
@@ -347,7 +347,7 @@ const StudentMail = () => {
   const markMessagesAsSeenByStudent = async (student_id) => {
     try {
       const response = await fetch(
-        `http://localhost:8000/api/mark_messages_as_seen_by_student/${student_id}/`,
+        `https://cce-backend-54k0.onrender.com/api/mark_messages_as_seen_by_student/${student_id}/`,
         {
           method: "POST",
           headers: {
@@ -384,7 +384,7 @@ const StudentMail = () => {
 
     try {
         const response = await fetch(
-            "http://localhost:8000/api/student_send_message/",
+            "https://cce-backend-54k0.onrender.com/api/student_send_message/",
             {
                 method: "POST",
                 headers: {

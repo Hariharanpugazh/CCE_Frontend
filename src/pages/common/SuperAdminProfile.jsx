@@ -21,7 +21,7 @@ const SuperAdminProfile = () => {
         const token = Cookies.get("jwt");
         const userId = JSON.parse(atob(token.split(".")[1])).superadmin_user;
         const response = await axios.get(
-          `http://localhost:8000/api/get-superadmin/${userId}/`
+          `https://cce-backend-54k0.onrender.com/api/get-superadmin/${userId}/`
         );
         const superAdminData = response.data.data;
 
@@ -48,7 +48,7 @@ const SuperAdminProfile = () => {
       };
 
       await axios.put(
-        `http://localhost:8000/api/update-superadmin/${userId}/`,
+        `https://cce-backend-54k0.onrender.com/api/update-superadmin/${userId}/`,
         updatedData
       );
 

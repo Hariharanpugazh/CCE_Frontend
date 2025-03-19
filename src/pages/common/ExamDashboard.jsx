@@ -52,7 +52,7 @@ export default function ExamDashboard() {
       try {
         setIsLoading(true);
         const response = await axios.get(
-          "http://localhost:8000/api/published-exams/"
+          "https://cce-backend-54k0.onrender.com/api/published-exams/"
         );
         const examsWithType = response.data.exams
           .filter(
@@ -96,7 +96,7 @@ export default function ExamDashboard() {
       const token = Cookies.get("jwt");
       const userId = JSON.parse(atob(token.split(".")[1])).student_user;
       const response = await axios.get(
-        `http://localhost:8000/api/saved-exams/${userId}/`
+        `https://cce-backend-54k0.onrender.com/api/saved-exams/${userId}/`
       );
       setSavedExams(response.data.exams.map((exam) => exam._id));
     } catch (err) {

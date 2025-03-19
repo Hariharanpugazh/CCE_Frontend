@@ -30,7 +30,7 @@ const CategoryInput = ({ value, onChange, selectedType, onSelect }) => {
     if (token && inputValue && !isSuggestionSelected) {
       axios
         .get(
-          `http://localhost:8000/api/get-categories/?type=${selectedType}&query=${inputValue}`,
+          `https://cce-backend-54k0.onrender.com/api/get-categories/?type=${selectedType}&query=${inputValue}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -185,7 +185,7 @@ const handleFileUpload = async (index, file) => {
   try {
     const token = Cookies.get("jwt");
     const response = await axios.post(
-      "http://localhost:8000/api/upload-drive-file/", // Backend endpoint for Drive upload
+      "https://cce-backend-54k0.onrender.com/api/upload-drive-file/", // Backend endpoint for Drive upload
       formData,
       {
         headers: {
@@ -315,7 +315,7 @@ export default function StudyMaterialForm() {
       }
 
       const response = await axios.post(
-        "http://localhost:8000/api/post-study-material/",
+        "https://cce-backend-54k0.onrender.com/api/post-study-material/",
         formData,
         {
           headers: {

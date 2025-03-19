@@ -928,7 +928,7 @@ export default function JobPostForm() {
       } else {
         // Create new job
         const response = await axios.post(
-          "http://localhost:8000/api/job_post/",
+          "https://cce-backend-54k0.onrender.com/api/job_post/",
           formDataToSend,
           {
             headers: {

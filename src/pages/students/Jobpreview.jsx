@@ -111,7 +111,7 @@ const JobPreview = () => {
       setLoadingJobs(true);
       try {
         const response = await axios.get(
-          "http://localhost:8000/api/published-jobs/"
+          "https://cce-backend-54k0.onrender.com/api/published-jobs/"
         );
         const jobsData = Array.isArray(response.data)
           ? response.data
@@ -149,7 +149,7 @@ const JobPreview = () => {
     try {
       const token = Cookies.get("jwt");
       const userId = JSON.parse(atob(token.split(".")[1])).student_user;
-      await axios.post("http://localhost:8000/api/apply-job/", {
+      await axios.post("https://cce-backend-54k0.onrender.com/api/apply-job/", {
         studentId: userId,
         jobId: id,
       });
@@ -175,8 +175,8 @@ const JobPreview = () => {
         const isJobSaved = savedJobs.includes(id);
 
         const endpoint = isJobSaved
-            ? `http://localhost:8000/api/unsave-job/${id}/`
-            : `http://localhost:8000/api/save-job/${id}/`;
+            ? `https://cce-backend-54k0.onrender.com/api/unsave-job/${id}/`
+            : `https://cce-backend-54k0.onrender.com/api/save-job/${id}/`;
 
         const response = await axios.post(endpoint, { userId });
 

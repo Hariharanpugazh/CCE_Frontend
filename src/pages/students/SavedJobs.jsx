@@ -23,7 +23,7 @@ export default function SavedJobs() {
         const token = Cookies.get("jwt");
         const userId = JSON.parse(atob(token.split(".")[1])).student_user;
         const response = await axios.get(
-          `http://localhost:8000/api/saved-jobs/${userId}/`
+          `https://cce-backend-54k0.onrender.com/api/saved-jobs/${userId}/`
         );
 
         // Access the jobs array within the response data
@@ -53,7 +53,7 @@ export default function SavedJobs() {
         const token = Cookies.get("jwt");
         const userId = JSON.parse(atob(token.split(".")[1])).student_user;
         const response = await axios.get(
-          `http://localhost:8000/api/saved-internships/${userId}/`
+          `https://cce-backend-54k0.onrender.com/api/saved-internships/${userId}/`
         );
 
         // Access the jobs array within the response data

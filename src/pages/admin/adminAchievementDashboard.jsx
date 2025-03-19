@@ -22,7 +22,7 @@ export default function AchievementDashboard() {
     const fetchPublishedAchievements = async () => {
       setIsLoading(true); // Show loader when fetching data
       try {
-        const response = await axios.get("http://localhost:8000/api/published-achievement/");
+        const response = await axios.get("https://cce-backend-54k0.onrender.com/api/published-achievement/");
         setAchievements(response.data.achievements);
         setFilteredAchievements(response.data.achievements);
       } catch (err) {

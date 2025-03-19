@@ -110,7 +110,7 @@ const InternshipPreview = () => {
       setLoadingInternships(true);
       try {
         const response = await axios.get(
-          "http://localhost:8000/api/published-internship/"
+          "https://cce-backend-54k0.onrender.com/api/published-internship/"
         );
 
         // Check if response.data is an array or if it has a specific property containing the internships
@@ -155,7 +155,7 @@ const InternshipPreview = () => {
     try {
       const token = Cookies.get("jwt");
       const userId = JSON.parse(atob(token.split(".")[1])).student_user;
-      await axios.post("http://localhost:8000/api/apply-internship/", {
+      await axios.post("https://cce-backend-54k0.onrender.com/api/apply-internship/", {
         studentId: userId,
         internshipId: id,
       });
@@ -181,8 +181,8 @@ const InternshipPreview = () => {
         }
 
         const endpoint = saved
-            ? `http://localhost:8000/api/unsave-internship/${id}/`
-            : `http://localhost:8000/api/save-internship/${id}/`;
+            ? `https://cce-backend-54k0.onrender.com/api/unsave-internship/${id}/`
+            : `https://cce-backend-54k0.onrender.com/api/save-internship/${id}/`;
 
         const response = await axios.post(endpoint, { userId });
 

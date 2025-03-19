@@ -151,7 +151,7 @@ export default function AchievementPostForm() {
       formDataObj.append("role", userRole);
 
       const response = await axios.post(
-        "http://localhost:8000/api/upload_achievement/",
+        "https://cce-backend-54k0.onrender.com/api/upload_achievement/",
         formDataObj,
         {
           headers: {

@@ -111,7 +111,7 @@ const InboxPage = () => {
   const fetchAchievements = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/get_achievements_with_admin/"
+        "https://cce-backend-54k0.onrender.com/api/get_achievements_with_admin/"
       );
       setAchievements(response.data.achievements || []);
     } catch (err) {
@@ -122,7 +122,7 @@ const InboxPage = () => {
   const fetchJobs = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/get_jobs_with_admin/"
+        "https://cce-backend-54k0.onrender.com/api/get_jobs_with_admin/"
       );
       let jobsData = response.data.jobs || [];
       if (Array.isArray(jobsData)) {
@@ -142,7 +142,7 @@ const InboxPage = () => {
   const fetchExams = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/get_exams_with_admin/"
+        "https://cce-backend-54k0.onrender.com/api/get_exams_with_admin/"
       );
       let examsData = response.data.exams || [];
       if (Array.isArray(examsData)) {
@@ -161,7 +161,7 @@ const InboxPage = () => {
   const fetchInternships = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/get_internships_with_admin/"
+        "https://cce-backend-54k0.onrender.com/api/get_internships_with_admin/"
       );
       let internshipsData = response.data.internships || [];
       if (Array.isArray(internshipsData)) {
@@ -180,7 +180,7 @@ const InboxPage = () => {
   const fetchStudyMaterials = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/get_study_materials_with_admin/"
+        "https://cce-backend-54k0.onrender.com/api/get_study_materials_with_admin/"
       );
       setStudyMaterials(response.data.study_materials || []);
     } catch (err) {
@@ -191,7 +191,7 @@ const InboxPage = () => {
   const fetchStudentAchievements = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/get_student_achievements_with_students/"
+        "https://cce-backend-54k0.onrender.com/api/get_student_achievements_with_students/"
       );
       setStudentAchievements(response.data.student_achievements || []);
     } catch (err) {
@@ -424,7 +424,7 @@ const InboxPage = () => {
                     //     await markMessagesAsSeen(item.student_id);
                     //     await fetchMessages(item.student_id);
                     //     const response = await axios.get(
-                    //       `http://localhost:8000/api/profile/${item.student_id}/`
+                    //       `https://cce-backend-54k0.onrender.com/api/profile/${item.student_id}/`
                     //     );
                     //     const data = response.data;
                     //     item.name = data.data.name;

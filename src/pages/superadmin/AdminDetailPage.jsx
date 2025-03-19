@@ -70,7 +70,7 @@ const AdminProfile = () => {
   
   
     try {
-      const response = await axios.post(`http://localhost:8000/api/admin-status/${id}/`, {
+      const response = await axios.post(`https://cce-backend-54k0.onrender.com/api/admin-status/${id}/`, {
         status: newStatus,
       });
   
@@ -99,7 +99,7 @@ const AdminProfile = () => {
             return;
           }
 
-          const response = await axios.get(`http://localhost:8000/api/get-admin/${id}/`);
+          const response = await axios.get(`https://cce-backend-54k0.onrender.com/api/get-admin/${id}/`);
           const adminData = response.data.data;
 
           setAdmin(adminData);
@@ -121,7 +121,7 @@ const AdminProfile = () => {
           if (!token) return;
 
           // Fetch jobs and internships
-          const jobsResponse = await axios.get(`http://localhost:8000/api/get-items/${id}/`, {
+          const jobsResponse = await axios.get(`https://cce-backend-54k0.onrender.com/api/get-items/${id}/`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -238,12 +238,12 @@ const AdminProfile = () => {
         department: editableAdmin.department,
       };
 
-      await axios.put(`http://localhost:8000/api/update-admin/${id}/`, updatedData);
+      await axios.put(`https://cce-backend-54k0.onrender.com/api/update-admin/${id}/`, updatedData);
 
       setEditMode(false);
       setShowAdminPopup(false); // Hide pop-up after saving
       // Refresh admin data
-      const response = await axios.get(`http://localhost:8000/api/get-admin/${id}/`);
+      const response = await axios.get(`https://cce-backend-54k0.onrender.com/api/get-admin/${id}/`);
       setAdmin(response.data.data);
     } catch (error) {
       console.error("Error updating profile:", error);

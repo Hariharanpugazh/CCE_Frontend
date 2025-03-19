@@ -61,7 +61,7 @@ export default function InternshipDashboard() {
       setIsLoading(true); // Set loading to true before fetching data
       try {
         setIsLoading(true);
-        const response = await axios.get("http://localhost:8000/api/published-internship/");
+        const response = await axios.get("https://cce-backend-54k0.onrender.com/api/published-internship/");
         const internshipsWithType = response.data.internships.map((internship) => ({
           ...internship.internship_data,
           id: internship._id,
@@ -111,7 +111,7 @@ export default function InternshipDashboard() {
       const token = Cookies.get("jwt");
       if (!token) return;
       const userId = JSON.parse(atob(token.split(".")[1])).student_user;
-      const response = await axios.get(`http://localhost:8000/api/saved-internships/${userId}/`);
+      const response = await axios.get(`https://cce-backend-54k0.onrender.com/api/saved-internships/${userId}/`);
       setSavedInterns(response.data.internships.map((internship) => internship._id));
     } catch (err) {
       console.error("Error fetching saved internships:", err);

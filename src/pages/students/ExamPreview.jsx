@@ -92,7 +92,7 @@ const ExamPreview = () => {
       setLoadingExams(true);
       try {
         const response = await axios.get(
-          "http://localhost:8000/api/published-exams/" // Adjust endpoint as needed
+          "https://cce-backend-54k0.onrender.com/api/published-exams/" // Adjust endpoint as needed
         );
         console.log("Published exams API response:", response.data);
 
@@ -135,7 +135,7 @@ const ExamPreview = () => {
           return;
         }
         const response = await axios.delete(
-          `http://localhost:8000/api/exam-delete/${id}/`,
+          `https://cce-backend-54k0.onrender.com/api/exam-delete/${id}/`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -158,7 +158,7 @@ const ExamPreview = () => {
     try {
       const token = Cookies.get("jwt");
       const userId = JSON.parse(atob(token.split(".")[1])).student_user;
-      await axios.post("http://localhost:8000/api/apply-exam/", {
+      await axios.post("https://cce-backend-54k0.onrender.com/api/apply-exam/", {
         studentId: userId,
         examId: id,
       });
@@ -190,7 +190,7 @@ const ExamPreview = () => {
     try {
       const token = Cookies.get("jwt");
       const userId = JSON.parse(atob(token.split(".")[1])).student_user;
-      await axios.post(`http://localhost:8000/api/save-exam/${id}/`, {
+      await axios.post(`https://cce-backend-54k0.onrender.com/api/save-exam/${id}/`, {
         userId: userId,
         examId: id,
       });

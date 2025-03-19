@@ -82,7 +82,7 @@ export default function SidePreview({ selectedItem, handleViewItem, setSelectedI
             const userId = JSON.parse(atob(token.split(".")[1])).student_user;
             if (selectedItem.job_data) {
                 const res = await axios.post(
-                    `http://localhost:8000/api/save-job/${selectedItem._id}/`,
+                    `https://cce-backend-54k0.onrender.com/api/save-job/${selectedItem._id}/`,
                     { applicationId: selectedItem._id, userId }
                 );
                 if (res.status === 200) {
@@ -91,7 +91,7 @@ export default function SidePreview({ selectedItem, handleViewItem, setSelectedI
                 }
             } else {
                 const res = await axios.post(
-                    `http://localhost:8000/api/save-internship/${selectedItem.id}/`,
+                    `https://cce-backend-54k0.onrender.com/api/save-internship/${selectedItem.id}/`,
                     { applicationId: selectedItem.id, userId }
                 );
                 if (res.status === 200) {
@@ -112,7 +112,7 @@ export default function SidePreview({ selectedItem, handleViewItem, setSelectedI
             const userId = JSON.parse(atob(token.split(".")[1])).student_user;
             if (selectedItem.job_data) {
                 const res = await axios.post(
-                    `http://localhost:8000/api/unsave-job/${selectedItem._id}/`,
+                    `https://cce-backend-54k0.onrender.com/api/unsave-job/${selectedItem._id}/`,
                     { applicationId: selectedItem._id, userId }
                 );
                 if (res.status === 200) {
@@ -121,7 +121,7 @@ export default function SidePreview({ selectedItem, handleViewItem, setSelectedI
                 }
             } else {
                 const res = await axios.post(
-                    `http://localhost:8000/api/unsave-internship/${selectedItem.id}/`,
+                    `https://cce-backend-54k0.onrender.com/api/unsave-internship/${selectedItem.id}/`,
                     { applicationId: selectedItem.id, userId }
                 );
                 if (res.status === 200) {

@@ -731,7 +731,7 @@ export default function ExamPostForm() {
           }
           navigate("/exams");
         } else {
-          const response = await axios.post("http://localhost:8000/api/exam_post/", formDataToSend, { headers });
+          const response = await axios.post("https://cce-backend-54k0.onrender.com/api/exam_post/", formDataToSend, { headers });
           setMessage(response.data.message);
           navigate("/exams");
         }

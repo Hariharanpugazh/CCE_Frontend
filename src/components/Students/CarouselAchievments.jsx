@@ -34,7 +34,7 @@ export default function AchievementDashboard() {
       setIsLoading(true);
       try {
         const response = await axios.get(
-          "http://localhost:8000/api/published-achievement/"
+          "https://cce-backend-54k0.onrender.com/api/published-achievement/"
         );
         const sortedAchievements = response.data.achievements.sort(
           (a, b) => new Date(b.updated_at) - new Date(a.updated_at)

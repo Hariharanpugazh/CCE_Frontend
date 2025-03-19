@@ -29,7 +29,7 @@ const StudentManagement = () => {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/students/");
+        const response = await axios.get("https://cce-backend-54k0.onrender.com/api/students/");
         setStudents(response.data.students);
       } catch (error) {
         console.error("Error fetching students:", error);
@@ -64,7 +64,7 @@ const StudentManagement = () => {
 
   const handleDeleteStudent = async (id) => {
     try {
-      await axios.delete(`http://localhost:8000/api/students/${id}/delete/`);
+      await axios.delete(`https://cce-backend-54k0.onrender.com/api/students/${id}/delete/`);
       setStudents(students.filter((student) => student._id !== id));
       setSelectedStudent(null);
       setShowDeleteConfirm(false);
@@ -77,7 +77,7 @@ const StudentManagement = () => {
   const handleToggleStatus = async (student) => {
     const updatedStatus = student.status === "active" ? "inactive" : "active";
     try {
-      await axios.put(`http://localhost:8000/api/students/${student._id}/update/`, { status: updatedStatus });
+      await axios.put(`https://cce-backend-54k0.onrender.com/api/students/${student._id}/update/`, { status: updatedStatus });
 
       // Update both student list and selected student to reflect changes
       setStudents(
@@ -103,7 +103,7 @@ const StudentManagement = () => {
   const handleSaveChanges = async () => {
     try {
       // Send the updated student data to the backend with the correct URL
-      await axios.put(`http://localhost:8000/api/students/${editableStudent._id}/update/`, editableStudent);
+      await axios.put(`https://cce-backend-54k0.onrender.com/api/students/${editableStudent._id}/update/`, editableStudent);
 
       // Update the local state with the new student data
       setStudents(

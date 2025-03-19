@@ -139,7 +139,7 @@ export default function JobDashboard() {
       try {
         setIsLoading(true);
         const response = await axios.get(
-          "http://localhost:8000/api/published-jobs/"
+          "https://cce-backend-54k0.onrender.com/api/published-jobs/"
         );
         const jobsWithType = response.data.jobs.map((job) => ({
           ...job,
@@ -163,7 +163,7 @@ export default function JobDashboard() {
       const token = Cookies.get("jwt");
       const userId = JSON.parse(atob(token.split(".")[1])).student_user;
       const response = await axios.get(
-        `http://localhost:8000/api/saved-jobs/${userId}/`
+        `https://cce-backend-54k0.onrender.com/api/saved-jobs/${userId}/`
       );
       setSavedJobs(response.data.jobs.map((job) => job._id));
     } catch (err) {

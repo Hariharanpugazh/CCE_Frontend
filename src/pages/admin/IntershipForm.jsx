@@ -864,8 +864,8 @@ const InternPostForm = () => {
 
         const internshipId = sessionStorage.getItem("internshipId");
         const url = internshipId
-          ? `http://localhost:8000/api/internship-edit/${internshipId}/`
-          : "http://localhost:8000/api/post-internship/";
+          ? `https://cce-backend-54k0.onrender.com/api/internship-edit/${internshipId}/`
+          : "https://cce-backend-54k0.onrender.com/api/post-internship/";
         const method = internshipId ? axios.put : axios.post;
 
         const response = await method(url, formDataToSend, {

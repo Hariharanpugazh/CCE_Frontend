@@ -83,7 +83,7 @@ export default function ApplicationCard({
 
     try {
       const jobId = application._id || application.id;
-      await axios.post(`http://localhost:8000/api/increment-view-count/${jobId}/`, {
+      await axios.post(`https://cce-backend-54k0.onrender.com/api/increment-view-count/${jobId}/`, {
         student_id: userId, // Include the student's ObjectId in the request payload
       });
 
@@ -113,16 +113,16 @@ export default function ApplicationCard({
 
       if (application.type === "exam") {
         endpoint = isSaved
-          ? `http://localhost:8000/api/unsave-exam/${jobId}/`
-          : `http://localhost:8000/api/save-exam/${jobId}/`;
+          ? `https://cce-backend-54k0.onrender.com/api/unsave-exam/${jobId}/`
+          : `https://cce-backend-54k0.onrender.com/api/save-exam/${jobId}/`;
       } else if (application.type === "internship") {
         endpoint = isSaved
-          ? `http://localhost:8000/api/unsave-internship/${jobId}/`
-          : `http://localhost:8000/api/save-internship/${jobId}/`;
+          ? `https://cce-backend-54k0.onrender.com/api/unsave-internship/${jobId}/`
+          : `https://cce-backend-54k0.onrender.com/api/save-internship/${jobId}/`;
       } else {
         endpoint = isSaved
-          ? `http://localhost:8000/api/unsave-job/${jobId}/`
-          : `http://localhost:8000/api/save-job/${jobId}/`;
+          ? `https://cce-backend-54k0.onrender.com/api/unsave-job/${jobId}/`
+          : `https://cce-backend-54k0.onrender.com/api/save-job/${jobId}/`;
       }
 
       const response = await axios.post(endpoint, {

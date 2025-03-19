@@ -45,33 +45,33 @@ const StudentProfile = () => {
         const token = Cookies.get("jwt");
         const userId = JSON.parse(atob(token.split(".")[1])).student_user;
 
-        const profileResponse = await axios.get(`http://localhost:8000/api/profile/${userId}/`);
+        const profileResponse = await axios.get(`https://cce-backend-54k0.onrender.com/api/profile/${userId}/`);
         const studentData = profileResponse.data.data;
         console.log("Student Data:", studentData);
         setStudent(studentData);
 
-        const jobsResponse = await axios.get(`http://localhost:8000/api/saved-jobs/${userId}/`);
+        const jobsResponse = await axios.get(`https://cce-backend-54k0.onrender.com/api/saved-jobs/${userId}/`);
         if (jobsResponse.data && jobsResponse.data.jobs) {
           setSavedJobs(jobsResponse.data.jobs);
         }
 
-        const internshipsResponse = await axios.get(`http://localhost:8000/api/saved-internships/${userId}/`);
+        const internshipsResponse = await axios.get(`https://cce-backend-54k0.onrender.com/api/saved-internships/${userId}/`);
         if (internshipsResponse.data && internshipsResponse.data.internships) {
           setSavedInternships(internshipsResponse.data.internships);
         } 
 
-        const appliedInternshipsResponse = await axios.get(`http://localhost:8000/api/applied-internships/${userId}/`);
+        const appliedInternshipsResponse = await axios.get(`https://cce-backend-54k0.onrender.com/api/applied-internships/${userId}/`);
         console.log("Applied Internships Response:", appliedInternshipsResponse.data);
         if (appliedInternshipsResponse.data && appliedInternshipsResponse.data.internships) {
           setAppliedInternships(appliedInternshipsResponse.data.internships);
         }
 
-        const examsResponse = await axios.get(`http://localhost:8000/api/saved-exams/${userId}/`);
+        const examsResponse = await axios.get(`https://cce-backend-54k0.onrender.com/api/saved-exams/${userId}/`);
         if (examsResponse.data && examsResponse.data.exams) {
           setSavedExams(examsResponse.data.exams);
         }
 
-        const appliedJobsResponse = await axios.get(`http://localhost:8000/api/applied-jobs/${userId}/`);
+        const appliedJobsResponse = await axios.get(`https://cce-backend-54k0.onrender.com/api/applied-jobs/${userId}/`);
         console.log("Applied Jobs Response:", appliedJobsResponse.data);
         if (appliedJobsResponse.data && appliedJobsResponse.data.jobs) {
           setAppliedJobs(appliedJobsResponse.data.jobs);

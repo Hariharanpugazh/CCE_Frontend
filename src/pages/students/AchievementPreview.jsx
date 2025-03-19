@@ -25,7 +25,7 @@ export default function AchievementPreview() {
   useEffect(() => {
     const fetchAchievement = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/get-achievement/${id}/`, {
+        const response = await fetch(`https://cce-backend-54k0.onrender.com/api/get-achievement/${id}/`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
