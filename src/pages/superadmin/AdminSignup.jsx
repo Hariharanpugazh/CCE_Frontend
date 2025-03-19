@@ -1,342 +1,3 @@
-// import { useState, useEffect } from "react";
-// import { useNavigate } from "react-router-dom";
-// import { ToastContainer, toast } from "react-toastify";
-// import { FiEye, FiEyeOff } from "react-icons/fi";
-// import login1 from "../../assets/images/LoginImg1.png";
-// import login2 from "../../assets/images/LoginImg2.png";
-// import login3 from "../../assets/images/LoginImg3.png";
-// import Squares from "../../components/ui/GridLogin";
-// import "react-toastify/dist/ReactToastify.css";
-
-// export default function AdminSignup() {
-//   const [formData, setFormData] = useState({
-//     name: "",
-//     email: "",
-//     password: "",
-//     confirmPassword: "",
-//     department: "",
-//     college_name: "",
-//   });
-
-//   const [errors, setErrors] = useState({});
-//   const [passwordVisible, setPasswordVisible] = useState(false);
-//   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
-//   const navigate = useNavigate();
-//   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-//   const [isTransitioning, setIsTransitioning] = useState(false);
-//   const images = [login1, login2, login3];
-//   const [passwordStrength, setPasswordStrength] = useState(0);
-//   const [isLoading, setIsLoading] = useState(false);
-
-//   useEffect(() => {
-//     const slideInterval = setInterval(() => {
-//       if (!isTransitioning) {
-//         setIsTransitioning(true);
-//         setCurrentImageIndex((prevIndex) =>
-//           prevIndex === images.length - 1 ? 0 : prevIndex + 1
-//         );
-//         setTimeout(() => {
-//           setIsTransitioning(false);
-//         }, 1000);
-//       }
-//     }, 4000);
-
-//     return () => clearInterval(slideInterval);
-//   }, [isTransitioning, images.length]);
-
-//   const handleChange = (e) => {
-//     const { name, value } = e.target;
-//     setFormData((prevData) => ({
-//       ...prevData,
-//       [name]: value,
-//     }));
-
-//     if (name === "password") {
-//       setPasswordStrength(calculatePasswordStrength(value));
-//     }
-//   };
-
-//   const calculatePasswordStrength = (password) => {
-//     let strength = 0;
-//     if (password.length >= 8) strength++;
-//     if (/[A-Z]/.test(password)) strength++;
-//     if (/[0-9]/.test(password)) strength++;
-//     if (/[^A-Za-z0-9]/.test(password)) strength++;
-//     return strength;
-//   };
-
-//   const togglePasswordVisibility = () => setPasswordVisible(!passwordVisible);
-//   const toggleConfirmPasswordVisibility = () => setConfirmPasswordVisible(!confirmPasswordVisible);
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     const { name, email, password, confirmPassword, department, college_name } = formData;
-//     const newErrors = {};
-
-//     if (password !== confirmPassword) {
-//       newErrors.confirmPassword = "Passwords do not match";
-//     }
-
-//     if (Object.keys(newErrors).length > 0) {
-//       setErrors(newErrors);
-//       return;
-//     }
-
-//     setIsLoading(true);
-
-//     try {
-//       const response = await fetch("https://cce-backend-54k0.onrender.com/api/admin-signup/", {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify({
-//           name,
-//           email,
-//           password,
-//           department,
-//           college_name,
-//         }),
-//       });
-
-//       const data = await response.json();
-
-//       if (response.ok) {
-//         toast.success("Account created successfully!");
-//         setTimeout(() => navigate("/Admin-Management"), 2000);
-//       } else {
-//         toast.error(data.error || "Signup failed");
-//       }
-//     } catch (error) {
-//       console.error("Error during signup:", error);
-//       toast.error("Something went wrong. Please try again.");
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   };
-
-//   const PasswordStrengthIndicator = ({ strength }) => {
-//     const getColor = () => {
-//       if (strength === 0) return "bg-gray-300";
-//       if (strength === 1) return "bg-red-500";
-//       if (strength === 2) return "bg-yellow-500";
-//       if (strength === 3) return "bg-blue-500";
-//       if (strength === 4) return "bg-green-500";
-//     };
-
-//     return (
-//       <div className="mt-2">
-//         <div className="flex justify-between mb-1">
-//           <span className="text-sm">Password Strength:</span>
-//           <span className="text-sm font-medium">
-//             {strength === 0
-//               ? "Very Weak"
-//               : strength === 1
-//               ? "Weak"
-//               : strength === 2
-//               ? "Fair"
-//               : strength === 3
-//               ? "Good"
-//               : "Strong"}
-//           </span>
-//         </div>
-//         <div className="w-full bg-gray-200 rounded-full h-2.5">
-//           <div
-//             className={`h-2.5 rounded-full ${getColor()}`}
-//             style={{ width: `${strength * 25}%` }}
-//           ></div>
-//         </div>
-//       </div>
-//     );
-//   };
-
-//   return (
-//     <div className="w-screen h-screen flex items-center justify-center relative overflow-hidden">
-//       {/* Background */}
-//       <div className="h-full w-full absolute top-0 left-0 z[-5]">
-//         <Squares
-//           speed={0.1}
-//           squareSize={40}
-//           direction="diagonal"
-//           borderColor="#FCF55F"
-//           hoverFillColor="#ffcc00"
-//         />
-//       </div>
-
-//       {/* Form Container */}
-//       <div className="w-3/4 min-h-3/4 max-h-[90%] bg-white shadow-lg rounded-lg flex items-stretch p-2 relative">
-//         {/* Image Slider */}
-//         <div className="flex-1 flex justify-center items-center p-2">
-//           <div className="relative w-full rounded-lg h-full">
-//             {images.map((img, index) => (
-//               <img
-//                 key={index}
-//                 src={img}
-//                 alt={`Slide ${index + 1}`}
-//                 className="absolute w-full h-full rounded-lg object-cover transition-all duration-1000 ease-in-out"
-//                 style={{
-//                   opacity: currentImageIndex === index ? 1 : 0,
-//                   transform: `scale(${currentImageIndex === index ? 1 : 0.95})`,
-//                   zIndex: currentImageIndex === index ? 1 : 0
-//                 }}
-//               />
-//             ))}
-//           </div>
-//         </div>
-
-//         {/* Form Section */}
-//         <div className="flex-1 p-1 flex flex-col items-center justify-evenly">
-//           <p className="text-3xl font-medium mb-2 pt-2">Admin Create</p>
-//           <p className="text-[#838383] text-sm w-3/4 text-center mb-2">
-//             Create a new account by filling out the details below.
-//           </p>
-
-//           <form
-//             onSubmit={handleSubmit}
-//             className="w-3/4 flex flex-col items-center"
-//           >
-//             <div className="space-y-4 mb-6 w-full relative">
-//               {/* Name Field */}
-//               <input
-//                 type="text"
-//                 placeholder="Enter your Name"
-//                 name="name"
-//                 value={formData.name}
-//                 onChange={handleChange}
-//                 className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-yellow-400"
-//                 required
-//               />
-
-//               {/* Email Field */}
-//               <input
-//                 type="email"
-//                 placeholder="Enter your Email"
-//                 name="email"
-//                 value={formData.email}
-//                 onChange={handleChange}
-//                 className={`w-full p-3 rounded-md border ${
-//                   errors.email ? "border-red-500" : "border-gray-300"
-//                 } focus:ring-2 focus:ring-yellow-400`}
-//                 required
-//               />
-//               {errors.email && (
-//                 <p className="text-red-500 text-sm">{errors.email}</p>
-//               )}
-
-//               {/* Department & College */}
-//               <input
-//                 type="text"
-//                 placeholder="Enter your Department"
-//                 name="department"
-//                 value={formData.department}
-//                 onChange={handleChange}
-//                 className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-yellow-400"
-//                 required
-//               />
-
-//               <input
-//                 type="text"
-//                 placeholder="Enter your College Name"
-//                 name="college_name"
-//                 value={formData.college_name}
-//                 onChange={handleChange}
-//                 className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-yellow-400"
-//                 required
-//               />
-
-//               {/* Password Field with Eye Icon */}
-//               <div className="relative">
-//                 <input
-//                   type={passwordVisible ? "text" : "password"}
-//                   placeholder="Enter your Password"
-//                   name="password"
-//                   value={formData.password}
-//                   onChange={handleChange}
-//                   className="w-full p-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-//                   required
-//                 />
-//                 <div
-//                   className="absolute top-1/2 right-3 transform -translate-y-1/2 cursor-pointer"
-//                   onClick={togglePasswordVisibility}
-//                 >
-//                   {passwordVisible ? (
-//                     <FiEyeOff size={20} />
-//                   ) : (
-//                     <FiEye size={20} />
-//                   )}
-//                 </div>
-//               </div>
-//               <PasswordStrengthIndicator strength={passwordStrength} />
-
-//               {/* Confirm Password Field with Eye Icon */}
-//               <div className="relative">
-//                 <input
-//                   type={confirmPasswordVisible ? "text" : "password"}
-//                   placeholder="Confirm your Password"
-//                   name="confirmPassword"
-//                   value={formData.confirmPassword}
-//                   onChange={handleChange}
-//                   className="w-full p-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-//                   required
-//                 />
-//                 <div
-//                   className="absolute top-1/2 right-3 transform -translate-y-1/2 cursor-pointer"
-//                   onClick={toggleConfirmPasswordVisibility}
-//                 >
-//                   {confirmPasswordVisible ? (
-//                     <FiEyeOff size={20} />
-//                   ) : (
-//                     <FiEye size={20} />
-//                   )}
-//                 </div>
-//               </div>
-//               {errors.confirmPassword && (
-//                 <p className="text-red-500 text-sm">{errors.confirmPassword}</p>
-//               )}
-
-//               <button
-//                 type="submit"
-//                 className="p-2 rounded-2xl w-full font-semibold bg-[#FECC00] hover:bg-yellow-500 transition duration-300 flex items-center justify-center"
-//                 disabled={isLoading}
-//               >
-//                 {isLoading ? (
-//                   <>
-//                     <svg
-//                       className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-//                       xmlns="http://www.w3.org/2000/svg"
-//                       fill="none"
-//                       viewBox="0 0 24 24"
-//                     >
-//                       <circle
-//                         className="opacity-25"
-//                         cx="12"
-//                         cy="12"
-//                         r="10"
-//                         stroke="currentColor"
-//                         strokeWidth="4"
-//                       ></circle>
-//                       <path
-//                         className="opacity-75"
-//                         fill="currentColor"
-//                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-//                       ></path>
-//                     </svg>
-//                     Signing Up...
-//                   </>
-//                 ) : (
-//                   "Sign Up"
-//                 )}
-//               </button>
-//             </div>
-//           </form>
-//         </div>
-//       </div>
-//       <ToastContainer position="top-right" autoClose={3000} />
-//     </div>
-//   );
-// }
-
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
@@ -348,7 +9,6 @@ import login3 from "../../assets/images/LoginImg3.png";
 import Squares from "../../components/ui/GridLogin";
 import "react-toastify/dist/ReactToastify.css";
 
-// Animation variants defined outside component to prevent recreation on each render
 const slideVariants = {
   enter: {
     x: 1000,
@@ -379,6 +39,7 @@ export default function AdminSignup() {
     confirmPassword: "",
     department: "",
     college_name: "",
+    mobile_number: "", // New field for mobile number
   });
 
   const [errors, setErrors] = useState({});
@@ -422,6 +83,13 @@ export default function AdminSignup() {
         confirmPassword: value === formData.password ? "" : "Passwords do not match",
       }));
     }
+
+    if (name === "mobile_number") {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        mobile_number: /^\d{10}$/.test(value) ? "" : "Enter a valid 10-digit mobile number",
+      }));
+    }
   };
 
   const calculatePasswordStrength = (password) => {
@@ -438,7 +106,7 @@ export default function AdminSignup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { name, email, password, confirmPassword, department, college_name } = formData;
+    const { name, email, password, confirmPassword, department, college_name, mobile_number } = formData;
     const newErrors = {};
 
     if (!email.includes("@sns")) {
@@ -449,6 +117,10 @@ export default function AdminSignup() {
       newErrors.confirmPassword = "Passwords do not match";
     }
 
+    if (!/^\d{10}$/.test(mobile_number)) {
+      newErrors.mobile_number = "Enter a valid 10-digit mobile number";
+    }
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -457,7 +129,7 @@ export default function AdminSignup() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("https://cce-backend-54k0.onrender.com/api/admin-signup/", {
+      const response = await fetch("http://localhost:8000/api/admin-signup/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -468,6 +140,7 @@ export default function AdminSignup() {
           password,
           department,
           college_name,
+          mobile_number, // Include mobile number in the request
         }),
       });
 
@@ -504,12 +177,12 @@ export default function AdminSignup() {
             {strength === 0
               ? "Very Weak"
               : strength === 1
-              ? "Weak"
-              : strength === 2
-              ? "Fair"
-              : strength === 3
-              ? "Good"
-              : "Strong"}
+                ? "Weak"
+                : strength === 2
+                  ? "Fair"
+                  : strength === 3
+                    ? "Good"
+                    : "Strong"}
           </span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2.5">
@@ -524,7 +197,6 @@ export default function AdminSignup() {
 
   return (
     <div className="w-screen h-screen flex items-center justify-center relative overflow-hidden">
-      {/* Background */}
       <div className="h-full w-full absolute top-0 left-0 z[-5]">
         <Squares
           speed={0.1}
@@ -535,9 +207,7 @@ export default function AdminSignup() {
         />
       </div>
 
-      {/* Form Container */}
       <div className="w-3/4 min-h-3/4 max-h-[90%] bg-white shadow-lg rounded-lg flex items-stretch p-2 relative">
-        {/* Image Slider */}
         <div className="flex-1 flex justify-center items-center p-2">
           <div className="relative w-full h-[300px] sm:h-[400px] md:h-[500px] lg:h-[550px] overflow-hidden">
             <AnimatePresence initial={false}>
@@ -555,7 +225,6 @@ export default function AdminSignup() {
           </div>
         </div>
 
-        {/* Form Section */}
         <div className="flex-1 p-1 flex flex-col items-center justify-evenly">
           <p className="text-3xl font-medium mb-2 pt-2">Admin Create</p>
           <p className="text-[#838383] text-sm w-3/4 text-center mb-2">
@@ -567,7 +236,6 @@ export default function AdminSignup() {
             className="w-3/4 flex flex-col items-center"
           >
             <div className="space-y-4 mb-6 w-full relative">
-              {/* Name Field */}
               <input
                 type="text"
                 placeholder="Enter your Name"
@@ -576,9 +244,9 @@ export default function AdminSignup() {
                 onChange={handleChange}
                 className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-yellow-400"
                 required
+                maxLength={50}
               />
 
-              {/* Email Field */}
               <input
                 type="email"
                 placeholder="Enter your Email"
@@ -587,14 +255,14 @@ export default function AdminSignup() {
                 onChange={handleChange}
                 className={`w-full p-3 rounded-md border ${
                   errors.email ? "border-red-500" : "border-gray-300"
-                } focus:ring-2 focus:ring-yellow-400`}
+                  } focus:ring-2 focus:ring-yellow-400`}
                 required
+                maxLength={100}
               />
               {errors.email && (
                 <p className="text-red-500 text-sm">{errors.email}</p>
               )}
 
-              {/* Department & College */}
               <input
                 type="text"
                 placeholder="Enter your Department"
@@ -603,6 +271,7 @@ export default function AdminSignup() {
                 onChange={handleChange}
                 className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-yellow-400"
                 required
+                maxLength={50}
               />
 
               <input
@@ -613,9 +282,30 @@ export default function AdminSignup() {
                 onChange={handleChange}
                 className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-yellow-400"
                 required
+                maxLength={100}
               />
 
-              {/* Password Field with Eye Icon */}
+              <input
+                type="tel"
+                placeholder="Enter your Mobile Number"
+                name="mobile_number"
+                value={formData.mobile_number}
+                onChange={handleChange}
+                onKeyPress={(e) => {
+                  if (!/[0-9]/.test(e.key)) {
+                    e.preventDefault();
+                  }
+                }}
+                className={`w-full p-3 rounded-md border ${
+                  errors.mobile_number ? "border-red-500" : "border-gray-300"
+                  } focus:ring-2 focus:ring-yellow-400`}
+                required
+                maxLength={10}
+              />
+              {errors.mobile_number && (
+                <p className="text-red-500 text-sm">{errors.mobile_number}</p>
+              )}
+
               <div className="relative">
                 <input
                   type={passwordVisible ? "text" : "password"}
@@ -625,6 +315,7 @@ export default function AdminSignup() {
                   onChange={handleChange}
                   className="w-full p-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
                   required
+                  maxLength={20}
                 />
                 <div
                   className="absolute top-1/2 right-3 transform -translate-y-1/2 cursor-pointer"
@@ -639,7 +330,6 @@ export default function AdminSignup() {
               </div>
               <PasswordStrengthIndicator strength={passwordStrength} />
 
-              {/* Confirm Password Field with Eye Icon */}
               <div className="relative">
                 <input
                   type={confirmPasswordVisible ? "text" : "password"}

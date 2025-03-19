@@ -6,6 +6,7 @@ import SuperAdminPageNavbar from "../../components/SuperAdmin/SuperAdminNavBar";
 import JobTable from "../../components/SuperAdmin/ManagementTable/JobTable";
 import AchievementTable from "../../components/SuperAdmin/ManagementTable/AchievementTable";
 import InternshipTable from "../../components/SuperAdmin/ManagementTable/InternshipTable";
+import ExamTable from "../../components/SuperAdmin/ManagementTable/ExamTable";
 import { LoaderContext } from "../../components/Common/Loader";
 import { toast, ToastContainer } from "react-toastify";
 
@@ -13,9 +14,11 @@ export default function MailPage() {
   const [jobs, setJobs] = useState([]);
   const [achievements, setAchievements] = useState([]);
   const [internships, setInternships] = useState([]);
+  const [exams, setExams] = useState([]);
   const [selectedJobs, setSelectedJobs] = useState([]);
   const [selectedAchievements, setSelectedAchievements] = useState([]);
   const [selectedInternships, setSelectedInternships] = useState([]);
+  const [selectedExams, setSelectedExams] = useState([]);
   const [autoApproval, setAutoApproval] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [feedback, setFeedback] = useState("");
@@ -55,15 +58,18 @@ export default function MailPage() {
           },
         };
 
-        const [jobsRes, achievementsRes, internshipsRes] = await Promise.all([
-          axios.get("https://cce-backend-54k0.onrender.com/api/jobs", config),
-          axios.get("https://cce-backend-54k0.onrender.com/api/achievements/", config),
-          axios.get("https://cce-backend-54k0.onrender.com/api/internship/", config),
+        const [jobsRes, achievementsRes, internshipsRes, examsRes] = await Promise.all([
+          axios.get("http://localhost:8000/api/jobs", config),
+          axios.get("http://localhost:8000/api/achievements/", config),
+          axios.get("http://localhost:8000/api/internship/", config),
+          axios.get("http://localhost:8000/api/exams/", config),
         ]);
 
         setJobs(jobsRes.data.jobs);
         setAchievements(achievementsRes.data.achievements);
         setInternships(internshipsRes.data.internships);
+        console.log("Fetched exams:", examsRes.data.exams); // Log fetched exams
+        setExams(examsRes.data.exams);
       } catch (err) {
         console.error("Error fetching data:", err);
         toast.error("Failed to load data.");
@@ -78,7 +84,7 @@ export default function MailPage() {
   useEffect(() => {
     const fetchAutoApproval = async () => {
       try {
-        const response = await axios.get("https://cce-backend-54k0.onrender.com/api/get-auto-approval-status/", {
+        const response = await axios.get("http://localhost:8000/api/get-auto-approval-status/", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setAutoApproval(response.data.is_auto_approval);
@@ -92,7 +98,7 @@ export default function MailPage() {
   const toggleAutoApproval = async () => {
     try {
       await axios.post(
-        "https://cce-backend-54k0.onrender.com/api/toggle-auto-approval/",
+        "http://localhost:8000/api/toggle-auto-approval/",
         { is_auto_approval: !autoApproval },
         {
           headers: {
@@ -118,10 +124,12 @@ export default function MailPage() {
     try {
       const endpoint =
         type === "job"
-          ? `https://cce-backend-54k0.onrender.com/api/review-job/${id}/`
+          ? `http://localhost:8000/api/review-job/${id}/`
           : type === "achievement"
-            ? `https://cce-backend-54k0.onrender.com/api/review-achievement/${id}/`
-            : `https://cce-backend-54k0.onrender.com/api/review-internship/${id}/`;
+          ? `http://localhost:8000/api/review-achievement/${id}/`
+          : type === "internship"
+          ? `http://localhost:8000/api/review-internship/${id}/`
+          : `http://localhost:8000/api/review-exam/${id}/`;
 
       const response = await axios.post(
         endpoint,
@@ -149,12 +157,18 @@ export default function MailPage() {
               : achievement
           )
         );
-      } else {
+      } else if (type === "internship") {
         setInternships((prev) =>
           prev.map((internship) =>
             internship._id === id
               ? { ...internship, is_publish: action === "approve" }
               : internship
+          )
+        );
+      } else {
+        setExams((prev) =>
+          prev.map((exam) =>
+            exam._id === id ? { ...exam, is_publish: action === "approve" } : exam
           )
         );
       }
@@ -168,10 +182,12 @@ export default function MailPage() {
     try {
       const endpoint =
         type === "job"
-          ? `https://cce-backend-54k0.onrender.com/api/job-delete/${id}/`
+          ? `http://localhost:8000/api/job-delete/${id}/`
           : type === "achievement"
-            ? `https://cce-backend-54k0.onrender.com/api/delete-achievement/${id}/`
-            : `https://cce-backend-54k0.onrender.com/api/internship-delete/${id}/`;
+          ? `http://localhost:8000/api/delete-achievement/${id}/`
+          : type === "internship"
+          ? `http://localhost:8000/api/internship-delete/${id}/`
+          : `http://localhost:8000/api/exam-delete/${id}/`;
 
       const response = await axios.delete(endpoint, {
         headers: {
@@ -184,8 +200,10 @@ export default function MailPage() {
         setJobs((prev) => prev.filter((job) => job._id !== id));
       } else if (type === "achievement") {
         setAchievements((prev) => prev.filter((achievement) => achievement._id !== id));
-      } else {
+      } else if (type === "internship") {
         setInternships((prev) => prev.filter((internship) => internship._id !== id));
+      } else {
+        setExams((prev) => prev.filter((exam) => exam._id !== id));
       }
     } catch (err) {
       console.error(`Error deleting ${type}:`, err);
@@ -198,29 +216,32 @@ export default function MailPage() {
       navigate(`/job-edit/${id}`);
     } else if (type === "achievement") {
       navigate(`/achievement-edit/${id}`);
-    } else {
+    } else if (type === "internship") {
       navigate(`/internship-edit/${id}`);
+    } else {
+      navigate(`/exam-edit/${id}`);
     }
   };
 
   const handleSelectAll = (type) => {
-    console.log(`Select all clicked for ${type}`);
     if (type === "job") {
       setSelectedJobs((prev) => {
         const newSelected = prev.length === jobs.length ? [] : jobs.map((job) => job._id);
-        console.log(`Selected jobs: ${newSelected}`);
         return newSelected;
       });
     } else if (type === "achievement") {
       setSelectedAchievements((prev) => {
         const newSelected = prev.length === achievements.length ? [] : achievements.map((achievement) => achievement._id);
-        console.log(`Selected achievements: ${newSelected}`);
+        return newSelected;
+      });
+    } else if (type === "internship") {
+      setSelectedInternships((prev) => {
+        const newSelected = prev.length === internships.length ? [] : internships.map((internship) => internship._id);
         return newSelected;
       });
     } else {
-      setSelectedInternships((prev) => {
-        const newSelected = prev.length === internships.length ? [] : internships.map((internship) => internship._id);
-        console.log(`Selected internships: ${newSelected}`);
+      setSelectedExams((prev) => {
+        const newSelected = prev.length === exams.length ? [] : exams.map((exam) => exam._id);
         return newSelected;
       });
     }
@@ -231,10 +252,10 @@ export default function MailPage() {
       type === "job"
         ? selectedJobs
         : type === "achievement"
-          ? selectedAchievements
-          : selectedInternships;
-
-    console.log(`Bulk approve clicked for ${type} with IDs:`, ids);
+        ? selectedAchievements
+        : type === "internship"
+        ? selectedInternships
+        : selectedExams;
 
     try {
       const promises = ids.map((id) => handleAction(id, "approve", type));
@@ -251,10 +272,10 @@ export default function MailPage() {
       type === "job"
         ? selectedJobs
         : type === "achievement"
-          ? selectedAchievements
-          : selectedInternships;
-
-    console.log(`Bulk delete clicked for ${type} with IDs:`, ids);
+        ? selectedAchievements
+        : type === "internship"
+        ? selectedInternships
+        : selectedExams;
 
     if (window.confirm(`Are you sure you want to delete all selected ${type}s?`)) {
       try {
@@ -271,7 +292,7 @@ export default function MailPage() {
   const handleFeedbackSubmit = async () => {
     try {
       const response = await axios.post(
-        "https://cce-backend-54k0.onrender.com/api/submit-feedback/",
+        "http://localhost:8000/api/submit-feedback/",
         {
           item_id: rejectedItemId,
           item_type: rejectedItemType,
@@ -304,12 +325,18 @@ export default function MailPage() {
               : achievement
           )
         );
-      } else {
+      } else if (rejectedItemType === "internship") {
         setInternships((prev) =>
           prev.map((internship) =>
             internship._id === rejectedItemId
               ? { ...internship, is_publish: false }
               : internship
+          )
+        );
+      } else {
+        setExams((prev) =>
+          prev.map((exam) =>
+            exam._id === rejectedItemId ? { ...exam, is_publish: false } : exam
           )
         );
       }
@@ -329,7 +356,7 @@ export default function MailPage() {
       <div className="flex flex-col flex-1 p-6">
         <h1 className="text-1xl font-semibold pt-4 text-gray-800 mb-4">
           Manage
-          {` ${["jobs", "achievements", "internships"].find((option) => option === visibleSection).replace(
+          {` ${["jobs", "achievements", "internships", "exams"].find((option) => option === visibleSection).replace(
             /\w\S*/g,
             text => text.charAt(0).toUpperCase() + text.substring(1).toLowerCase()
           )}`}
@@ -374,7 +401,6 @@ export default function MailPage() {
             handleBulkApprove={handleBulkApprove}
             handleBulkDelete={handleBulkDelete}
             handleSelectAll={handleSelectAll}
-            setAchievements={setAchievements} // Pass setAchievements here
           />
         )}
 
@@ -383,6 +409,26 @@ export default function MailPage() {
             internships={internships}
             selectedInternships={selectedInternships}
             setSelectedInternships={setSelectedInternships}
+            handleAction={handleAction}
+            toggleAutoApproval={toggleAutoApproval}
+            autoApproval={autoApproval}
+            handleDelete={handleDelete}
+            handleView={handleView}
+            setVisibleSection={setVisibleSection}
+            currentPage={currentPage}
+            itemsPerPage={itemsPerPage}
+            handlePageChange={handlePageChange}
+            handleBulkApprove={handleBulkApprove}
+            handleBulkDelete={handleBulkDelete}
+            handleSelectAll={handleSelectAll}
+          />
+        )}
+
+        {visibleSection === "exams" && (
+          <ExamTable
+            exams={exams}
+            selectedExams={selectedExams}
+            setSelectedExams={setSelectedExams}
             handleAction={handleAction}
             toggleAutoApproval={toggleAutoApproval}
             autoApproval={autoApproval}

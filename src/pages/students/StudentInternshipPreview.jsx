@@ -41,7 +41,7 @@ const InternshipPreview = () => {
     }, []);
 
     useEffect(() => {
-        fetch(`https://cce-backend-54k0.onrender.com/api/internship/${id}/`)
+        fetch(`http://127.0.0.1:8000/api/internship/${id}/`)
             .then((response) => response.json())
             .then((data) => setInternship(data.internship))
             .catch((error) => console.error("Error fetching internship:", error));

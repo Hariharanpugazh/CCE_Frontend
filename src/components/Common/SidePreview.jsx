@@ -82,7 +82,7 @@ export default function SidePreview({ selectedItem, handleViewItem, setSelectedI
             const userId = JSON.parse(atob(token.split(".")[1])).student_user;
             if (selectedItem.job_data) {
                 const res = await axios.post(
-                    `https://cce-backend-54k0.onrender.com/api/save-job/${selectedItem._id}/`,
+                    `http://localhost:8000/api/save-job/${selectedItem._id}/`,
                     { applicationId: selectedItem._id, userId }
                 );
                 if (res.status === 200) {
@@ -91,7 +91,7 @@ export default function SidePreview({ selectedItem, handleViewItem, setSelectedI
                 }
             } else {
                 const res = await axios.post(
-                    `https://cce-backend-54k0.onrender.com/api/save-internship/${selectedItem.id}/`,
+                    `http://localhost:8000/api/save-internship/${selectedItem.id}/`,
                     { applicationId: selectedItem.id, userId }
                 );
                 if (res.status === 200) {
@@ -112,7 +112,7 @@ export default function SidePreview({ selectedItem, handleViewItem, setSelectedI
             const userId = JSON.parse(atob(token.split(".")[1])).student_user;
             if (selectedItem.job_data) {
                 const res = await axios.post(
-                    `https://cce-backend-54k0.onrender.com/api/unsave-job/${selectedItem._id}/`,
+                    `http://localhost:8000/api/unsave-job/${selectedItem._id}/`,
                     { applicationId: selectedItem._id, userId }
                 );
                 if (res.status === 200) {
@@ -121,7 +121,7 @@ export default function SidePreview({ selectedItem, handleViewItem, setSelectedI
                 }
             } else {
                 const res = await axios.post(
-                    `https://cce-backend-54k0.onrender.com/api/unsave-internship/${selectedItem.id}/`,
+                    `http://localhost:8000/api/unsave-internship/${selectedItem.id}/`,
                     { applicationId: selectedItem.id, userId }
                 );
                 if (res.status === 200) {
@@ -188,7 +188,7 @@ export default function SidePreview({ selectedItem, handleViewItem, setSelectedI
                     <div className="flex justify-between items-start p-3 px-5">
                         <div className='w-[85%] break-words'>
                             <p className="text-xl"> {dataFields.itemTitle} </p>
-                            <p className="text-xs text-yellow-300"> {dataFields.company_name} </p>
+                            <p className="text-sm text-gray-700"> {dataFields.company_name} </p>
                         </div>
 
                         {isSaved !== undefined && <FiBookmark className={`text-2xl cursor-pointer ${isSaved && "text-blue-500 fill-current"}`} onClick={isSaved ? handleUnbookmark : handleBookmark} />}

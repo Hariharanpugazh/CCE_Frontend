@@ -42,7 +42,7 @@ export default function SuperAdminLogin() {
         setIsLoading(true);
     
         try {
-            const response = await fetch("https://cce-backend-54k0.onrender.com/api/superadmin_login/", {
+            const response = await fetch("http://localhost:8000/api/superadmin_login/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -70,7 +70,47 @@ export default function SuperAdminLogin() {
             toast.error("Something went wrong. Please try again.");
             setIsLoading(false); // Ensure loading state is stopped
         }
-    };    
+    };  
+    
+    const handleGoogleSuccess = async (credentialResponse) => {
+                setIsLoading(true);
+                try {
+                    const response = await fetch("http://localhost:8000/api/superadmin/google/login/", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ token: credentialResponse.credential }),
+                        credentials: "include" // Ensures cookies are handled correctly
+                    });
+            
+                    const data = await response.json();
+            
+                    if (response.ok) {
+                        Cookies.set("jwt", data.token.jwt, { expires: 7, path: "/" });
+                        Cookies.set("username", data.username, { expires: 7, path: "/" });
+            
+                        toast.success("Google login successful! Redirecting...");
+                        navigate("/superadmin-dashboard");
+                  }
+                } catch (error) {
+                  console.error("Google login error:", error);
+                  
+                  if (error.response?.status === 404) {
+                    toast.error("No student account found with this Google email.");
+                  } else {
+                    const errorMsg = error.response?.data?.error || "Google login failed";
+                    setErrorMessage(errorMsg);
+                    toast.error(errorMsg);
+                  }
+                } finally {
+                    setIsLoading(false);
+                }
+              };
+            
+              const handleGoogleFailure = () => {
+                toast.error("Google sign-in was unsuccessful");
+              };
 
     return (
         <>
@@ -79,6 +119,8 @@ export default function SuperAdminLogin() {
                 formData={formData}
                 formDataSetter={setFormData}
                 onSubmit={handleSubmit}
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleFailure}
                 isLocked={isLocked}
                 lockoutTime={lockoutTime}
                 isLoading={isLoading}

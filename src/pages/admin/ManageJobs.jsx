@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
@@ -6,23 +6,19 @@ import AdminPageNavbar from "../../components/Admin/AdminNavBar";
 import Pagination from "../../components/Admin/pagination";
 import backIcon from "../../assets/icons/back-icon.svg";
 import nextIcon from "../../assets/icons/next-icon.svg";
+import approvedIcon from "../../assets/icons/Approved 1.png";
+import rejectedIcon from "../../assets/icons/rejected 1.png";
+import pendingIcon from "../../assets/icons/pending 1.png"; // Corrected import for pending icon
+import NoListing from "../../assets/images/NoListing.svg";
 
 import {
-  Briefcase,
-  GraduationCap,
-  BookOpen,
-  Trophy,
-  View,
   CheckCircle2,
   XCircle,
   Clock,
-  Building2,
-  Folder,
-  Calendar,
-  MapPin,
-  FileText,
 } from "lucide-react";
-import { FaCheck, FaClock, FaCross, FaEye, FaMinus } from "react-icons/fa";
+import { FaClock, FaEye, FaMinus } from "react-icons/fa";
+import { IoMdCheckboxOutline } from "react-icons/io";
+import { LoaderContext } from "../../components/Common/Loader";
 
 const ItemCard = ({ item, type }) => {
   const navigate = useNavigate();
@@ -34,14 +30,15 @@ const ItemCard = ({ item, type }) => {
     company = item.job_data?.company_name || "Unknown Company";
     jobLocation = item.job_data?.job_location || "Not Specified";
     status = item.is_publish;
-    selectedCategory = item.job_data?.selectedCategory || "No Category required";
+    console.log(item);
+    selectedCategory = item.job_data ? "Job" : "No Category required";
     previewPath = `/job-preview/${itemId}`;
 
   } else if (type === "study materials") {
-    title = item.study_material_data?.title || "No Title";
-    company = item.study_material_data?.category || "Unknown Category";
+    title = item?.title || "No Title";
+    selectedCategory = item?.category || "Unknown Category";
     status = item.is_publish;
-    previewPath = `/study-material/${itemId}`;
+    previewPath = `/student-study-detail/${itemId}`;
 
   } else if (type === "internships") {
     title = item.internship_data?.title || "No Title";
@@ -51,6 +48,12 @@ const ItemCard = ({ item, type }) => {
     selectedCategory = item.internship_data?.selectedCategory || "Internship";
     previewPath = `/internship-preview/${itemId}`;
 
+  } else if (type === "exams") {
+    title = item.exam_data?.exam_title || "No Title";
+    // company = item.exam_data?.category || "Unknown Category";
+    status = item.is_publish;
+    previewPath = `/exam-preview/${itemId}`;
+
   } else {
     title = item.name || "No Title";
     company = item.company_name || "No Company";
@@ -59,29 +62,41 @@ const ItemCard = ({ item, type }) => {
   }
 
   return (
-    <div className="border rounded-xl p-4 shadow-sm flex items-center justify-between bg-white">
-      <div>
-        <h3 className="font-semibold text-lg mb-0.5">{title}</h3>
-        <p className="text-sm text-gray-700 flex space-x-3">
-          <span className="font-semibold">Company: <span className="font-normal"> {company} &nbsp;  </span> </span>
-          <span className="font-semibold">Location: <span className="font-normal"> {jobLocation} &nbsp; </span> </span>
-          <span className="font-semibold">Category: <span className="font-normal"> {selectedCategory}  </span> </span>
+    <div className="border border-gray-300 rounded-xl p-4 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between bg-white flex-wrap mb-4">
+      <div className="flex-1 min-w-0">
+        <h3 className="font-semibold text-lg md:text-xl mb-0.5">{title}</h3>
+        <p className="text-sm text-gray-700 flex space-x-3 flex-wrap">
+        {(type === "jobs" || type === "internships" || type === "achievements") && (
+            <span className="font-semibold">
+              Company: <span className="font-normal"> {company} &nbsp; </span>
+            </span>
+          )}
+          {(type === "jobs" || type === "internships") && (
+            <span className="font-semibold">
+              Location: <span className="font-normal"> {jobLocation} &nbsp; </span>
+            </span>
+          )}
+          {(type === "jobs" || type === "internships" || type === "study materials") && (
+            <span className="font-semibold">
+              Category: <span className="font-normal"> {selectedCategory} &nbsp; </span>
+            </span>
+          )}
         </p>
       </div>
-      <div className="flex gap-2">
+      <div className="flex gap-2 items-left mt-4 md:mt-0">
         {(status === true) && (
           <span className="bg-teal-500 text-white px-4 py-2 rounded-lg text-sm flex items-center">
-            <FaCheck className="mr-2 text-xs" /> Approved
+            Approved <img src={approvedIcon} alt="Approved" className="ml-1 text-xs" width={20} height={10} />
           </span>
         )}
         {(status === false) && (
-          <span className="bg-red-400 text-white px-4 py-2 rounded-lg text-sm flex items-center">
-            <FaCross className="mr-2 text-xs" /> Rejected
+          <span className="bg-red-500 text-white px-4 py-2  rounded-lg text-sm flex items-center">
+            Rejected  <img src={rejectedIcon} alt="Rejected" className="ml-1 text-xs mr-1" width={20} height={10} />  
           </span>
         )}
         {(status === null) && (
-          <span className="bg-yellow-400 text-white px-4 py-2 rounded-lg text-sm flex items-center">
-            <FaClock className="mr-2 text-xs" /> Pending
+          <span className="bg-yellow-500 text-black px-5 py-2 ml-1 rounded-lg text-sm flex items-center">
+            Pending <img src={pendingIcon} alt="Pending" className="ml-1 text-xs" width={20} height={10} /> 
           </span>
         )}
         <button
@@ -92,7 +107,7 @@ const ItemCard = ({ item, type }) => {
               alert("Error: Invalid ObjectId. Please check backend response.");
             }
           }}
-          className="text-black border px-3 py-1 rounded-lg text-sm flex items-center gap-1"
+          className="text-black border px-3 py-2 rounded-lg text-sm flex items-center gap-1"
         >
           View
           <FaEye size={14} />
@@ -104,20 +119,24 @@ const ItemCard = ({ item, type }) => {
 
 const ManageJobs = () => {
   const [jobs, setJobs] = useState([]);
+  const [exams, setExams] = useState([]);
   const [studyMaterials, setStudyMaterials] = useState([]);
   const [internships, setInternships] = useState([]);
   const [achievements, setAchievements] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("Jobs");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const itemsPerPage = 5;
   const navigate = useNavigate();
+
+  const { setIsLoading } = useContext(LoaderContext)
 
   useEffect(() => {
     const fetchData = async (endpoint, setState, key) => {
       try {
+        setIsLoading(true);
         const token = Cookies.get("jwt");
         const response = await axios.get(
-          `https://cce-backend-54k0.onrender.com/api/${endpoint}/`,
+          `http://localhost:8000/api/${endpoint}/`,
           {
             headers: { Authorization: `Bearer ${token}` },
             withCredentials: true,
@@ -129,8 +148,10 @@ const ManageJobs = () => {
         } else {
           setState([]);
         }
+        setIsLoading(false);
       } catch (error) {
         setState([]);
+        setIsLoading(false);
       }
     };
 
@@ -138,6 +159,7 @@ const ManageJobs = () => {
     fetchData("manage-study-materials", setStudyMaterials, "study_materials");
     fetchData("manage-internships", setInternships, "internships");
     fetchData("manage-achievements", setAchievements, "achievements");
+    fetchData("manage-exams", setExams, "exams");
   }, []);
 
   const paginate = (items) => {
@@ -181,14 +203,16 @@ const ManageJobs = () => {
     };
   };
 
+  const itemsToDisplay = paginate({ Jobs: jobs, Internships: internships, Exams: exams, Achievements: achievements, 'Study Materials': studyMaterials }[selectedCategory]);
+
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gray-50 flex-col md:flex-row pt-5">
       <AdminPageNavbar />
       <div className="flex-1 flex flex-col items-stretch">
         <section className="flex flex-col">
-          <div className="flex rounded-lg border border-gray-300 items-center  my-10 mx-6 max-w-55">
+          <div className="flex rounded-lg border border-gray-300 items-center my-10 mx-6 max-w-full md:max-w-55">
             <button
-              className={`p-2 border-r border-gray-300  rounded-l-lg ${selectedCategory === "Jobs" ? "opacity-50" : "cursor-pointer"}`}
+              className={`p-2 border-r border-gray-300 rounded-l-lg ${selectedCategory === "Jobs" ? "opacity-50" : "cursor-pointer"}`}
               onClick={() => {
                 switch (selectedCategory) {
                   case "Jobs": {
@@ -198,8 +222,12 @@ const ManageJobs = () => {
                     setSelectedCategory("Jobs");
                     return;
                   }
-                  case "Achievements": {
+                  case "Exams": {
                     setSelectedCategory("Internships");
+                    return;
+                  }
+                  case "Achievements": {
+                    setSelectedCategory("Exams");
                     return;
                   }
                   case "Study Materials": {
@@ -224,6 +252,10 @@ const ManageJobs = () => {
                     return;
                   }
                   case "Internships": {
+                    setSelectedCategory("Exams");
+                    return;
+                  }
+                  case "Exams": {
                     setSelectedCategory("Achievements");
                     return;
                   }
@@ -245,14 +277,29 @@ const ManageJobs = () => {
           </div>
 
           <div className="flex-1 px-6 flex flex-col space-y-3">
-            {paginate({ Jobs: jobs, Internships: internships, Achievements: achievements, 'Study Materials': studyMaterials }[selectedCategory]).map((achievement, key) => (
-              <ItemCard item={{ ...achievement }} type={selectedCategory.toLowerCase()} key={key} />
-            ))}
+            {itemsToDisplay.length > 0 ? (
+              <div className="border border-gray-300 rounded-lg p-5 shadow-sm bg-white">
+                {itemsToDisplay.map((achievement, key) => (
+                  <ItemCard item={{ ...achievement }} type={selectedCategory.toLowerCase()} key={key} />
+                ))}
+              </div>
+            ) : (
+              <div className="flex-1 flex items-center justify-center">
+                <img src={NoListing} alt="No Listings" className="max-w-full max-h-full mt-40" />
+              </div>
+            )}
           </div>
         </section>
-        <div className="px-6">
-          <Pagination currentPage={currentPage} itemsPerPage={itemsPerPage} totalItems={{ Jobs: jobs.length, Internships: internships.length, Achievements: achievements.length, StudyMaterials: studyMaterials.length }[selectedCategory]} onPageChange={setCurrentPage} />
-        </div>
+        {itemsPerPage.length > 0 && (
+          <div className="px-6">
+            <Pagination
+              currentPage={currentPage}
+              itemsPerPage={itemsPerPage}
+              totalItems={{ Jobs: jobs.length, Internships: internships.length, Exams: exams.length, Achievements: achievements.length, StudyMaterials: studyMaterials.length }[selectedCategory]}
+              onPageChange={setCurrentPage}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

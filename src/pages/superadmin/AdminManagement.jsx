@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import SuperAdminPageNavbar from "../../components/SuperAdmin/SuperAdminNavBar";
 import Pagination from "../../components/Admin/pagination"; // Import Pagination component
+import { FaSearch } from "react-icons/fa";
 
 export default function ManagementHomePage() {
     const navigate = useNavigate();
@@ -18,7 +19,7 @@ export default function ManagementHomePage() {
     useEffect(() => {
         const fetchAdminDetails = async () => {
             try {
-                const response = await axios.get("https://cce-backend-54k0.onrender.com/api/admins-list/");
+                const response = await axios.get("http://localhost:8000/api/admins-list/");
                 console.log("Fetched admins:", response.data.admins); // Debugging line
                 setAdmins(response.data.admins); // Set admin details
             } catch (err) {
@@ -125,24 +126,22 @@ export default function ManagementHomePage() {
 
                     {/* Filters */}
                     <div className="flex flex-wrap items-center mb-10 gap-4">
-                        <div className="flex flex-1 items-center border rounded-lg border-gray-500 w-full">
+                        <div className="flex flex-1 items-center w-full relative">
                             <input
                                 type="text"
                                 placeholder=" Search..."
                                 value={filter}
                                 onChange={(e) => setFilter(e.target.value)}
-                                className="flex-1 px-3 outline-none w-full"
+                                className="border border-gray-400 text-sm rounded-lg pl-8 py-2 w-full max-w-xs focus:outline-none focus:ring-2 focus:ring-yellow-500"
                             />
-                            <button className="px-10 py-2 bg-yellow-400 rounded-tr rounded-br border-l border-gray-500">
-                                <strong>Search</strong>
-                            </button>
+                            <FaSearch className="absolute left-2 text-gray-400"/>
                         </div>
 
                         <div className="flex items-center ml-60 border rounded-lg">
                             <select
                                 value={statusFilter}
                                 onChange={(e) => setStatusFilter(e.target.value)}
-                                className="flex-1 p-3 border-r px-3  py-2 ml-1 mr-3  rounded-l-lg  appearance-none"
+                                className="flex-1 p-3 border-r px-3  py-2 mr-3  rounded-l-lg  appearance-none"
                             >
                                 <option value="">Filter by Status  ⮟ </option>
                                 <option value="active">Active</option>
@@ -167,30 +166,30 @@ export default function ManagementHomePage() {
                                 <thead>
                                     <tr>
                                         <th
-                                            className="py-3 px-4  border-b  border-gray-500 text-left cursor-pointer"
+                                            className="py-3 px-4 border-b border-gray-500 text-center cursor-pointer"
                                             onClick={() => requestSort('name')}
                                         >
                                             Name {sortConfig.key === 'name' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
                                         </th>
                                         <th
-                                            className="py-2 px-4 border-b border-gray-500 text-left cursor-pointer"
+                                            className="py-2 px-4 border-b border-gray-500 text-center cursor-pointer"
                                             onClick={() => requestSort('email')}
                                         >
                                             Email Address{sortConfig.key === 'email' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
                                         </th>
                                         <th
-                                            className="py-2 px-4 border-b border-gray-500 text-left cursor-pointer"
+                                            className="py-2 px-4 border-b border-gray-500 text-center cursor-pointer"
                                             onClick={() => requestSort('created_at')}
                                         >
                                             Date Created {sortConfig.key === 'created_at' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
                                         </th>
                                         <th
-                                            className="py-2 px-4 border-b border-gray-500 text-left cursor-pointer"
+                                            className="py-2 px-4 border-b border-gray-500 text-center cursor-pointer"
                                             onClick={() => requestSort('last_login')}
                                         >
                                             Last Logged in {sortConfig.key === 'last_login' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
                                         </th>
-                                        <th className="py-2 px-4 border-b border-gray-500 text-center">Status</th>
+                                        <th className="py-2 px-4 border-b border-gray-500 text-center w-32">Status</th> {/* Fixed width for Status column */}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -200,13 +199,13 @@ export default function ManagementHomePage() {
                                             onClick={() => handleAdminClick(admin._id)}
                                             className="cursor-pointer hover:bg-gray-100"
                                         >
-                                            <td className="py-2 px-4 border-b border-gray-300">{admin.name || 'N/A'}</td>
-                                            <td className="py-2 px-4 border-b border-gray-300">{admin.email || 'N/A'}</td>
-                                            <td className="py-2 px-4 border-b border-gray-300">{admin.created_at ? new Date(admin.created_at).toLocaleString() : "N/A"}</td>
-                                            <td className="py-2 px-4 border-b border-gray-300">{admin.last_login ? new Date(admin.last_login).toLocaleString() : "N/A"}</td>
-                                            <td className="py-2 px-4 border-b border-gray-300">
+                                            <td className="py-2 px-4 border-b border-gray-300 text-center w-30">{admin.name || 'N/A'}</td>
+                                            <td className="py-2 px-4 border-b border-gray-300 text-center w-80">{admin.email || 'N/A'}</td>
+                                            <td className="py-2 px-4 border-b border-gray-300 text-center w-70">{admin.created_at ? new Date(admin.created_at).toLocaleString() : "N/A"}</td>
+                                            <td className="py-2 px-4 border-b border-gray-300 text-center w-80">{admin.last_login ? new Date(admin.last_login).toLocaleString() : "N/A"}</td>
+                                            <td className="py-2 px-4 border-b border-gray-300 text-center w-32"> {/* Fixed width for Status column */}
                                                 <span
-                                                    className={`inline-block text-center w-30 px-5 py-1  ml-12 rounded-lg text-m font-semibold ${admin.status === "Active" ? "bg-green-100 text-green-500" : "bg-red-100 text-red-500"
+                                                    className={`inline-block text-center w-24 px-3 py-1 rounded-lg text-m font-semibold ${admin.status === "Active" ? "bg-green-100 text-green-500" : "bg-red-100 text-red-500"
                                                         }`}
                                                 >
                                                     {admin.status || 'N/A'}

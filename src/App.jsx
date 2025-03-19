@@ -44,6 +44,15 @@ import { LoaderContext, LoaderLayout } from "./components/Common/Loader";
 import { useState } from "react";
 import JobEntrySelection from "./pages/admin/JobEntrySelection";
 import InternshipEntrySelection from "./pages/admin/InternshipEntrySelection";
+import Message from "./pages/superadmin/Message";
+import StudentStudyDetail from './pages/students/StudentStudyDetail';
+import ExamPostForm from "./pages/superadmin/ExamPostForm";
+import ExamDashboard from "./pages/common/ExamDashboard";
+import AdminInbox from "./pages/admin/Admininbox";
+import ExamPreview from "./pages/students/ExamPreview";
+import StudentRegister from "./pages/superadmin/StudentRegister";
+
+
 
 
 
@@ -94,13 +103,16 @@ function App() {
         <Route path="/student/mail" element={<ProtectedRoute> <StudentMail /> </ProtectedRoute>} />
         <Route path="/job-preview/:id" element={<JobPreview />} />
         <Route path="/internship-preview/:id" element={<InternshipPreview />} />
+      
         <Route path="/studentachievement" element= {<ProtectedRoute><StudentAchievementPostForm /> </ProtectedRoute>} />
         <Route path="/saved-jobs" element={<ProtectedRoute> <SavedJobs /> </ProtectedRoute>} />
         <Route path="/study-material" element={<ProtectedRoute> <StudentStudyMaterial /> </ProtectedRoute>} />        
         <Route path="/applied-jobs" element={<ProtectedRoute> <AppliedJobs /> </ProtectedRoute>} />
+        <Route path="/student-study-detail/:id" element={<ProtectedRoute> <StudentStudyDetail /> </ProtectedRoute>} />
 
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminLogin />} />
+          <Route path="/studentbulksignup" element={<StudentRegister />} />
 
           {/* Protected Admin Routes */}
           <Route path="/admin/home" element={<ProtectedRoute> <AdminHome /> </ProtectedRoute>} />
@@ -131,6 +143,12 @@ function App() {
           <Route path={"/superadmin-manage-jobs"} element={<ProtectedRoute> <MailPage /> </ProtectedRoute>} />
           <Route path={"/contact-inbox"} element={<ProtectedRoute> <InboxPage /> </ProtectedRoute>} />
           <Route path={"/admin-details/:id"} element={<ProtectedRoute> <AdminDetailPage /> </ProtectedRoute>} />
+          <Route path={"/message"} element={<ProtectedRoute> <Message /> </ProtectedRoute>} />
+          <Route path={"/exam-post"} element={<ProtectedRoute> <ExamPostForm /> </ProtectedRoute>} />
+          <Route path={"/exams"} element={<ProtectedRoute> <ExamDashboard /> </ProtectedRoute>} />
+          <Route path={"/exam-preview/:id"} element={<ProtectedRoute> <ExamPreview /> </ProtectedRoute>} />
+          
+          
         </Routes>
       </LoaderContext.Provider>
     </BrowserRouter>

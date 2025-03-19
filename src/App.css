@@ -2,9 +2,19 @@
   margin: 0;
 }
 
-body {
-  background-color: #FFFAFA;
+@font-face {
+    font-family: 'Britti Sans Trial';
+    src: url('path-to-font/BrittiSansTrial-Regular.woff2') format('woff2'),
+         url('path-to-font/BrittiSansTrial-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
 }
+
+body {
+    font-family: 'Britti Sans Trial', sans-serif;
+    background-color: #FFFAFA;
+}
+
 
 input[type="range"] {
   -webkit-appearance: none;
@@ -178,4 +188,42 @@ input[type="checkbox"]:hover {
 .custom-border::before {
   filter: blur(1.5rem);
   opacity: 0.5;
+}
+
+
+
+/* Custom styles for the dashboard */
+.custom-border {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.custom-border::before {
+  content: "";
+  position: absolute;
+  inset: var(--border-width, -1.5px);
+  background: var(--custom-gradient);
+  border-radius: inherit;
+  z-index: -1;
+}
+
+.custom-justify {
+  text-align: justify;
+  text-align-last: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .custom-justify {
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .custom-justify {
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+  }
 }

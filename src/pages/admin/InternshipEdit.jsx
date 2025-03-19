@@ -13,7 +13,7 @@ const InternshipEdit = () => {
     const [userRole, setUserRole] = useState(null);
 
     useEffect(() => {
-        fetch(`https://cce-backend-54k0.onrender.com/api/internship/${id}/`)
+        fetch(`http://127.0.0.1:8000/api/internship/${id}/`)
             .then(response => response.json())
             .then(data => {
                 setInternship(data.internship.internship_data);
@@ -52,7 +52,7 @@ const InternshipEdit = () => {
             edited: role
         };
     
-        fetch(`https://cce-backend-54k0.onrender.com/api/internship-edit/${id}/`, {
+        fetch(`http://127.0.0.1:8000/api/internship-edit/${id}/`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -65,6 +65,8 @@ const InternshipEdit = () => {
             if (data.internship && data.internship.internship_data) {
                 setInternship(data.internship.internship_data);
                 setIsEditing(false);
+                // Redirect back to the internship preview page
+                navigate(`/internship-preview/${id}`);
             } else {
                 console.error("Unexpected response structure:", data);
             }
@@ -76,7 +78,7 @@ const InternshipEdit = () => {
 
     const handleDelete = () => {
         if (window.confirm("Are you sure you want to delete this internship?")) {
-            fetch(`https://cce-backend-54k0.onrender.com/api/internship-delete/${id}/`, {
+            fetch(`http://127.0.0.1:8000/api/internship-delete/${id}/`, {
                 method: 'DELETE'
             })
             .then(response => {

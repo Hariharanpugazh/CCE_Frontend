@@ -7,32 +7,104 @@
 
 import { useState } from "react";
 
-export function InputField({ value, label, setter, args = {}, required = false }) {
-  return <div className="space-y-1 w-full flex flex-col">
-    <label htmlFor={label} className="text-sm">{label} { required && <span className="text-rose-400"> * </span>} </label>
-    <input value={value} onChange={(e) => setter(e.target.value)} {...args} className="bg-gray-200 rounded-md p-2 border-none text-xs outline-transparent focus:outline-yellow-300" />
-  </div>
+export function InputField({
+  value,
+  label,
+  setter,
+  args = {},
+  required = false,
+  disabled = false,
+}) {
+  return (
+    <div className="space-y-1 w-full flex flex-col">
+      <label htmlFor={label} className="text-sm font-semibold">
+        {label} {required && <span className="text-rose-400"> * </span>}{" "}
+      </label>
+      <input
+        value={value}
+        onChange={(e) => setter(e.target.value)}
+        {...args}
+        className={`w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 ${disabled && "opacity-50"
+          }`}
+        disabled={disabled}
+      />
+    </div>
+  );
 }
 
-export function FormInputField({ value, label, setter, args = {}, required = false }) {
-  return <div className="space-y-1 w-full flex flex-col">
-    <label htmlFor={label} className="text-sm">{label} { required && <span className="text-rose-400"> * </span>} </label>
-    <input value={value} onChange={(e) => setter(e.target.value)} {...args} className="rounded-md p-2 border border-gray-400 text-xs outline-transparent focus:outline-yellow-300" />
-  </div>
+export function FormInputField({
+  value,
+  label,
+  setter,
+  args = {},
+  required = false,
+  disabled = false,
+}) {
+  return (
+    <div className="space-y-1 w-full flex flex-col">
+      <label htmlFor={label} className="text-sm font-semibold">
+        {label} {required && <span className="text-rose-400"> * </span>}{" "}
+      </label>
+      <input
+        value={value}
+        onChange={(e) => setter(e.target.value)}
+        {...args}
+        className={`rounded-md p-2 border-2 border-[#bababa]/50  text-xs outline-transparent focus:outline-yellow-300 ${disabled && "opacity-50"
+          }`}
+        disabled={disabled}
+      />
+    </div>
+  );
 }
 
-export function TextAreaField({ value, label, setter, args = {} }) {
-  return <div className="space-y-1 w-full flex flex-col">
-    <label htmlFor={label} className="text-sm">{label}</label>
-    <textarea value={value} onChange={(e) => setter(e.target.value)} rows={5} {...args} className="bg-gray-200 rounded-md p-2 border-none text-xs outline-transparent focus:outline-yellow-300" />
-  </div>
+export function TextAreaField({
+  value,
+  label,
+  setter,
+  args = {},
+  disabled = false,
+}) {
+  return (
+    <div className="space-y-1 w-full flex flex-col">
+      <label htmlFor={label} className="text-sm">
+        {label}
+      </label>
+      <textarea
+        value={value}
+        onChange={(e) => setter(e.target.value)}
+        rows={5}
+        {...args}
+        className={`${disabled && "opacity-50"
+          } bg-gray-200 rounded-md p-2 border-none text-xs outline-transparent focus:outline-yellow-300 resize-none`}
+        disabled={disabled}
+      />
+    </div>
+  );
 }
 
-export function FormTextAreaField({ value, label, setter, args = {} }) {
-  return <div className="space-y-1 w-full flex flex-col">
-    <label htmlFor={label} className="text-sm">{label}</label>
-    <textarea value={value} onChange={(e) => setter(e.target.value)} rows={5} {...args} className="rounded-md p-2 border border-gray-400 text-xs outline-transparent focus:outline-yellow-300" />
-  </div>
+export function FormTextAreaField({
+  value,
+  label,
+  setter,
+  args = {},
+  disabled = false,
+}) {
+  return (
+    <div className="space-y-1 w-full flex flex-col">
+      <label htmlFor={label} className="text-sm font-semibold">
+        {label}
+      </label>
+      <textarea
+        value={value}
+        onChange={(e) => setter(e.target.value)}
+        style={{ minHeight: "115px", maxHeight: "115px", overflowY: "auto" }} // Fixed height with vertical scroll
+        {...args}
+        className={`${disabled && "opacity-50"
+          } rounded-md p-2 border-2 border-[#bababa]/50 text-sm outline-transparent focus:outline-yellow-300 resize-none`}
+        disabled={disabled}
+      />
+    </div>
+  );
 }
 
 export function SelectField({ value, label, setter, options = [], args = {} }) {
@@ -40,14 +112,16 @@ export function SelectField({ value, label, setter, options = [], args = {} }) {
   const [isOpen, setIsOpen] = useState(false);
 
   // Filter options based on search input
-  const filteredOptions = options.filter(option =>
+  const filteredOptions = options.filter((option) =>
     option.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="relative space-y-1 w-full flex flex-col">
-      <label htmlFor={label} className="text-sm">{label}</label>
-      
+      <label htmlFor={label} className="text-sm">
+        {label}
+      </label>
+
       {/* Input field to trigger dropdown and search */}
       <input
         type="text"
@@ -55,7 +129,7 @@ export function SelectField({ value, label, setter, options = [], args = {} }) {
         value={searchTerm || value}
         onChange={(e) => setSearchTerm(e.target.value)}
         onFocus={() => setIsOpen(true)}
-        className="bg-gray-200 rounded-md p-2 border-none text-xs outline-transparent focus:outline-yellow-300"
+        className="bg-gray-200 rounded-md p-3 border-none text-xs outline-transparent focus:outline-yellow-300"
         {...args}
       />
 

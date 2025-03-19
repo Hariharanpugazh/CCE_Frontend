@@ -53,7 +53,7 @@ export default function AchievementPostForm() {
       [e.target.name]: e.target.value,
     });
   };
-
+  
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -67,41 +67,59 @@ export default function AchievementPostForm() {
       }
     }
   };
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
+  
     // Validate date
     const selectedDate = new Date(formData.date_of_achievement);
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Set time to midnight for accurate comparison
-
+  
     if (selectedDate > today) {
       toast.error("Date of achievement cannot be in the future.");
       setLoading(false);
       return;
     }
-
+  
     // Validate batch field format
-    const batchPattern = /^[0-9]{4} - [0-9]{4}$/;
-    if (!batchPattern.test(formData.batch)) {
-      toast.error("Batch should be in the format YYYY - YYYY. (e.g. 2020 - 2024)");
+    const batchPattern = /^(\d{4})\s*-\s*(\d{4})$/; // Accepts "2023-2027", "2023 - 2027", "2020-2024", etc.
+    if (!formData.batch || !batchPattern.test(formData.batch)) {
+      toast.error("Batch should be in the format YYYY-YYYY or YYYY - YYYY (e.g., 2020-2024 or 2020 - 2024)");
+      setLoading(false);
+      return;
+    }
+  
+    // Normalize batch to "YYYY - YYYY" format (e.g., "2023-2027" -> "2023 - 2027")
+    const normalizedBatch = formData.batch.replace(/\s*-\s*/, " - ");
+    const [startYear, endYear] = normalizedBatch.split(" - ").map(Number);
+  
+    // Validate the 4-year difference
+    if (endYear - startYear !== 4) {
+      toast.error(`Batch "${formData.batch}" must have exactly a 4-year difference (e.g., 2022-2026 or 2022 - 2026)`);
+      setLoading(false);
+      return;
+    }
+  
+    // Optional: Validate year range
+    const currentYear = new Date().getFullYear();
+    if (startYear < 1900 || endYear > currentYear + 4) {
+      toast.error(`Batch years must be between 1900 and ${currentYear + 4}.`);
       setLoading(false);
       return;
     }
 
-    // Check if all fields are filled
+    // Check if all required fields (except photo) are filled
     if (
       !formData.name ||
       !formData.achievement_description ||
       !formData.achievement_type ||
       !formData.company_name ||
       !formData.date_of_achievement ||
-      !formData.batch ||
-      !formData.photo
+      !formData.batch
     ) {
-      toast.error("All fields are required.");
+      toast.error("Please fill in all required fields.");
       setLoading(false);
       return;
     }
@@ -117,17 +135,23 @@ export default function AchievementPostForm() {
 
       const formDataObj = new FormData();
       formDataObj.append("name", formData.name);
-      formDataObj.append("achievement_description", formData.achievement_description);
+      formDataObj.append(
+        "achievement_description",
+        formData.achievement_description
+      );
       formDataObj.append("achievement_type", formData.achievement_type);
       formDataObj.append("company_name", formData.company_name);
       formDataObj.append("date_of_achievement", formData.date_of_achievement);
-      formDataObj.append("batch", formData.batch);
-      formDataObj.append("photo", formData.photo);
+      formDataObj.append("batch", normalizedBatch);
+      // Only append photo if it exists
+      if (formData.photo) {
+        formDataObj.append("photo", formData.photo);
+      }
       formDataObj.append("userId", userId);
       formDataObj.append("role", userRole);
 
       const response = await axios.post(
-        "https://cce-backend-54k0.onrender.com/api/upload_achievement/",
+        "http://localhost:8000/api/upload_achievement/",
         formDataObj,
         {
           headers: {
@@ -141,9 +165,9 @@ export default function AchievementPostForm() {
         autoClose: 2000,
         onClose: () => {
           if (userRole === "admin") {
-            navigate("/admin/home");
+            navigate("/admin-achievements");
           } else if (userRole === "superadmin") {
-            navigate("/superadmin-dashboard");
+            navigate("/admin-achievements");
           }
         },
       });
@@ -166,18 +190,32 @@ export default function AchievementPostForm() {
     }
   };
 
-  return (
-    <div className="flex justify-center min-h-screen bg-gray-100">
-      <ToastContainer />
-      {userRole === "admin" && <AdminPageNavbar />}
-      {userRole === "superadmin" && <SuperAdminPageNavbar />}
+  const getInitials = (name) => {
+    if (!name) return '';
+    return name
+      .split(' ')
+      .map(word => word[0])
+      .join('')
+      .toUpperCase();
+  };
 
-      <div className="flex-1 p-6 max-w-6xl w-full mx-auto bg-white rounded-lg shadow-lg my-auto">
-        <div className="flex justify-between items-center mb-6">
+  return (
+    <div className="flex">
+      <ToastContainer />
+      {userRole === "admin" && (
+        <AdminPageNavbar className="fixed left-0 top-0 h-full" />
+      )}
+      {userRole === "superadmin" && (
+        <SuperAdminPageNavbar className="fixed left-0 top-0 h-full" />
+      )}
+
+      <div className="flex-1 p-6 max-w-6xl w-full mx-auto bg-white rounded-lg shadow-lg my-auto md:m-10 ml-64">
+        {/* Adjusted margin-left to account for the fixed navbar */}
+        <div className="flex justify-between items-center mb-5">
           <h2 className="text-2xl font-bold text-black">Post an Achievement</h2>
           <button
             onClick={() => navigate(-1)}
-            className="px-4 py-2 bg-gray-200 text-black rounded-lg hover:bg-gray-300 transition-colors"
+            className="px-4 py-2 border-1 text-black rounded-lg hover:bg-gray-300 transition-colors"
           >
             Cancel
           </button>
@@ -196,14 +234,16 @@ export default function AchievementPostForm() {
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="w-full mb-3 border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 placeholder-gray-400"
+                maxLength={70} // Set character limit
+                className="w-full mb-3 border-2 border-gray-300 px-4 py-2 rounded-lg outline-transparent focus:outline-yellow-300 placeholder-gray-400"
                 placeholder="Enter the name here"
               />
             </div>
 
             <div className="w-full space-y-2">
               <label className="block text-sm font-semibold text-black">
-                Company/Organization Name <span className="text-red-500">*</span>
+                Company/Organization Name{" "}
+                <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -211,7 +251,8 @@ export default function AchievementPostForm() {
                 value={formData.company_name}
                 onChange={handleChange}
                 required
-                className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 placeholder-gray-400"
+                maxLength={50} // Set character limit
+                className="w-full  border-2 border-gray-300/80 px-4 py-2 rounded-lg outline-transparent focus:outline-yellow-300 placeholder-gray-400"
                 placeholder="Enter the company/organization name here"
               />
             </div>
@@ -227,7 +268,7 @@ export default function AchievementPostForm() {
                 value={formData.achievement_type}
                 onChange={handleChange}
                 required
-                className="w-full border border-gray-300 px-4 py-2 mb-3 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                className="w-full  border-2 border-gray-300/80 px-4 py-2 mb-3 rounded-lg outline-transparent focus:outline-yellow-300"
               >
                 <option value="">Select Achievement Type</option>
                 <option value="Job Placement">Job Placement</option>
@@ -241,14 +282,30 @@ export default function AchievementPostForm() {
               <label className="block text-sm font-semibold text-black">
                 Date of Achievement <span className="text-red-500">*</span>
               </label>
-              <input
-                type="date"
-                name="date_of_achievement"
-                value={formData.date_of_achievement}
-                onChange={handleChange}
-                required
-                className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 placeholder-gray-400"
-              />
+              <div>
+                <input
+                  type="date"
+                  name="date_of_achievement"
+                  value={formData.date_of_achievement}
+                  onChange={(e) => {
+                    const selectedDate = new Date(e.target.value);
+                    const today = new Date();
+                    today.setHours(23, 59, 59, 999); // Set to end of today
+                    
+                    if (selectedDate > today) {
+                      toast.error("Achievement date must be today or earlier", {
+                        position: "top-right",
+                        autoClose: 3000,
+                      });
+                      return;
+                    }
+                    handleChange(e);
+                  }}
+                  max={new Date().toISOString().split('T')[0]}
+                  required
+                  className="w-full border-2 border-gray-300/80 px-4 py-2 rounded-lg outline-transparent focus:outline-yellow-300 placeholder-gray-400"
+                />
+              </div>
             </div>
           </div>
 
@@ -264,17 +321,20 @@ export default function AchievementPostForm() {
                   value={formData.batch}
                   onChange={handleChange}
                   required
-                  className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 placeholder-gray-400"
+                  maxLength={9} // Set character limit
+                  className="w-full  border-2 border-gray-300/80 px-4 py-2 rounded-lg outline-transparent focus:outline-yellow-300 placeholder-gray-400"
                   placeholder="Enter the batch here (e.g. 2020 - 2024)"
                 />
               </div>
 
-              <div className="border-dashed border-2 border-gray-400 rounded-xl pt-4 pb-2 px-2 text-center bg-white mt-4">
+              <div className="border-2 border-gray-300 border-dashed rounded-xl p-4 text-center bg-white mt-8 w-full">
                 <label
                   htmlFor="photo"
-                  className="cursor-pointer text-blue-600 font-semibold text-xl hover:underline"
+                  className="cursor-pointer text-gray-500 text-lg"
                 >
-                  {imagePreview ? "Change Image " : "Upload an Achievement Photo"}
+                  {imagePreview
+                    ? "Change Image"
+                    : "Upload an achievement’s or an achiever’s photo (Accepted formats: JPG, PNG)"}
                 </label>
                 <input
                   type="file"
@@ -282,18 +342,28 @@ export default function AchievementPostForm() {
                   name="photo"
                   accept="image/jpeg, image/png"
                   onChange={handleImageChange}
-                  className="mt-2"
-                  required
+                  className="hidden"
                 />
-                {imagePreview && (
+                {imagePreview ? (
                   <div className="mt-4">
                     <img
                       src={imagePreview}
                       alt="Uploaded"
-                      className="max-h-30 mx-auto rounded-lg shadow-md"
+                      className="mx-auto w-[150px] h-[150px] object-cover rounded-full shadow-md"
                     />
                   </div>
-                )}
+                  
+                ) : null 
+                // (
+                //   formData.name && (
+                //     <div className="mt-4">
+                //       <div className="mx-auto w-[150px] h-[150px] rounded-full bg-yellow-500 flex items-center justify-center text-4xl font-bold text-white">
+                //         {getInitials(formData.name)}
+                //       </div>
+                //     </div>
+                //   )
+                // )
+                }
               </div>
             </div>
 
@@ -306,9 +376,10 @@ export default function AchievementPostForm() {
                 value={formData.achievement_description}
                 onChange={handleChange}
                 required
-                className="w-full flex-1 border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 placeholder-gray-400 overflow-y-auto resize-none"
+                maxLength={300} // Set character limit
+                className="w-full flex-1  border-2 border-gray-300/80 px-4 py-2 rounded-lg outline-transparent focus:outline-yellow-300 placeholder-gray-400 overflow-y-auto resize-none"
                 rows="5"
-                placeholder="Enter the achievement description here"
+                placeholder="Enter the achievement description here (Max 300 characters)"
               ></textarea>
             </div>
           </div>

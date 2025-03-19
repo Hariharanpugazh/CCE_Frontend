@@ -19,7 +19,7 @@ const StudyEdit = () => {
             setUserRole(payload.role);
         }
         
-        fetch(`https://cce-backend-54k0.onrender.com/api/study-material/${id}/`)
+        fetch(`http://127.0.0.1:8000/api/study-material/${id}/`)
             .then(response => response.json())
             .then(data => {
                 setStudyMaterial(data.study_material);
@@ -40,7 +40,7 @@ const StudyEdit = () => {
     };
 
     const handleSave = () => {
-        fetch(`https://cce-backend-54k0.onrender.com/api/study-material-edit/${id}/`, {
+        fetch(`http://127.0.0.1:8000/api/study-material-edit/${id}/`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -57,7 +57,7 @@ const StudyEdit = () => {
 
     const handleDelete = () => {
         if (window.confirm("Are you sure you want to delete this study material?")) {
-            fetch(`https://cce-backend-54k0.onrender.com/api/study-material-delete/${id}/`, {
+            fetch(`http://127.0.0.1:8000/api/study-material-delete/${id}/`, {
                 method: 'DELETE'
             })
             .then(response => {

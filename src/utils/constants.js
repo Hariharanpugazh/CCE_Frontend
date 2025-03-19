@@ -1,4 +1,4 @@
-const apiBaseURL = "https://cce-backend-54k0.onrender.com";
+const apiBaseURL = "http://localhost:8000";
 
 const AppPages = {
   studentLogin: {
@@ -26,7 +26,7 @@ const AppPages = {
   },
 
   studymaterialPage:{
-    route: "/study-material",
+    route: "/study-material-cards",
     name: "studyMaterial",
     displayName: "Study Material",
   },

@@ -5,6 +5,12 @@ import Cookies from 'js-cookie';
 import AdminPageNavbar from '../../components/Admin/AdminNavBar';
 import SuperAdminPageNavbar from "../../components/SuperAdmin/SuperAdminNavBar";
 import Pagination from "../../components/Admin/pagination";
+import { HiOutlineBuildingOffice } from "react-icons/hi2";
+import { MdOutlineMailOutline } from "react-icons/md";
+import { LuGitFork, LuPhone } from "react-icons/lu";
+import NoStudent from "../../assets/images/NoStudent.svg";
+import { FaSearch } from "react-icons/fa";
+
 
 const StudentManagement = () => {
   const [students, setStudents] = useState([]);
@@ -23,7 +29,7 @@ const StudentManagement = () => {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const response = await axios.get("https://cce-backend-54k0.onrender.com/api/students/");
+        const response = await axios.get("http://localhost:8000/api/students/");
         setStudents(response.data.students);
       } catch (error) {
         console.error("Error fetching students:", error);
@@ -58,27 +64,32 @@ const StudentManagement = () => {
 
   const handleDeleteStudent = async (id) => {
     try {
-      await axios.delete(`https://cce-backend-54k0.onrender.com/api/students/${id}/delete/`);
+      await axios.delete(`http://localhost:8000/api/students/${id}/delete/`);
       setStudents(students.filter((student) => student._id !== id));
       setSelectedStudent(null);
       setShowDeleteConfirm(false);
-    } catch (error) { 
+    } catch (error) {
       console.error("Error deleting student:", error.response ? error.response.data : error);
       alert("Failed to delete student. Please try again.");
     }
   };
-  
 
   const handleToggleStatus = async (student) => {
     const updatedStatus = student.status === "active" ? "inactive" : "active";
     try {
-      await axios.put(`https://cce-backend-54k0.onrender.com/api/students/${student._id}/update/`, { status: updatedStatus });
+      await axios.put(`http://localhost:8000/api/students/${student._id}/update/`, { status: updatedStatus });
+
+      // Update both student list and selected student to reflect changes
       setStudents(
         students.map((s) =>
           s._id === student._id ? { ...s, status: updatedStatus } : s
         )
       );
-      setSelectedStudent(null);
+
+      setSelectedStudent((prevStudent) => ({
+        ...prevStudent,
+        status: updatedStatus, // Update the status without closing the modal
+      }));
     } catch (error) {
       console.error("Error updating student status:", error);
     }
@@ -92,8 +103,8 @@ const StudentManagement = () => {
   const handleSaveChanges = async () => {
     try {
       // Send the updated student data to the backend with the correct URL
-      await axios.put(`https://cce-backend-54k0.onrender.com/api/students/${editableStudent._id}/update/`, editableStudent);
-  
+      await axios.put(`http://localhost:8000/api/students/${editableStudent._id}/update/`, editableStudent);
+
       // Update the local state with the new student data
       setStudents(
         students.map((student) =>
@@ -131,53 +142,57 @@ const StudentManagement = () => {
 
   return (
     <div>
-      {/* <div className="flex flex-col min-h-screen bg-gray-100"> */}
       {userRole === "admin" && <AdminPageNavbar />}
       {userRole === "superadmin" && <SuperAdminPageNavbar />}
-      <div className="p-8  min-h-screen ml-62 mr-5">
-        <h1 className="text-4xl font-bold  mb-3">Student Management</h1>
+      <div className="p-8 min-h-screen ml-62 mr-5">
+        <h1 className="text-4xl font-bold mb-3">Student Management</h1>
 
-        <div className="flex flex-wrap items-center py-5 mb-6 gap-4">
-          <div className="flex flex-1 items-center border rounded-lg border-gray-400   ">
+        <div className="sticky top-0 bg-white z-10 py-5 mb-6 flex flex-wrap items-center gap-4">
+          <div className="flex flex-1 items-center border rounded-lg border-gray-400">
             <input
               type="text"
-              placeholder="Search "
+              placeholder=" Search..."
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              className="flex-1 px-3 outline-none"
+              className="border border-gray-400 text-sm rounded-lg pl-8 py-2 w-full max-w-xs focus:outline-none focus:ring-2 focus:ring-yellow-500"
             />
-            <button className="px-10  py-2 bg-yellow-400 rounded-tr rounded-br border-l border-gray-500">
-             <strong> Search</strong> 
-            </button>
+            <FaSearch className="absolute left-2 text-gray-400" />
           </div>
 
-          <div className="flex  items-center ml-60  border rounded-lg border-gray-500">
+          <div className="flex items-center border rounded-lg border-gray-500">
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="flex-1 p-3 border-r px-3  py-2 mr-3  rounded-l-lg  appearance-none"
+              className="flex-1 p-3 border-r px-3 py-2 mr-3 rounded-l-lg"
             >
-              <option value=""><center>Filter by Status ⮟</center></option>
+              <option value=""><center>Filter by Status</center></option>
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
             </select>
             <button
-              className="text-black px-5"
+              className="text-black border-r px-5"
               onClick={() => navigate("/student-signup")}
             >
-              Create Student <strong>＋</strong> 
+              Create Student <strong>＋</strong>
+            </button>
+            <button
+              className="text-black px-5"
+              onClick={() => navigate("/studentbulksignup")}
+            >
+              Bulk Upload student <strong>＋</strong>
             </button>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg overflow-x-auto border border-gray-500">
-          <table className="min-w-full  table-auto ">
-            <thead className=" border-b border-gray-500">
+        <div className="bg-white rounded-lg overflow-x-auto border border-gray-500 max-h-[calc(100vh-300px)] overflow-y-auto">
+          <table className="min-w-full table-auto">
+            <thead className="outline sticky top-0 bg-white">
               <tr>
-                <th className="text-center p-4 ">Name</th>
-                <th className="text-center p-4 ">Department</th>
-                <th className="text-left w-1/4  p-4 ">Email Address</th>
-                <th className="text-center p-4 ">Status</th>
+                <th className="text-center p-4 w-40">Name</th>
+                <th className="text-center p-4 w-60">Department</th>
+                <th className="text-center p-4 w-2/6">Email Address</th>
+                <th className="text-center p-4 w-40">Phone Number</th> {/* Increased width for Phone Number column */}
+                <th className="text-center p-4 w-32">Status</th> {/* Fixed width for Status column */}
               </tr>
             </thead>
             <tbody>
@@ -185,18 +200,19 @@ const StudentManagement = () => {
                 <tr
                   key={student._id}
                   onClick={() => setSelectedStudent(student)}
-                  className="cursor-pointer hover:bg-gray-100 border-b  border-gray-300"
+                  className="cursor-pointer hover:bg-gray-100 border-b border-gray-300"
                 >
                   <td className="text-center p-4">{student.name}</td>
-                  <td className="text-center px-4">{student.department}</td>
-                  <td className="text-left p-4 w-2/9">{student.email}</td>
-                  <td className="text-center p-4">
+                  <td className="text-center p-4 W-50">{student.department}</td>
+                  <td className="text-center p-4 w-2/9">{student.email}</td>
+                  <td className="text-center p-4 w-60"> {student.mobile_number ? student.mobile_number : "N/A"}
+                  </td>
+                  <td className="text-center p-4 w-32"> {/* Fixed width for Status column */}
                     <span
-                      className={`inline-block text-center w-24 px-3 py-1 rounded-lg text-m font-semibold ${
-                        student.status === "active"
+                      className={`inline-block text-center w-24 px-3 py-1 rounded-lg text-m font-semibold ${student.status === "active"
                           ? "bg-green-100 text-green-500"
                           : "bg-red-100 text-red-500"
-                      }`}
+                        }`}
                     >
                       {student.status.charAt(0).toUpperCase() + student.status.slice(1)}
                     </span>
@@ -207,20 +223,27 @@ const StudentManagement = () => {
           </table>
         </div>
 
-        <div className="mt-4">
-          <Pagination
-            currentPage={currentPage}
-            totalItems={filteredStudents.length}
-            itemsPerPage={itemsPerPage}
-            onPageChange={handlePageChange}
-          />
-        </div>
+        {paginatedStudents.length > 0 ? (
+          <div className="mt-4">
+            <Pagination
+              currentPage={currentPage}
+              totalItems={filteredStudents.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        ) : (
+          <div className="flex-1 flex items-center justify-center mt-10">
+            <img src={NoStudent} alt="No Students" className="max-w-full max-h-full mt-30" />
+          </div>
+        )}
 
         {selectedStudent && (
-          <div className="fixed inset-0 backdrop-blur-md bg-opacity-40 backdrop-blur-md flex justify-center items-center z-50">
-            <div className="bg-white bg-opacity-90 backdrop-blur-lg p-8 rounded-lg shadow-lg w-3/4 max-w-2xl relative">
+          <div className="fixed inset-0 backdrop-blur-md bg-opacity-40 flex justify-center items-center z-50">
+            <div className="bg-white bg-opacity-90 backdrop-blur-lg p-8 rounded-lg shadow-lg w-full max-w-xl relative">
+              {/* Close Button */}
               <button
-                className="absolute top-4 right-4 text-gray-600 hover:text-gray-800 focus:outline-none"
+                className="absolute top-2 right-2 p-4 text-gray-600 hover:text-gray-800 focus:outline-none"
                 onClick={() => {
                   setSelectedStudent(null);
                   setEditMode(false);
@@ -228,39 +251,95 @@ const StudentManagement = () => {
               >
                 ✕
               </button>
-              <h2 className="text-2xl font-bold mb-6">Student Details</h2>
-              <div className="grid grid-cols-2 gap-4">
-                {["name", "email",    "department", "year", "college_name"].map((field) => (
-                  <div key={field} className="bg-gray-100 p-4 rounded-lg">
-                    <strong className="block text-sm font-semibold">
-                      {field.replace("_", " ").toUpperCase()}:
-                    </strong>
-                    {editMode && field !== "email" ? ( // Make email non-editable
-                      <input
-                        type="text" 
-                        name={field}
-                        value={editableStudent[field] || ""}
-                        onChange={handleInputChange}
-                        className="w-full p-2 border rounded"
-                      />
-                    ) : (
-                      <span>{selectedStudent[field]}</span>
-                    )}
+
+              {/* Header Section */}
+              <div className="flex items-center mb-4">
+                <div className="w-15 h-15 rounded-full bg-gray-300 flex items-center justify-center text-gray-700 text-3xl font-bold mr-4">
+                  {selectedStudent.name.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold">{selectedStudent.name.toUpperCase()}</h2>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`p-1 bg-gray-200 rounded-sm text-sm font-semibold ${selectedStudent.status === "active" ? "text-green-500" : "text-red-500"
+                        }`}
+                    >
+                      {selectedStudent.status.toUpperCase()}
+                    </span>
+                    <span className="p-1 text-sm bg-gray-200 rounded-sm text-gray-500">
+                      CREATED ON : {new Date(selectedStudent.created_at).toLocaleDateString()}
+                    </span>
                   </div>
-                ))}
+                </div>
               </div>
 
-              <div className="mt-8 flex justify-center gap-6">
+              {/* About Section */}
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold mb-2">About</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <HiOutlineBuildingOffice className="text-gray-500 mb-1" />
+                    <span className="text-gray-400">College Name:</span>
+                    <span>{editMode ? (
+                      <input
+                        type="text"
+                        name="college_name"
+                        value={editableStudent.college_name || ""}
+                        onChange={handleInputChange}
+                        className="border rounded p-1 w-full"
+                      />
+                    ) : (
+                      selectedStudent.college_name
+                    )}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <LuGitFork className="rotate-180 text-gray-500" />
+                    <span className="text-gray-400">Department:</span>
+                    <span>{editMode ? (
+                      <input
+                        type="text"
+                        name="department"
+                        value={editableStudent.department || ""}
+                        onChange={handleInputChange}
+                        className="border rounded p-1 w-full"
+                      />
+                    ) : (
+                      selectedStudent.department
+                    )}</span>
+                  </div>
+                </div>
+              </div>
+              <hr className="my-4" />
+
+              {/* Contact Section */}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-2">Contact</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <MdOutlineMailOutline className="text-gray-500 mb-1" />
+                    <span className="text-gray-400">E-mail:</span>
+                    <span>{selectedStudent.email}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <LuPhone className="text-gray-500 mb-1" />
+                    <span className="text-gray-400">Contact Number:</span>
+                    <span>{selectedStudent.mobile_number || "N/A"}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-4">
                 {editMode ? (
                   <>
                     <button
-                      className={`${buttonStyles} bg-blue-600 hover:bg-blue-700`}
+                      className={`px-4 py-3 w-32 text-black rounded-lg text-sm font-medium transition-colors duration-200 bg-yellow-300 hover:bg-yellow-600`}
                       onClick={handleSaveChanges}
                     >
                       Save Changes
                     </button>
                     <button
-                      className={`${buttonStyles} bg-gray-600 hover:bg-gray-700`}
+                      className={`px-4 py-3 w-32 text-red rounded-lg text-sm font-medium  duration-200 bg-white border-2 border-red-600 text-red-600 font-semibold`}
                       onClick={handleCancelEdit}
                     >
                       Cancel
@@ -269,19 +348,22 @@ const StudentManagement = () => {
                 ) : (
                   <>
                     <button
-                      className={`${buttonStyles} bg-blue-600 hover:bg-blue-700`}
+                      className={`px-4 py-3 w-32 text-black rounded-lg text-sm font-medium transition-colors duration-200 bg-yellow-300 hover:bg-yellow-600 text-black font-semibold`}
+                      onClick={handleEditProfile}
+                    >
+                      Edit Info
+                    </button>
+                    <button
+                      className={`px-4 py-3 w-32 rounded-lg text-sm font-medium duration-200 border-2 font-semibold ${selectedStudent.status === "active"
+                        ? "bg-white border-red-600 text-red-600"
+                        : "border-green-600 text-green-600"
+                        }`}
                       onClick={() => handleToggleStatus(selectedStudent)}
                     >
                       {selectedStudent.status === "active" ? "Deactivate" : "Activate"}
                     </button>
                     <button
-                      className={`${buttonStyles} bg-yellow-600 hover:bg-yellow-700`}
-                      onClick={handleEditProfile}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className={`${buttonStyles} bg-red-600 hover:bg-red-700`}
+                      className={`${buttonStyles} bg-red-600 hover:bg-red-800 text-white font-semibold`}
                       onClick={() => setShowDeleteConfirm(true)}
                     >
                       Delete

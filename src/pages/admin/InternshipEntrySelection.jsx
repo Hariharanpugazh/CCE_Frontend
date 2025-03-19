@@ -36,7 +36,7 @@ const InternshipEntrySelection = () => {
     const formData = new FormData();
     formData.append("image", file);
     try {
-      const response = await axios.post("https://cce-backend-54k0.onrender.com/api/upload-internship-image/", formData, {
+      const response = await axios.post("http://127.0.0.1:8000/api/upload-internship-image/", formData, {
         headers: { "Content-Type": "multipart/form-data" },
         onUploadProgress: (progressEvent) => {
           const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
@@ -100,13 +100,15 @@ const InternshipEntrySelection = () => {
           {!selectedFile && (
             <div
               {...getRootProps()}
-              className={`w-full border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-all ${isDragActive ? "border-blue-500 bg-blue-100" : "border-gray-300"
+              className={`w-full border-2 border rounded-lg p-6 text-center cursor-pointer transition-all ${isDragActive ? "border-blue-500 bg-blue-100" : "border-gray-300"
                 }`}
             >
               <input {...getInputProps()} />
               <p className="text-gray-700">
-                Drag & Drop an Image here, or Click to select a File
+                Drag & Drop an Image here, or Click to select a File accepted formats: JPG, PNG
               </p>
+              <br />
+            <p className="text-gray-700">(Accepted formats: JPG, PNG)</p>
             </div>
           )}
           {/* Display uploaded file details */}

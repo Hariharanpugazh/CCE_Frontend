@@ -1,185 +1,232 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import StudentPageNavbar from "../../components/Students/StudentPageNavbar";
-import PageHeader from "../../components/Common/StudentPageHeader";
-import { AppPages } from "../../utils/constants";
 import ApplicationCard from "../../components/Students/ApplicationCard";
 import Cookies from "js-cookie";
 import AdminPageNavbar from "../../components/Admin/AdminNavBar";
 import SuperAdminPageNavbar from "../../components/SuperAdmin/SuperAdminNavBar";
-import Filters from "../../components/Common/Filters";
-import SidePreview from "../../components/Common/SidePreview";
+import { FiMenu, FiX, FiSearch } from "react-icons/fi";
+import Footer from "../../components/Common/Footer";
+import { useNavigate } from "react-router-dom";
 import Pagination from "../../components/Admin/pagination";
+import { LoaderContext } from "../../components/Common/Loader";
+import NoListingImage from "../../assets/images/NoListing.svg"; // Import the image
 
 export default function InternshipDashboard() {
   const [internships, setInternships] = useState([]);
-  const [error, setError] = useState("");
   const [filteredInterns, setFilteredInterns] = useState([]);
+  const [error, setError] = useState("");
   const [searchPhrase, setSearchPhrase] = useState("");
   const [userRole, setUserRole] = useState(null);
-  const [selectedIntern, setSelectedIntern] = useState();
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
-
-  const borderColor = "border-gray-300";
-
-  const [isSalaryOpen, setIsSalaryOpen] = useState(false);
-  const [isExperienceOpen, setIsExperienceOpen] = useState(false);
-  const [isEmployTypeOpen, setIsEmployTypeOpen] = useState(false);
-  const [isWorkModeOpen, setIsWorkModeOpen] = useState(false);
-  const [isSortOpen, setIsSortOpen] = useState(false);
+  const [selectedIntern, setSelectedIntern] = useState(null);
   const [savedInterns, setSavedInterns] = useState([]);
+  const [isSavedInternsOpen, setIsSavedInternsOpen] = useState(false);
+  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12;
 
-  const [salaryRangeIndex, setSalaryRangeIndex] = useState(0);
-
-  const [filters, setFilters] = useState({
-    salaryRange: { min: 10000, max: 1000000 },
-    experience: { value: 0, category: "under" },
-    employmentType: {
-      onSite: false,
-      remote: false,
-      hybrid: false
-    },
-    workingMode: {
-      online: false,
-      offline: false,
-      hybrid: false
-    },
-    sortBy: "Relevance",
-  });
+  const { isLoading, setIsLoading } = useContext(LoaderContext);
 
   const [location, setLocation] = useState("");
   const [duration, setDuration] = useState("");
   const [stipendRange, setStipendRange] = useState("");
+  const [isFiltering, setIsFiltering] = useState(false);
+  const [filters, setFilters] = useState({
+    sortBy: "Relevance",
+  });
 
-  const clearFilters = () => {
-    setFilters({
-      salaryRange: { min: 10000, max: 1000000 },
-      experience: { value: 0, category: "under" },
-      employmentType: {
-        onSite: false,
-        remote: false,
-        hybrid: false
-      },
-      workingMode: {
-        online: false,
-        offline: false,
-        hybrid: false
-      },
-      sortBy: "Relevance",
-    });
-  };
+  const navigate = useNavigate();
+  const borderColor = "border-gray-300";
 
-  const filterArgs = {
-    searchPhrase,
-    clearFilters,
-    isSalaryOpen,
-    setIsSalaryOpen,
-    salaryRangeIndex,
-    setSalaryRangeIndex,
-    filters,
-    setFilters,
-    isExperienceOpen,
-    setIsExperienceOpen,
-    isEmployTypeOpen,
-    setIsEmployTypeOpen,
-    isWorkModeOpen,
-    setIsWorkModeOpen,
-    isSortOpen,
-    setIsSortOpen,
-  };
-
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "location") {
-      setLocation(value);
-    } else if (name === "duration") {
-      setDuration(value);
-    } else if (name === "stipendRange") {
-      setStipendRange(value);
-    }
-  };
-
-  // Fetch published internships from the backend
+  // Load saved filters and page position from localStorage on component mount
   useEffect(() => {
-    const fetchPublishedInternships = async () => {
-      try {
-        const response = await axios.get("https://cce-backend-54k0.onrender.com/api/published-internship/");
+    const savedFilters = localStorage.getItem("internshipFilters");
+    if (savedFilters) {
+      const parsedFilters = JSON.parse(savedFilters);
+      setSearchPhrase(parsedFilters.searchPhrase || "");
+      setLocation(parsedFilters.location || "");
+      setDuration(parsedFilters.duration || "");
+      setStipendRange(parsedFilters.stipendRange || "");
+      setFilters({ sortBy: parsedFilters.sortBy || "Relevance" });
+    }
 
-        const internshipsWithType = response.data.internships.map((internship) => ({
-          ...internship.internship_data, // Extract internship_data
-          id: internship._id, // Add id field
-          type: "internship",
-          status: internship.status,
-          updated_at: internship.updated_at, // Add type field
-          total_views: internship.total_views // Include total_views
-        }));
-        // console.log("Internships with type:", internshipsWithType); // Debugging line
-        setInternships(internshipsWithType); // Set internships with type
-        setFilteredInterns(internshipsWithType); // Update filtered internships
-      } catch (err) {
-        console.error("Error fetching published internships:", err);
-        setError("Failed to load internships.");
-      }
-    };
-
-    fetchPublishedInternships();
+    const savedPage = localStorage.getItem("internshipCurrentPage");
+    if (savedPage) {
+      setCurrentPage(Number.parseInt(savedPage, 10));
+    }
   }, []);
 
   useEffect(() => {
-    if (
-      searchPhrase === "" &&
-      location === "" &&
-      duration === "" &&
-      stipendRange === ""
-    ) {
-      setFilteredInterns(internships);
-    } else {
-      setFilteredInterns(
-        internships.filter((intern) => {
-          const [minStipend, maxStipend] = stipendRange.split("-").map(Number);
-          return (
-            (intern.title.toLowerCase().includes(searchPhrase) ||
-              intern.company_name.toLowerCase().includes(searchPhrase) ||
-              intern.job_description.toLowerCase().includes(searchPhrase) ||
-              intern.required_skills.includes(searchPhrase) ||
-              intern.internship_type.toLowerCase().includes(searchPhrase)) &&
-            (location === "" || intern.location.toLowerCase().includes(location)) &&
-            (duration === "" || intern.duration.toLowerCase().includes(duration)) &&
-            (stipendRange === "" || (intern.stipend >= minStipend && intern.stipend <= maxStipend))
-          );
-        })
-      );
+    const fetchPublishedInternships = async () => {
+      setIsLoading(true); // Set loading to true before fetching data
+      try {
+        setIsLoading(true);
+        const response = await axios.get("http://localhost:8000/api/published-internship/");
+        const internshipsWithType = response.data.internships.map((internship) => ({
+          ...internship.internship_data,
+          id: internship._id,
+          type: "internship",
+          status: internship.status,
+          updated_at: internship.updated_at,
+          views: internship.views,
+        }));
+        setInternships(internshipsWithType);
+        setFilteredInterns(internshipsWithType);
+        setIsLoading(false);
+      } catch (err) {
+        console.error("Error fetching published internships:", err);
+        setError("Failed to load internships.");
+        setIsLoading(false);
+      }
+    };
+    fetchPublishedInternships();
+  }, [setIsLoading]);
+
+  useEffect(() => {
+    if (internships.length > 0) {
+      applyFilters();
     }
-    setCurrentPage(1);
-  }, [searchPhrase, location, duration, stipendRange, internships]);
+  }, [internships]);
 
   useEffect(() => {
     const token = Cookies.get("jwt");
     if (token) {
-      const payload = JSON.parse(atob(token.split(".")[1])); // Decode JWT payload
-      const user = !payload.student_user ? payload.role : "student";
-      setUserRole(user);
-      user === "superadmin" || user === "admin" ? undefined : fetchSavedInternships(); // Assuming the payload has a 'role' field
+      try {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        setUserRole(!payload.student_user ? payload.role : "student");
+      } catch (err) {
+        console.error("Error parsing JWT:", err);
+      }
     }
   }, []);
+
+  useEffect(() => {
+    if (userRole === "student") {
+      fetchSavedInternships();
+    }
+  }, [userRole, isSavedInternsOpen]);
 
   const fetchSavedInternships = async () => {
     try {
       const token = Cookies.get("jwt");
+      if (!token) return;
       const userId = JSON.parse(atob(token.split(".")[1])).student_user;
-      const response = await axios.get(`https://cce-backend-54k0.onrender.com/api/saved-internships/${userId}/`);
-      setSavedInterns(response.data.internships.map(internship => internship._id));
+      const response = await axios.get(`http://localhost:8000/api/saved-internships/${userId}/`);
+      setSavedInterns(response.data.internships.map((internship) => internship._id));
     } catch (err) {
-      console.error("Error fetching saved jobs:", err);
+      console.error("Error fetching saved internships:", err);
     }
   };
 
-  useEffect(() => {
-    console.log(savedInterns);
-  }, []);
+  const applyFilters = () => {
+    let filtered = [...internships];
 
-  // Pagination logic
+    const filtersToSave = {
+      searchPhrase,
+      location,
+      duration,
+      stipendRange,
+      sortBy: filters.sortBy,
+    };
+    localStorage.setItem("internshipFilters", JSON.stringify(filtersToSave));
+
+    filtered = filtered.filter((intern) => {
+      const matchesSearch =
+        !searchPhrase ||
+        intern.title?.toLowerCase().includes(searchPhrase) ||
+        intern.company_name?.toLowerCase().includes(searchPhrase) ||
+        intern.job_description?.toLowerCase().includes(searchPhrase) ||
+        (Array.isArray(intern.required_skills) &&
+          intern.required_skills.some((skill) => skill?.toLowerCase().includes(searchPhrase))) ||
+        intern.internship_type?.toLowerCase().includes(searchPhrase);
+
+      const matchesLocation = !location || intern.location?.toLowerCase().includes(location.toLowerCase());
+      const matchesDuration = !duration || intern.duration?.toLowerCase().includes(duration.toLowerCase());
+
+      let matchesStipend = true;
+      if (stipendRange) {
+        const [minStipend, maxStipend] = stipendRange.split("-").map(Number);
+        const internStipend = Number.parseInt(intern.stipend) || 0;
+        matchesStipend = internStipend >= minStipend && internStipend <= maxStipend;
+      }
+
+      return matchesSearch && matchesLocation && matchesDuration && matchesStipend;
+    });
+
+    if (filters.sortBy === "Newest" || filters.sortBy === "Oldest") {
+      const now = new Date();
+      const oneDayAgo = new Date(now);
+      oneDayAgo.setDate(now.getDate() - 1);
+
+      if (filters.sortBy === "Newest") {
+        filtered = filtered.filter((intern) => {
+          const internshipUpdateDate = new Date(intern.updated_at);
+          return internshipUpdateDate >= oneDayAgo;
+        });
+      } else if (filters.sortBy === "Oldest") {
+        filtered = filtered.filter((intern) => {
+          const internshipUpdateDate = new Date(intern.updated_at);
+          return internshipUpdateDate < oneDayAgo;
+        });
+      }
+    } else {
+      filtered.sort((a, b) => {
+        const dateA = new Date(a.updated_at);
+        const dateB = new Date(b.updated_at);
+        return filters.sortBy === "Newest" ? dateB - dateA : dateA - dateB;
+      });
+    }
+
+    setFilteredInterns(filtered);
+  };
+
+  useEffect(() => {
+    if (internships.length > 0) {
+      applyFilters();
+    }
+  }, [searchPhrase, location, duration, stipendRange, filters.sortBy]);
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    switch (name) {
+      case "location":
+        setLocation(value);
+        break;
+      case "duration":
+        setDuration(value);
+        break;
+      case "stipendRange":
+        setStipendRange(value);
+        break;
+      case "sortBy":
+        setFilters((prev) => ({ ...prev, sortBy: value }));
+        break;
+      default:
+        break;
+    }
+  };
+
+  const handleSearchClick = () => {
+    applyFilters();
+  };
+
+  const clearFilters = () => {
+    setSearchPhrase("");
+    setLocation("");
+    setDuration("");
+    setStipendRange("");
+    setFilters({ sortBy: "Relevance" });
+    setFilteredInterns(internships);
+    setCurrentPage(1);
+
+    localStorage.removeItem("internshipFilters");
+    localStorage.removeItem("internshipCurrentPage");
+  };
+
+  useEffect(() => {
+    localStorage.setItem("internshipCurrentPage", currentPage.toString());
+  }, [currentPage]);
+
   const indexOfLastIntern = currentPage * itemsPerPage;
   const indexOfFirstIntern = indexOfLastIntern - itemsPerPage;
   const currentInterns = filteredInterns.slice(indexOfFirstIntern, indexOfLastIntern);
@@ -188,104 +235,118 @@ export default function InternshipDashboard() {
     setCurrentPage(pageNumber);
   };
 
+  const handleInternshipSelection = (intern) => {
+    setSelectedIntern(intern);
+
+    localStorage.setItem("internshipCurrentPage", currentPage.toString());
+
+    const filtersToSave = {
+      searchPhrase,
+      location,
+      duration,
+      stipendRange,
+      sortBy: filters.sortBy,
+    };
+    localStorage.setItem("internshipFilters", JSON.stringify(filtersToSave));
+
+    navigate(`/internship-details/${intern.id}`);
+  };
+
   return (
-    <div className="flex">
+    <div className="sm:flex">
       {userRole === "admin" && <AdminPageNavbar />}
       {userRole === "superadmin" && <SuperAdminPageNavbar />}
       <div className="flex flex-col flex-1">
-
         {userRole === "student" && <StudentPageNavbar />}
-        <header className="flex flex-col items-center justify-center py-14 container self-center">
-          <p className="text-6xl tracking-[0.8px]">
-            Internships
-          </p>
-          <p className="text-lg mt-2 text-center">
-            Explore all the internship opportunities
-            in all the existing fields <br />around the globe.
-          </p>
-          
-        </header>
 
-         {/* search */}
-         <div className="sticky ml-10 top-10 z-10 bg-white flex border border-gray-300 mr-11 mb-5">
-          <input
-            type="text"
-            value={searchPhrase}
-            onChange={(e) => setSearchPhrase(e.target.value.toLocaleLowerCase())}
-            placeholder={`Search Jobs`}
-            className={`w-full text-lg p-2 px-4 bg-white hover:border-gray-400 outline-none ${borderColor}`}
-          />
-          <div className="flex mr-5 justify-center items-center space-x-4">
-            <select name="location" onChange={handleFilterChange} className="p-2 border-l border-gray-300">
-              <option value="">All Locations</option>
-              <option value="Bangalore">Bangalore</option>
-              <option value="Kerala">Kerala</option>
-              <option value="Chennai">Chennai</option>
-              <option value="Coimbatore">Coimbatore</option>
-              <option value="Mumbai">Mumbai</option>
-            </select>
-            <select name="duration" onChange={handleFilterChange} className="p-2 border-l border-gray-300">
-              <option value="">Duration</option>
-              <option value="1 month">1 Month</option>
-              <option value="3 months">3 Months</option>
-              <option value="6 months">6 Months</option>
-            </select>
-            <select name="stipendRange" onChange={handleFilterChange} className="p-2 border-l border-gray-300">
-              <option value="">Stipend Range</option>
-              <option value="3000-5000">3000-5000</option>
-              <option value="5000-8000">5000-8000</option>
-              <option value="8000-10000">8000-10000</option>
-              <option value="10000-15000">10000-15000</option>
-            </select>
+        <div className="flex flex-col flex-1">
+          <header className="flex flex-col items-center justify-center py-8 px-4 sm:py-14 container mx-auto text-center">
+            <p className="text-3xl sm:text-6xl tracking-[0.8px]">Internships</p>
+            <p className="text-base sm:text-lg mt-2">
+              Explore all the internship opportunities in all the existing fields <br />
+              around the globe.
+            </p>
+          </header>
+
+          <div className="top-0 z-10 bg-white px-4 sm:px-10 mb-5">
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <div className="relative flex items-center w-full">
+                <FiSearch className="absolute left-3 top-3 text-gray-500" />
+                <input
+                  type="text"
+                  placeholder="Search"
+                  className="pl-10 pr-4 h-10 rounded-md w-full border border-gray-300 focus:outline-none"
+                  value={searchPhrase}
+                  onChange={(e) => setSearchPhrase(e.target.value.toLowerCase())}
+                />
+              </div>
+
+              <div>
+                <select
+                  className="h-10 bg-white border border-gray-300 rounded-md px-4 hover:bg-gray-100 w-70"
+                  name="sortBy"
+                  value={filters.sortBy}
+                  onChange={handleFilterChange}
+                >
+                  <option value="Relevance">Sort by relevance</option>
+                  <option value="Newest">Newest (Last 24 hours)</option>
+                  <option value="Oldest">Oldest (More than 24 hours)</option>
+                </select>
+              </div>
+
+              <button
+                className="sm:hidden h-10 border border-gray-300 rounded-md px-4 flex items-center gap-2"
+                onClick={() => setIsMobileFiltersOpen(!isMobileFiltersOpen)}
+              >
+                Filters {isMobileFiltersOpen ? <FiX size={18} /> : <FiMenu size={18} />}
+              </button>
+            </div>
           </div>
-          <button className={`px-13 bg-yellow-400 rounded-tr rounded-br ${borderColor} border`}>Search</button>
-        </div>
 
-        <div className="flex px-10 space-x-5 items-start">
-          {/* filters */}
-          {/* <Filters args={filterArgs} /> */}
+          <div className="flex flex-col sm:flex-row px-4 sm:px-10 space-y-5 sm:space-y-0 sm:space-x-5">
+            <div className="flex-1 flex flex-col space-y-3">
+              <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {isLoading ? (
+                  <p className="text-center text-gray-600">Loading...</p>
+                ) : error ? (
+                  <p className="text-red-600">{error}</p>
+                ) : internships.length === 0 ? (
+                  <div className="alert alert-danger w-full col-span-full text-center flex flex-col items-center">
+                    <img src={NoListingImage} alt="No Listings" className="mb-4" />
+                  </div>
+                ) : currentInterns.length === 0 ? (
+                  <div className="alert alert-danger w-full col-span-full text-center flex flex-col items-center">
+                    <img src={NoListingImage} alt="No Listings" className="mb-4" />
+                  </div>
+                ) : (
+                  currentInterns.map((intern) => (
+                    <ApplicationCard
+                      application={intern}
+                      key={intern.id}
+                      handleCardClick={() => handleInternshipSelection(intern)}
+                      isSaved={
+                        userRole === "superadmin" || userRole === "admin" ? undefined : savedInterns.includes(intern.id)
+                      }
+                      savedJobs={savedInterns}
+                      isSavedJobsOpen={isSavedInternsOpen}
+                      setSavedJobs={setSavedInterns}
+                      setIsSavedJobsOpen={setIsSavedInternsOpen}
+                    />
+                  ))
+                )}
+              </div>
 
-          {/* Job cards */}
-          <div className="flex-1 flex flex-col space-y-3">
-
-
-            {/* jobs */}
-            <div className="w-full self-start grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {error ? (
-                <p className="text-red-600">{error}</p>
-              ) : internships.length === 0 ? (
-                <p className="text-gray-600">No internships available at the moment.</p>
-              ) : currentInterns.length === 0 ? (
-                <p className="alert alert-danger w-full col-span-full text-center">
-                  !! No Internships Found !!
-                </p>
-              ) : (
-                currentInterns.map((intern) => (
-                  <ApplicationCard
-                    key={intern.id}
-                    application={{ ...intern, total_views: intern.total_views }} // Include total_views
-                    handleCardClick={() => { setSelectedIntern(intern); console.log(intern); }}
-                    isSaved={userRole === "superadmin" || userRole === "admin" ? undefined : savedInterns.includes(intern.id)}
-                  />
-                ))
+              {filteredInterns.length > 0 && (
+                <Pagination
+                  currentPage={currentPage}
+                  totalItems={filteredInterns.length}
+                  itemsPerPage={itemsPerPage}
+                  onPageChange={handlePageChange}
+                />
               )}
             </div>
-            <Pagination
-              currentPage={currentPage}
-              totalItems={filteredInterns.length}
-              itemsPerPage={itemsPerPage}
-              onPageChange={handlePageChange}
-            />
           </div>
-
-          {/* job preview */}
-          <SidePreview
-            selectedItem={selectedIntern}
-            handleViewItem={() => { window.location.href = `/internship-preview/${selectedIntern.id}`; }}
-            isSaved={userRole === "superadmin" || userRole === "admin" ? undefined : savedInterns.includes(selectedIntern?.id)}
-            fetchSavedJobs={fetchSavedInternships}
-            setSelectedItem={setSelectedIntern}
-          />
+          {userRole === "student" && <Footer />}
         </div>
       </div>
     </div>

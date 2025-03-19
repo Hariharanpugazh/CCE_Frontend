@@ -48,7 +48,7 @@ export default function AdminLogin() {
         setIsLoading(true);
     
         try {
-            const response = await fetch("https://cce-backend-54k0.onrender.com/api/login/", {
+            const response = await fetch("http://localhost:8000/api/login/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -81,6 +81,45 @@ export default function AdminLogin() {
             setIsLoading(false); // Ensure loading state is stopped
         }
     };    
+
+    const handleGoogleSuccess = async (credentialResponse) => {
+            setIsLoading(true);
+            try {
+                const response = await fetch("http://localhost:8000/api/admin/google/login/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ token: credentialResponse.credential }),
+                    credentials: "include" // Ensures cookies are handled correctly
+                });
+        
+                const data = await response.json();
+        
+                if (response.ok) {
+                    Cookies.set("jwt", data.token.jwt, { expires: 7, path: "/" });
+                    Cookies.set("username", data.username, { expires: 7, path: "/" });
+        
+                    toast.success("Google login successful! Redirecting...");
+                    navigate("/admin/home");
+                } else if (data.error === "Admin account is deactivated. Please contact superadmin.") {
+                    toast.error(data.error); // Display inactive admin account message
+                } else if (response.status === 404) {
+                    toast.error("No admin account found with this Google email.");
+                } else {
+                    const errorMsg = data.error || "Google login failed";
+                    toast.error(errorMsg);
+                }
+            } catch (error) {
+              console.error("Google login error:", error);
+            } finally {
+                setIsLoading(false);
+            }
+          };
+        
+          const handleGoogleFailure = () => {
+            toast.error("Google sign-in was unsuccessful");
+          };
     
 
     const handleForgotPassword = () => {
@@ -96,7 +135,7 @@ export default function AdminLogin() {
         const email = formData.email;
 
         try {
-            const response = await fetch("https://cce-backend-54k0.onrender.com/api/forgot-password/", {
+            const response = await fetch("http://localhost:8000/api/forgot-password/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -123,7 +162,7 @@ export default function AdminLogin() {
         const email = formData.email;
         const otp = formData.token;
         try {
-            const response = await fetch("https://cce-backend-54k0.onrender.com/api/verify-otp/", {
+            const response = await fetch("http://localhost:8000/api/verify-otp/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -155,7 +194,7 @@ export default function AdminLogin() {
         }
 
         try {
-            const response = await fetch("https://cce-backend-54k0.onrender.com/api/reset-password/", {
+            const response = await fetch("http://localhost:8000/api/reset-password/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -177,43 +216,41 @@ export default function AdminLogin() {
         }
     };
 
-    if (isForgotPassword) {
-        return (
-            <ForgotPasswordCard
-                page={AppPages.forgotPassword}
-                formData={formData}
-                formDataSetter={setFormData}
-                onSubmit={handleForgotPasswordSubmit}
-                onResendOTP={handleForgotPasswordSubmit} // Resend OTP
-                onVerifyOTP={handleVerifyOtp} //  Verify OTP and proceed to reset password
-            />
-        );
-    }
-
-    if (isResetPassword) {
-        return (
-            <ResetPasswordCard
-                page={AppPages.resetPassword}
-                formData={formData}
-                formDataSetter={setFormData}
-                onSubmit={handleResetPasswordSubmit}
-            />
-        );
-    }
-
     return (
         <>
-            <LoginCard
-                page={AppPages.adminLogin}
-                formData={formData}
-                formDataSetter={setFormData}
-                onSubmit={handleSubmit}
-                onForgotPassword={handleForgotPassword}
-                onResetPassword={handleResetPassword}
-                isLocked={isLocked}
-                lockoutTime={lockoutTime}
-                isLoading={isLoading}
-            />
+            {isForgotPassword ? (
+                <ForgotPasswordCard
+                    page={AppPages.forgotPassword}
+                    formData={formData}
+                    formDataSetter={setFormData}
+                    onSubmit={handleForgotPasswordSubmit}
+                    onResendOTP={handleForgotPasswordSubmit}
+                    onVerifyOTP={handleVerifyOtp}
+                />
+            ) : isResetPassword ? (
+                <ResetPasswordCard
+                    page={AppPages.resetPassword}
+                    formData={formData}
+                    formDataSetter={setFormData}
+                    onSubmit={handleResetPasswordSubmit}
+                />
+            ) : (
+                <LoginCard
+                    page={AppPages.adminLogin}
+                    formData={formData}
+                    formDataSetter={setFormData}
+                    onSubmit={handleSubmit}
+                    onForgotPassword={handleForgotPassword}
+                    onResetPassword={handleResetPassword}
+                    onSuccess={handleGoogleSuccess}
+                    onError={handleGoogleFailure}
+                    isLocked={isLocked}
+                    lockoutTime={lockoutTime}
+                    isLoading={isLoading}
+                />
+            )}
+    
+            {/* Persistent ToastContainer for all cards */}
             <ToastContainer position="top-right" autoClose={3000} />
         </>
     );

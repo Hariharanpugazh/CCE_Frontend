@@ -21,7 +21,7 @@ const JobEdit = () => {
             setUserRole(payload.role);
         }
 
-        fetch(`https://cce-backend-54k0.onrender.com/api/job/${id}/`)
+        fetch(`http://127.0.0.1:8000/api/job/${id}/`)
             .then(response => response.json())
             .then(data => {
                 setJob(data.job);
@@ -55,7 +55,7 @@ const JobEdit = () => {
         };
         console.log(updatedJobData);
 
-        fetch(`https://cce-backend-54k0.onrender.com/api/job-edit/${id}/`, {
+        fetch(`http://127.0.0.1:8000/api/job-edit/${id}/`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -66,25 +66,21 @@ const JobEdit = () => {
         .then(data => {
             setJob(data.job);
             setIsEditing(false);
+            // Stay on the same preview page
+            navigate(`/job-preview/${id}`);
         })
         .catch(error => console.error("Error saving job:", error));
     };
 
     const handleDelete = () => {
         if (window.confirm("Are you sure you want to delete this job?")) {
-            fetch(`https://cce-backend-54k0.onrender.com/api/job-delete/${id}/`, {
+            fetch(`http://127.0.0.1:8000/api/job-delete/${id}/`, {
                 method: 'DELETE'
             })
             .then(response => {
                 if (response.ok) {
-                    // Redirect based on the user role
-                    if (userRole === "admin") {
-                        navigate('/manage-jobs');
-                    } else if (userRole === "superadmin") {
-                        navigate('/superadmin-manage-jobs');
-                    } else {
-                        navigate('/jobs'); // Default fallback
-                    }
+                    // Stay on the same preview page
+                    navigate(`/job-preview/${id}`);
                 } else {
                     console.error("Error deleting job:", response.statusText);
                 }

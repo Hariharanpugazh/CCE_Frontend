@@ -1,10 +1,12 @@
 import { useState, useEffect, useContext, useMemo, useRef } from "react";
 import axios from "axios";
 import { FiSearch } from "react-icons/fi";
+import { motion, useInView } from "framer-motion";
 import StudentPageNavbar from "../../components/Students/StudentPageNavbar";
 import { LoaderContext } from "../../components/Common/Loader";
 import Squares from "../../components/ui/GridLogin";
 import Pagination from "../../components/Admin/pagination";
+import Footer from "../../components/Common/Footer";
 
 export default function AchievementDashboard() {
   // State management
@@ -24,9 +26,12 @@ export default function AchievementDashboard() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const [carouselFilter, setCarouselFilter] = useState("");
+  const [isCarouselPaused, setIsCarouselPaused] = useState(false);
 
   const carouselRef = useRef(null);
-  const animationRef = useRef(null);
+  // const carouselControls = useAnimationControls(); // Not needed anymore
+  const carouselInView = useRef(null);
+  const isInView = useInView(carouselInView);
 
   // Fetch data
   useEffect(() => {
@@ -34,14 +39,13 @@ export default function AchievementDashboard() {
       setIsLoading(true);
       try {
         const response = await axios.get(
-          "https://cce-backend-54k0.onrender.com/api/published-achievement/"
+          "http://localhost:8000/api/published-achievement/"
         );
         const sortedAchievements = response.data.achievements.sort(
           (a, b) => new Date(b.updated_at) - new Date(a.updated_at)
         );
         setAchievements(sortedAchievements);
         setFilteredAchievements(sortedAchievements);
-        // setIsLoading(false)
       } catch (err) {
         setIsLoading(false);
         console.error("Error fetching published achievements:", err);
@@ -118,7 +122,6 @@ export default function AchievementDashboard() {
 
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);
-    // Remove the window.scrollTo(0, 0) to prevent full page refresh
   };
 
   // Recent achievements for carousel
@@ -131,8 +134,33 @@ export default function AchievementDashboard() {
         (achievement) => achievement.achievement_type === carouselFilter
       );
     }
-    return filtered.slice(0, isMobile ? 5 : 5); // Ensure we always show up to 5 items, regardless of view
-  }, [achievements, carouselFilter, isMobile]);
+    // Get up to 8 items for a better loop
+    let items = filtered.slice(0, 8);
+
+    // If we have less than 2 items, return an empty array to avoid errors
+    if (items.length < 2) {
+      return [];
+    }
+
+    // If we have 2 to 7 items, duplicate them to create a continuous effect
+    if (items.length < 8) {
+      const multiplier = Math.ceil(8 / items.length);
+      items = Array(multiplier).fill(items).flat().slice(0, 8);
+    }
+
+    return items;
+  }, [achievements, carouselFilter]);
+
+  // Continuous carousel animation - we're not using this anymore as we've implemented
+  // a more direct approach with the duplicated content above
+  useEffect(() => {
+    // Animation is now handled directly in the JSX with motion.div
+    // This effect is kept for reference but doesn't do anything now
+  }, [recentAchievements.length, isCarouselPaused, isInView]);
+
+  // Pause animation on hover
+  const handleMouseEnter = () => setIsCarouselPaused(true);
+  const handleMouseLeave = () => setIsCarouselPaused(false);
 
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "short", day: "numeric" };
@@ -155,7 +183,7 @@ export default function AchievementDashboard() {
       <StudentPageNavbar transparent={true} />
 
       {/* Header Section */}
-      <div className="text-center  my-4 md:my-6 py-2 md:py-4 relative px-4 ">
+      <div className="text-center my-4 md:my-6 py-2 md:py-4 relative px-4">
         <h1 className="text-3xl md:text-5xl lg:text-6xl tracking-[0.8px] font-bold mt-15">
           <span className="">Celebrating</span>
           <span className="text-[#ffcc00]"> Student Excellence,</span>
@@ -164,57 +192,157 @@ export default function AchievementDashboard() {
         </h1>
       </div>
 
-      {/* Featured Achievements Carousel */}
-      <div className="w-full overflow-hidden py-4 md:py-8 relative">
-        <div className="relative">
-          <div
-            ref={carouselRef}
-            className="flex w-full justify-start md:justify-center space-x-4 overflow-x-auto pb-4 snap-x snap-mandatory"
-            style={{
-              scrollBehavior: "smooth",
-              WebkitOverflowScrolling: "touch",
-              scrollbarWidth: "none",
-              msOverflowStyle: "none",
-            }}
-          >
-            {error ? (
-              <p className="text-red-600">{error}</p>
-            ) : recentAchievements.length === 0 ? (
-              <p className="text-gray-600 text-center w-full">
-                No starred achievements available at the moment.
-              </p>
-            ) : (
-              recentAchievements.map((achievement, index) => (
-                <div
-                  key={achievement._id}
-                  className="flex-shrink-0 w-[280px] md:w-[270px] snap-center"
-                >
-                  <div className="h-full bg-white rounded-xl shadow-md overflow-hidden">
-                    <div className="relative h-50 md:h-56">
-                      {achievement.photo && (
-                        <img
-                          src={`data:image/jpeg;base64,${achievement.photo}`}
-                          alt={achievement.name}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-                    </div>
-                    <div className="p-3">
-                      <h3 className="font-semibold text-lg mb-1 truncate">
-                        {achievement.name}
-                      </h3>
-                      <p className="text-sm text-amber-500 mb-2">
-                        {achievement.batch}
-                      </p>
-                      <p className="text-sm text-gray-600 line-clamp-2">
-                        {achievement.achievement_description}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
+      {/* Featured Achievements Carousel - Enhanced with Continuous Marquee Effect */}
+      <div
+        ref={carouselInView}
+        className="w-full py-6 md:py-10 relative overflow-hidden from-amber-50 via-white to-amber-50"
+      >
+        <div className="max-w-8xl mx-auto px-4">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold">
+              {/* <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-600 to-amber-400">
+                Featured Achievements
+              </span> */}
+            </h2>
           </div>
+          {error ? (
+            <p className="text-red-600 text-center">{error}</p>
+          ) : recentAchievements.length === 0 ? (
+            <p className="text-gray-600 text-center w-full">
+              No starred achievements available at the moment.
+            </p>
+          ) : (
+            <div
+              className="relative overflow-hidden"
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+            >
+              <div className="flex space-x-4 marquee-container">
+                <motion.div
+                  className="flex space-x-4 marquee-content"
+                  animate={{
+                    x: isCarouselPaused ? 0 : "-100%",
+                  }}
+                  transition={{
+                    ease: "linear",
+                    duration: 20,
+                    repeat: Number.POSITIVE_INFINITY,
+                    repeatType: "loop",
+                  }}
+                >
+                  {recentAchievements.map((achievement, index) => (
+                    <motion.div
+                      key={`${achievement._id}-${index}`}
+                      className="flex-shrink-0 w-[220px] md:w-[250px]"
+                      whileHover={{ y: -8, scale: 1.03 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 17,
+                      }}
+                    >
+                      <div className="bg-white rounded-xl shadow-lg overflow-hidden h-full border border-amber-100">
+                        <div className="relative h-64 overflow-hidden">
+                          {achievement.photo && (
+                            <img
+                              src={`data:image/jpeg;base64,${achievement.photo}`}
+                              alt={achievement.name}
+                              className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
+                            />
+                          )}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                          <div className="absolute top-2 right-2"></div>
+                        </div>
+
+                        <div className="p-2 ">
+                          <span className="inline-block px-2 py-1 bg-amber-500 text-white text-xs font-medium rounded-full">
+                            {achievement.achievement_type}
+                          </span>
+                          <h3 className="font-bold text-gray-800 mb-1 line-clamp-1">
+                            {achievement.name}
+                          </h3>
+                          <p className="text-amber-500 text-xs mb-2">
+                            {achievement.batch}
+                          </p>
+                          <p className="text-gray-600 text-xs line-clamp-2 mb-2">
+                            {achievement.achievement_description}
+                          </p>
+                          <div className="pt-2 border-t border-gray-100">
+                            {/* <p className="text-xs text-gray-500 truncate">
+                              {achievement.email}
+                            </p> */}
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </motion.div>
+                {/* Duplicate the content for seamless looping */}
+                <motion.div
+                  className="flex space-x-4 marquee-content"
+                  animate={{
+                    x: isCarouselPaused ? 0 : "-100%",
+                  }}
+                  transition={{
+                    ease: "linear",
+                    duration: 20,
+                    repeat: Number.POSITIVE_INFINITY,
+                    repeatType: "loop",
+                  }}
+                >
+                  {recentAchievements.map((achievement, index) => (
+                    <motion.div
+                      key={`${achievement._id}-duplicate-${index}`}
+                      className="flex-shrink-0 w-[220px] md:w-[250px]"
+                      whileHover={{ y: -8, scale: 1.03 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 17,
+                      }}
+                    >
+                      <div className="bg-white rounded-xl shadow-lg overflow-hidden h-full border border-amber-100">
+                        <div className="relative h-64 overflow-hidden">
+                          {achievement.photo && (
+                            <img
+                              src={`data:image/jpeg;base64,${achievement.photo}`}
+                              alt={achievement.name}
+                              className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
+                            />
+                          )}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                          <div className="absolute top-2 right-2"></div>
+                        </div>
+
+                        <div className="p-2 ">
+                          <span className="inline-block px-2 py-1 bg-amber-500 text-white text-xs font-medium rounded-full">
+                            {achievement.achievement_type}
+                          </span>
+                          <h3 className="font-bold text-gray-800 mb-1 line-clamp-1">
+                            {achievement.name}
+                          </h3>
+                          <p className="text-amber-500 text-xs mb-2">
+                            {achievement.batch}
+                          </p>
+                          <p className="text-gray-600 text-xs line-clamp-2 mb-2">
+                            {achievement.achievement_description}
+                          </p>
+                          <div className="pt-2 border-t border-gray-100">
+                            {/* <p className="text-xs text-gray-500 truncate">
+                              {achievement.email}
+                            </p> */}
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </div>
+              {/* Gradient overlays for seamless effect */}
+              <div className="absolute top-0 left-0 h-full w-16 bg-gradient-to-r from-amber-50 to-transparent z-10"></div>
+              <div className="absolute top-0 right-0 h-full w-16 bg-gradient-to-l from-amber-50 to-transparent z-10"></div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -296,121 +424,92 @@ export default function AchievementDashboard() {
 
       {/* Grid Layout */}
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {currentAchievements.map((achievement) => (
-            <div
-              key={achievement._id}
-              className="group relative bg-white rounded-lg shadow-lg p-6 flex flex-col items-center text-center transition-transform duration-300 hover:scale-105"
-            >
-              {/* Photo */}
-              {achievement.photo && (
-                <img
-                  src={`data:image/jpeg;base64,${achievement.photo}`}
-                  alt={achievement.name}
-                  className="w-24 h-24 md:w-32 md:h-32 object-cover rounded-full mb-4 shadow-md"
-                />
-              )}
-
-              {/* Name and Role */}
-              <h2 className="text-lg md:text-xl font-semibold text-gray-800 mb-1">
-                {achievement.name}
-              </h2>
-              <p className="text-xs md:text-sm text-gray-500 mb-2">
-                {achievement.achievement_type}
-                <br />
-                <span className="text-amber-400 text-xs md:text-sm font-medium">
-                  {achievement.batch}
-                </span>
-              </p>
-
-              {/* Email */}
-              <p className="text-xs md:text-sm text-gray-600 mb-4">
-                {achievement.email}
-              </p>
-
-              {/* Description */}
-              <p className="text-xs md:text-sm text-gray-700 text-center line-clamp-3">
-                {achievement.achievement_description}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        {/* Pagination */}
-        <Pagination
-          currentPage={currentPage}
-          totalItems={filteredAchievements.length}
-          itemsPerPage={itemsPerPage}
-          onPageChange={paginate}
-        />
-
-        {/* Footer */}
-        <footer className="w-full flex justify-center items-center min-h-[30vh] mt-20">
-          <div className="container p-4 md:p-10">
-            <div className="flex flex-col md:flex-row">
-              <div className="w-full md:w-2/5 mb-8 md:mb-0">
-                <h3 className="text-2xl md:text-3xl mb-5">
-                  Centre for Competitive Exams
-                </h3>
-                <div className="w-full md:w-3/4">
-                  <p className="text-xs md:text-sm">
-                    CCE focuses on constantly endeavor to identify the potential
-                    opportunities for our students to elevate their personality
-                    and professional competence, which in turn will enhance
-                    their socio-economic status
-                  </p>
-                  <hr className="border-1 border-black my-5" />
-                  <p className="text-xs md:text-sm mb-5">
-                    SNS Kalvi Nagar, Sathy Mani Road NH-209,
-                    <br />
-                    Vazhiyampalayam, Saravanampatti, Coimbatore,
-                    <br />
-                    Tamil Nadu
-                    <br />
-                    641035
-                  </p>
-                  <div className="flex space-x-7">
-                    <i className="bi bi-linkedin text-xl md:text-2xl"></i>
-                    <i className="bi bi-youtube text-xl md:text-2xl"></i>
-                    <i className="bi bi-instagram text-xl md:text-2xl"></i>
-                    <i className="bi bi-twitter text-xl md:text-2xl"></i>
-                  </div>
-                </div>
-              </div>
-              <div className="w-full md:w-3/5 flex flex-wrap justify-between md:pl-20">
-                {["Products", "Resources", "Company", "Support"].map(
-                  (category) => (
-                    <div
-                      key={category}
-                      className="w-1/2 md:w-auto mb-6 md:mb-0"
+        {filteredAchievements.length === 0 ? (
+          <p className="text-center text-gray-600">No results found</p>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {currentAchievements.map((achievement) => (
+                <motion.div
+                  key={achievement._id}
+                  className="group relative bg-white rounded-lg shadow-lg p-6 flex flex-col items-center text-center"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.5 }}
+                  whileHover={{
+                    y: -5,
+                    boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)",
+                  }}
+                >
+                  {/* Photo with animation */}
+                  {achievement.photo && (
+                    <motion.div
+                      className="relative w-24 h-24 md:w-32 md:h-32 rounded-full mb-4 overflow-hidden"
+                      whileHover={{ scale: 1.05 }}
                     >
-                      <p className="font-bold mb-4 md:mb-10">{category}</p>
-                      <ul className="space-y-2 md:space-y-3">
-                        {[...Array(6)].map((_, index) => (
-                          <li key={index}>
-                            <p className="text-xs">Product</p>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )
-                )}
-              </div>
+                      <img
+                        src={`data:image/jpeg;base64,${achievement.photo}`}
+                        alt={achievement.name}
+                        className="w-full h-full object-cover"
+                      />
+                      <motion.div
+                        className="absolute inset-0 bg-amber-500 mix-blend-overlay opacity-0"
+                        whileHover={{ opacity: 0.3 }}
+                      />
+                    </motion.div>
+                  )}
+
+                  {/* Name and Role */}
+                  <h2 className="text-lg md:text-xl font-semibold text-gray-800 mb-1">
+                    {achievement.name}
+                  </h2>
+                  <p className="text-xs md:text-sm text-gray-500 mb-2">
+                    {achievement.achievement_type}
+                    <br />
+                    <span className="text-amber-400 text-xs md:text-sm font-medium">
+                      {achievement.batch}
+                    </span>
+                  </p>
+
+                  {/* Email */}
+                  <p className="text-xs md:text-sm text-gray-600 mb-4">
+                    {achievement.email}
+                  </p>
+
+                  {/* Description */}
+                  <p className="text-xs md:text-sm text-gray-700 text-center line-clamp-3">
+                    {achievement.achievement_description}
+                  </p>
+                </motion.div>
+              ))}
             </div>
-            <div className="my-6 md:my-10 space-y-5">
-              <hr className="border-1 border-black" />
-              <p className="text-xs md:text-sm">
-                &copy; {new Date().getFullYear()} SNS iHub Workplace. All Rights
-                Reserved
-              </p>
-            </div>
-          </div>
-        </footer>
+
+            {/* Pagination */}
+            <Pagination
+              currentPage={currentPage}
+              totalItems={filteredAchievements.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={paginate}
+            />
+          </>
+        )}
+        {/* Footer */}
+        <Footer />
       </div>
       <style jsx>{`
         /* Hide scrollbar for Chrome, Safari and Opera */
         .overflow-x-auto::-webkit-scrollbar {
           display: none;
+        }
+        /* Marquee container styles */
+        .marquee-container {
+          width: 100%;
+          overflow: hidden;
+          position: relative;
+        }
+        .marquee-content {
+          will-change: transform;
         }
       `}</style>
     </div>

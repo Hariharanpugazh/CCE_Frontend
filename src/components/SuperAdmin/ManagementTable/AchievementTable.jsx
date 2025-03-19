@@ -6,6 +6,7 @@ import Pagination from "../../../components/Admin/pagination";
 import backIcon from "../../../assets/icons/back-icon.svg";
 import nextIcon from "../../../assets/icons/next-icon.svg";
 import axios from "axios";
+import { toast } from "react-toastify";
 import Cookies from "js-cookie";
 
 const AchievementTable = ({
@@ -40,9 +41,24 @@ const AchievementTable = ({
 
   const handleStar = async (id, isStarred) => {
     const token = Cookies.get("jwt");
+  
+    const starredCount = achievements.filter((ach) => ach.starred).length;
+  
+    if (!isStarred && starredCount >= 5) {
+      toast.warning("You can only star up to 5 achievements.");
+      return;
+    }
+  
+    // Optimistically update the UI
+    setAchievements((prev) =>
+      prev.map((achievement) =>
+        achievement._id === id ? { ...achievement, starred: !isStarred } : achievement
+      )
+    );
+  
     try {
-      const response = await axios.put(
-        `https://cce-backend-54k0.onrender.com/api/edit-achievement/${id}/`,
+      await axios.put(
+        `http://localhost:8000/api/edit-achievement/${id}/`,
         { starred: !isStarred },
         {
           headers: {
@@ -51,16 +67,18 @@ const AchievementTable = ({
           },
         }
       );
-      // Update the local state to reflect the change
-      setAchievements((prev) =>
-        prev.map((achievement) =>
-          achievement._id === id ? { ...achievement, starred: !isStarred } : achievement
-        )
-      );
     } catch (err) {
       console.error("Error updating star status:", err);
+      // Revert the UI if the API call fails
+      setAchievements((prev) =>
+        prev.map((achievement) =>
+          achievement._id === id ? { ...achievement, starred: isStarred } : achievement
+        )
+      );
+      toast.error("Failed to update star status. Please try again.");
     }
   };
+  
 
   return (
     <div id="achievements-section" className="mt-4 w-full flex-col">
@@ -72,7 +90,7 @@ const AchievementTable = ({
           </button>
           <p className="px-3">Achievement Approvals</p>
           <button
-            className="p-2 border-l border-gray-300 hover:bg-gray-50 opacity-50 rounded-r-lg" disabled
+            className="p-2 border-l border-gray-300 hover:bg-gray-50 rounded-r-lg" onClick={() => setVisibleSection("exams")}
           >
             <img src={nextIcon} alt="Next" className="w-5" />
           </button>
@@ -194,8 +212,8 @@ const AchievementTable = ({
                         onClick={() => handleDelete(achievement._id, "achievement")}
                       />
                       <FaStar
-                        className={`cursor-pointer ${achievement.starred ? "text-yellow-500" : "text-gray-500"}`}
-                        size={16}
+                        className={`cursor-pointer ${achievement.starred ? "text-amber-500" : "text-gray-400"}`}
+                        size={18}
                         onClick={() => handleStar(achievement._id, achievement.starred)}
                       />
                     </div>
