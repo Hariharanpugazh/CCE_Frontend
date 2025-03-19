@@ -8,7 +8,7 @@ import ApplicationCard from "../../components/Students/ApplicationCard";
 import Pagination from "../../components/Admin/pagination"; // Import Pagination
 import { Link } from "react-router-dom";
 import { LoaderContext } from "../../components/Common/Loader";
-import yellowBg from "../../assets/images/yellowbg.png"; // Import the background image
+import yellowBg from "../../assets/images/Yellowbg.png"; // Import the background image
 
 const SuperAdminHome = () => {
   const navigate = useNavigate();
