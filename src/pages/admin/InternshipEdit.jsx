@@ -13,7 +13,7 @@ const InternshipEdit = () => {
     const [userRole, setUserRole] = useState(null);
 
     useEffect(() => {
-        fetch(`http://127.0.0.1:8000/api/internship/${id}/`)
+        fetch(`https://cce-backend.onrender.com/api/internship/${id}/`)
             .then(response => response.json())
             .then(data => {
                 setInternship(data.internship.internship_data);
@@ -26,7 +26,6 @@ const InternshipEdit = () => {
         const token = Cookies.get("jwt");
         if (token) {
             const payload = JSON.parse(atob(token.split(".")[1])); // Decode JWT payload
-            console.log("Decoded JWT Payload:", payload); // Debugging line
             setUserRole(payload.role); // Assuming the payload has a 'role' field
         }
     }, []);
@@ -52,7 +51,7 @@ const InternshipEdit = () => {
             edited: role
         };
     
-        fetch(`http://127.0.0.1:8000/api/internship-edit/${id}/`, {
+        fetch(`https://cce-backend.onrender.com/api/internship-edit/${id}/`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -78,7 +77,7 @@ const InternshipEdit = () => {
 
     const handleDelete = () => {
         if (window.confirm("Are you sure you want to delete this internship?")) {
-            fetch(`http://127.0.0.1:8000/api/internship-delete/${id}/`, {
+            fetch(`https://cce-backend.onrender.com/api/internship-delete/${id}/`, {
                 method: 'DELETE'
             })
             .then(response => {

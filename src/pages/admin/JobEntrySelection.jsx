@@ -39,7 +39,7 @@ const JobEntrySelection = () => {
     formData.append("image", file);
 
     try {
-      const response = await axios.post("http://127.0.0.1:8000/api/upload_job_image/", formData, {
+      const response = await axios.post("https://cce-backend.onrender.com/api/upload_job_image/", formData, {
         headers: { "Content-Type": "multipart/form-data" },
         onUploadProgress: (progressEvent) => {
           const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);

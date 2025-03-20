@@ -399,7 +399,6 @@ const OtherInstructions = ({ formData, setFormData }) => {
     const file = e.target.files[0];
     if (file) {
       if (file.type === "image/jpeg" || file.type === "image/png") {
-        console.log("Selected file:", file); // Debug log
         
         // Clean up any previous object URL to prevent memory leaks
         if (formData.imagePreview) {
@@ -900,8 +899,6 @@ export default function JobPostForm() {
         }
       }
 
-      // Log data for debugging
-      console.log("Submitting job data:", jobData);
       
       formDataToSend.append("job_data", JSON.stringify(jobData));
       formDataToSend.append("role", userRole);
@@ -909,10 +906,9 @@ export default function JobPostForm() {
 
       // If in edit mode, handle the edit request using the same FormData structure
       if (isEditMode) {
-        console.log("Updating job with ID:", id);
         
         const response = await axios.post(
-          `http://127.0.0.1:8000/api/job-edit/${id}/`,
+          `https://cce-backend.onrender.com/api/job-edit/${id}/`,
           formDataToSend,
           {
             headers: {
@@ -922,13 +918,12 @@ export default function JobPostForm() {
           }
         );
         
-        console.log("Update response:", response.data);
         toast.success("Job updated successfully!");
         navigate("/jobs");
       } else {
         // Create new job
         const response = await axios.post(
-          "https://cce-backend-54k0.onrender.com/api/job_post/",
+          "https://cce-backend.onrender.com/api/job_post/",
           formDataToSend,
           {
             headers: {

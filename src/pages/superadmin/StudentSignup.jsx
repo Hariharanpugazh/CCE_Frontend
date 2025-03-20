@@ -131,7 +131,7 @@ export default function StudentSignup() {
 
     try {
       const response = await fetch(
-        "https://cce-backend-54k0.onrender.com/api/student-signup/",
+        "https://cce-backend.onrender.com/api/student-signup/",
         {
           method: "POST",
           headers: {

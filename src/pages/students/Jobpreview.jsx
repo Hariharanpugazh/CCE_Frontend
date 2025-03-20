@@ -66,7 +66,6 @@ const JobPreview = () => {
   const [userRole, setUserRole] = useState(null);
   const [saved, setSaved] = useState(false);
   const [savedJobs, setSavedJobs] = useState([]);
-  console.log(savedJobs);
   const [showApplySuccess, setShowApplySuccess] = useState(false);
   const [showSaveSuccess, setShowSaveSuccess] = useState(false);
   const [publishedJobs, setPublishedJobs] = useState([]);
@@ -94,7 +93,7 @@ const JobPreview = () => {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`http://127.0.0.1:8000/api/job/${id}/`)
+    fetch(`https://cce-backend.onrender.com/api/job/${id}/`)
       .then((response) => response.json())
       .then((data) => {
         setJob(data.job);
@@ -111,7 +110,7 @@ const JobPreview = () => {
       setLoadingJobs(true);
       try {
         const response = await axios.get(
-          "https://cce-backend-54k0.onrender.com/api/published-jobs/"
+          "https://cce-backend.onrender.com/api/published-jobs/"
         );
         const jobsData = Array.isArray(response.data)
           ? response.data
@@ -149,7 +148,7 @@ const JobPreview = () => {
     try {
       const token = Cookies.get("jwt");
       const userId = JSON.parse(atob(token.split(".")[1])).student_user;
-      await axios.post("https://cce-backend-54k0.onrender.com/api/apply-job/", {
+      await axios.post("https://cce-backend.onrender.com/api/apply-job/", {
         studentId: userId,
         jobId: id,
       });
@@ -175,8 +174,8 @@ const JobPreview = () => {
         const isJobSaved = savedJobs.includes(id);
 
         const endpoint = isJobSaved
-            ? `https://cce-backend-54k0.onrender.com/api/unsave-job/${id}/`
-            : `https://cce-backend-54k0.onrender.com/api/save-job/${id}/`;
+            ? `https://cce-backend.onrender.com/api/unsave-job/${id}/`
+            : `https://cce-backend.onrender.com/api/save-job/${id}/`;
 
         const response = await axios.post(endpoint, { userId });
 
@@ -209,7 +208,7 @@ const JobPreview = () => {
 
   const handleDelete = () => {
     if (window.confirm("Are you sure you want to delete this job?")) {
-      fetch(`http://127.0.0.1:8000/api/job-delete/${id}/`, {
+      fetch(`https://cce-backend.onrender.com/api/job-delete/${id}/`, {
         method: "DELETE",
       })
         .then((response) => {

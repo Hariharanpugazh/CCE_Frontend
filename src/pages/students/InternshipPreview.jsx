@@ -93,7 +93,7 @@ const InternshipPreview = () => {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`http://127.0.0.1:8000/api/internship/${id}/`)
+    fetch(`https://cce-backend.onrender.com/api/internship/${id}/`)
       .then((response) => response.json())
       .then((data) => {
         setInternship(data.internship);
@@ -110,7 +110,7 @@ const InternshipPreview = () => {
       setLoadingInternships(true);
       try {
         const response = await axios.get(
-          "https://cce-backend-54k0.onrender.com/api/published-internship/"
+          "https://cce-backend.onrender.com/api/published-internship/"
         );
 
         // Check if response.data is an array or if it has a specific property containing the internships
@@ -155,7 +155,7 @@ const InternshipPreview = () => {
     try {
       const token = Cookies.get("jwt");
       const userId = JSON.parse(atob(token.split(".")[1])).student_user;
-      await axios.post("https://cce-backend-54k0.onrender.com/api/apply-internship/", {
+      await axios.post("https://cce-backend.onrender.com/api/apply-internship/", {
         studentId: userId,
         internshipId: id,
       });
@@ -181,8 +181,8 @@ const InternshipPreview = () => {
         }
 
         const endpoint = saved
-            ? `https://cce-backend-54k0.onrender.com/api/unsave-internship/${id}/`
-            : `https://cce-backend-54k0.onrender.com/api/save-internship/${id}/`;
+            ? `https://cce-backend.onrender.com/api/unsave-internship/${id}/`
+            : `https://cce-backend.onrender.com/api/save-internship/${id}/`;
 
         const response = await axios.post(endpoint, { userId });
 
@@ -210,7 +210,7 @@ const InternshipPreview = () => {
 
   const handleDelete = () => {
     if (window.confirm("Are you sure you want to delete this internship?")) {
-      fetch(`http://127.0.0.1:8000/api/internship-delete/${id}/`, {
+      fetch(`https://cce-backend.onrender.com/api/internship-delete/${id}/`, {
         method: 'DELETE'
       })
         .then(response => {

@@ -430,7 +430,6 @@ export default function ExamPostForm() {
   const convertObjectToKeyValueArray = (obj) => {
     // Handle undefined, null, or non-object inputs
     if (!obj) {
-      console.log("convertObjectToKeyValueArray: Input is null/undefined, returning default", obj);
       return [{ key: "", value: "" }];
     }
 
@@ -443,19 +442,16 @@ export default function ExamPostForm() {
         }
         return { key: "", value: "" };
       });
-      console.log("convertObjectToKeyValueArray: Processed array", result);
       return result;
     }
 
     // If obj is a plain object (e.g., {"key1": "value1", "key2": "value2"})
     if (typeof obj === "object" && !Array.isArray(obj)) {
       const result = Object.entries(obj).map(([key, value]) => ({ key, value }));
-      console.log("convertObjectToKeyValueArray: Processed plain object", result);
       return result;
     }
 
     // Fallback for unexpected formats
-    console.log("convertObjectToKeyValueArray: Unexpected format, returning default", obj);
     return [{ key: "", value: "" }];
   };
 
@@ -487,10 +483,16 @@ export default function ExamPostForm() {
     },
   });
 
+  useEffect(() => {
+    if (isEditMode && JSON.stringify(examDataFromLocation) === JSON.stringify(formData.exam_data)) {
+      console.error("Error: examDataFromLocation should not be equal to examData in edit mode.");
+      toast.error("Data inconsistency detected. Please modify the exam details before submitting.");
+    }
+  }, [isEditMode, examDataFromLocation, formData]);
+
   // Reset form data when transitioning to create mode
   useEffect(() => {
     if (isCreateMode) {
-      console.log("Create mode detected - resetting form data");
       setFormData(emptyFormData);
       
       // Reset form sections to initial state
@@ -503,11 +505,6 @@ export default function ExamPostForm() {
       });
     }
   }, [isCreateMode]);
-
-  // Log the final formData to confirm initialization
-  console.log("formData.exam_data after initialization:", formData.exam_data);
-  console.log("formData.exam_data.exam_highlights:", formData.exam_data.exam_highlights);
-  console.log("formData.exam_data.cutoff:", formData.exam_data.cutoff);
   
 
   const [message, setMessage] = useState("");
@@ -628,6 +625,15 @@ export default function ExamPostForm() {
     setTimeout(async () => {
       const examData = formData.exam_data;
 
+      if (isEditMode && JSON.stringify(examDataFromLocation.exam_data) === JSON.stringify(examData)) {
+        toast.error("No changes detected. Please modify exam details before submitting.");
+        setLoading(false);
+        return;
+      }
+      console.log("editmode:", isEditMode);
+      console.log("Final examData:", examData);
+      console.log("Ajay:", examDataFromLocation.exam_data);
+
       // Validate required fields
       if (!examData.exam_title || !examData.application_process || !examData.application_deadline) {
         toast.error("Please fill in all mandatory fields.");
@@ -719,7 +725,7 @@ export default function ExamPostForm() {
         const headers = { Authorization: `Bearer ${token}` };
 
         if (isEditMode) {
-          const response = await fetch(`http://127.0.0.1:8000/api/exam-edit/${id || urlExamId}/`, {
+          const response = await fetch(`https://cce-backend.onrender.com/api/exam-edit/${id || urlExamId}/`, {
             method: "POST",  // Change the method to POST
             headers,
             body: formDataToSend,
@@ -731,7 +737,7 @@ export default function ExamPostForm() {
           }
           navigate("/exams");
         } else {
-          const response = await axios.post("https://cce-backend-54k0.onrender.com/api/exam_post/", formDataToSend, { headers });
+          const response = await axios.post("https://cce-backend.onrender.com/api/exam_post/", formDataToSend, { headers });
           setMessage(response.data.message);
           navigate("/exams");
         }

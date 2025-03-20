@@ -1,4 +1,3 @@
-"use client";
 import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import StudentPageNavbar from "../../components/Students/StudentPageNavbar";
@@ -139,7 +138,7 @@ export default function JobDashboard() {
       try {
         setIsLoading(true);
         const response = await axios.get(
-          "https://cce-backend-54k0.onrender.com/api/published-jobs/"
+          "https://cce-backend.onrender.com/api/published-jobs/"
         );
         const jobsWithType = response.data.jobs.map((job) => ({
           ...job,
@@ -163,7 +162,7 @@ export default function JobDashboard() {
       const token = Cookies.get("jwt");
       const userId = JSON.parse(atob(token.split(".")[1])).student_user;
       const response = await axios.get(
-        `https://cce-backend-54k0.onrender.com/api/saved-jobs/${userId}/`
+        `https://cce-backend.onrender.com/api/saved-jobs/${userId}/`
       );
       setSavedJobs(response.data.jobs.map((job) => job._id));
     } catch (err) {
@@ -172,7 +171,6 @@ export default function JobDashboard() {
   };
 
   useEffect(() => {
-    console.log(userRole);
     if (userRole !== "admin" && userRole !== "superadmin") {
       fetchSavedJobs();
     }
@@ -318,7 +316,7 @@ export default function JobDashboard() {
               </div>
 
               {/* Maintain Pagination but hide when "!! No Jobs Found !!" is displayed */}
-              {jobs.length > 0 && currentJobs.length > 0 && (
+              {filteredJobs.length > itemsPerPage && (
                 <Pagination
                   currentPage={currentPage}
                   totalItems={filteredJobs.length}

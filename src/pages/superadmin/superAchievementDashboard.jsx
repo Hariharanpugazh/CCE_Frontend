@@ -25,7 +25,7 @@ export default function AchievementDashboard() {
     const fetchPublishedAchievements = async () => {
       setIsLoading(true); // Show loader when fetching data
       try {
-        const response = await axios.get("https://cce-backend-54k0.onrender.com/api/published-achievement/");
+        const response = await axios.get("https://cce-backend.onrender.com/api/published-achievement/");
         setAchievements(response.data.achievements);
         setFilteredAchievements(response.data.achievements);
       } catch (err) {
@@ -78,13 +78,12 @@ export default function AchievementDashboard() {
     const currentTopMarkedCount = achievements.filter(achievement => achievement.starred).length;
 
     if (!isStarred && currentTopMarkedCount >= 5) {
-      console.log("Cannot mark more than 5 achievements as top.");
       return;
     }
 
     try {
       const response = await axios.put(
-        `https://cce-backend-54k0.onrender.com/api/edit-achievement/${id}/`,
+        `https://cce-backend.onrender.com/api/edit-achievement/${id}/`,
         { starred: !isStarred },
         {
           headers: {

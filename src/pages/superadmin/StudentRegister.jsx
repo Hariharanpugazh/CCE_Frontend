@@ -12,7 +12,7 @@ const StudentRegister = () => {
   const [fileUploadError, setFileUploadError] = useState('');
   const [uploadResults, setUploadResults] = useState(null);
 
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://cce-backend-54k0.onrender.com';
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://cce-backend.onrender.com';
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];

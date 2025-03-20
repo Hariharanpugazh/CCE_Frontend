@@ -23,14 +23,11 @@ export default function SavedJobs() {
         const token = Cookies.get("jwt");
         const userId = JSON.parse(atob(token.split(".")[1])).student_user;
         const response = await axios.get(
-          `https://cce-backend-54k0.onrender.com/api/saved-jobs/${userId}/`
+          `https://cce-backend.onrender.com/api/saved-jobs/${userId}/`
         );
 
         // Access the jobs array within the response data
         const jobs = response.data.jobs;
-
-        // Log the jobs to inspect their structure
-        console.log("Saved Jobs:", jobs);
 
         if (Array.isArray(jobs)) {
           const jobsWithType = jobs.map((job) => ({
@@ -53,14 +50,11 @@ export default function SavedJobs() {
         const token = Cookies.get("jwt");
         const userId = JSON.parse(atob(token.split(".")[1])).student_user;
         const response = await axios.get(
-          `https://cce-backend-54k0.onrender.com/api/saved-internships/${userId}/`
+          `https://cce-backend.onrender.com/api/saved-internships/${userId}/`
         );
 
         // Access the jobs array within the response data
         const interns = response.data.internships;
-
-        // Log the jobs to inspect their structure
-        console.log("Saved Jobs:", interns);
 
         if (Array.isArray(interns)) {
           const internsWithType = interns.map((job) => ({
@@ -180,7 +174,6 @@ export default function SavedJobs() {
   const handleStatusFilterChange = (status) => {
     setFilter(status);
   };
-  console.log("Saved Jobs ID:", savedJobs.map(j => j._id));
 
   return (
     <div className="flex flex-col">

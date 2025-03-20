@@ -59,7 +59,7 @@ const SuperAdminHome = () => {
           return;
         }
 
-        const response = await axios.get("https://cce-backend-54k0.onrender.com/api/all-jobs-internships/", {
+        const response = await axios.get("https://cce-backend.onrender.com/api/all-jobs-internships/", {
           headers: {
             Authorization: `Bearer ${token}`,
           },

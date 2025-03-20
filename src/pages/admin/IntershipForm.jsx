@@ -53,8 +53,8 @@ const InternshipDetails = ({ formData, setFormData }) => {
             maxLength: 100,
           }}
           setter={(val) => {
-            const filteredValue = val.replace(/[^A-Za-z ]/g, ""); // Remove numbers and special characters
-            setFormData((prev) => ({ ...prev, title: filteredValue }));
+            const filteredValue = val.replace(/[^A-Za-z ]/g, "").replace(/\s+/g, " ");
+            setFormData((prev) => ({ ...prev, title: filteredValue.trimStart() }));
           }}
         />
         <FormInputField
@@ -66,8 +66,8 @@ const InternshipDetails = ({ formData, setFormData }) => {
             maxLength: 100,
           }}
           setter={(val) => {
-            const filteredValue = val.replace(/[^A-Za-z ,]/g, ""); // Allow letters, spaces & commas
-            setFormData((prev) => ({ ...prev, location: filteredValue }));
+            const filteredValue = val.replace(/[^A-Za-z ,]/g, "").replace(/\s+/g, " ");
+            setFormData((prev) => ({ ...prev, location: filteredValue.trimStart() }));
           }}
         />
         <FormInputField
@@ -89,7 +89,7 @@ const InternshipDetails = ({ formData, setFormData }) => {
             maxLength: 100,
           }}
           setter={(val) => {
-            const filteredValue = val.replace(/[^A-Za-z ]/g, ""); // Allow only letters & spaces
+            const filteredValue = val.replace(/[^A-Za-z ]/g, "");
             setFormData((prev) => ({ ...prev, internship_type: filteredValue }));
           }}
         />
@@ -101,7 +101,7 @@ const InternshipDetails = ({ formData, setFormData }) => {
             maxLength: 100,
           }}
           setter={(val) => {
-            const filteredValue = val.replace(/[^A-Za-z0-9 &]/g, ""); // Allow letters, numbers, & spaces
+            const filteredValue = val.replace(/[^A-Za-z0-9 &]/g, "");
             setFormData((prev) => ({ ...prev, company_name: filteredValue }));
           }}
         />
@@ -139,8 +139,8 @@ const InternshipDetails = ({ formData, setFormData }) => {
             maxLength: 50,
           }}
           setter={(val) => {
-            const filteredValue = val.replace(/[^0-9A-Za-z ]/g, ""); // Allow numbers, letters & spaces
-            setFormData((prev) => ({ ...prev, duration: filteredValue }));
+            const filteredValue = val.replace(/[^0-9A-Za-z ]/g, "").replace(/\s+/g, " ");
+            setFormData((prev) => ({ ...prev, duration: filteredValue.trimStart() }));
           }}
         />
         <FormInputField
@@ -151,7 +151,7 @@ const InternshipDetails = ({ formData, setFormData }) => {
             maxLength: 10,
           }}
           setter={(val) => {
-            const filteredValue = val.replace(/[^0-9-]/g, ""); // Allow only numbers & hyphen
+            const filteredValue = val.replace(/[^0-9-]/g, "");
             setFormData((prev) => ({ ...prev, stipend: filteredValue }));
           }}
           type="text"
@@ -162,29 +162,19 @@ const InternshipDetails = ({ formData, setFormData }) => {
 };
 
 const InternshipRequirements = ({ formData, setFormData }) => {
-  // Add this to your state declarations
   const [imagePreview, setImagePreview] = useState(() => {
-    // Check if there's a saved image in localStorage
     const savedImage = localStorage.getItem("jobImagePreview");
     return savedImage || null;
   });
 
-  // Modified handle image change function
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       if (file.type === "image/jpeg" || file.type === "image/png") {
-        console.log("Selected file:", file); // Debug log
         setFormData({ ...formData, image: file });
-
-        // Create object URL and save to state
         const imageUrl = URL.createObjectURL(file);
         setImagePreview(imageUrl);
-
-        // Save to localStorage for persistence
         localStorage.setItem("jobImagePreview", imageUrl);
-
-        // Also save file info in localStorage if needed
         const fileInfo = {
           name: file.name,
           type: file.type,
@@ -202,20 +192,16 @@ const InternshipRequirements = ({ formData, setFormData }) => {
     }
   };
 
-  // Add this new function for image deletion
   const handleImageDelete = () => {
     setImagePreview(null);
     setFormData({ ...formData, image: null });
-
-    // Remove from localStorage
     localStorage.removeItem("jobImagePreview");
     localStorage.removeItem("jobImageFile");
-
-    // Revoke object URL to free memory
     if (imagePreview && imagePreview.startsWith("blob:")) {
       URL.revokeObjectURL(imagePreview);
     }
   };
+
   return (
     <>
       <div className="flex flex-col space-y-6 w-full">
@@ -247,8 +233,7 @@ const InternshipRequirements = ({ formData, setFormData }) => {
         <FormInputField
           label={"Educational Requirement"}
           args={{
-            placeholder:
-              "Enter Educational Requirement (e.g., Bachelor's Degree)",
+            placeholder: "Enter Educational Requirement (e.g., Bachelor's Degree)",
             value: formData.education_requirements,
             maxLength: 300,
           }}
@@ -285,12 +270,9 @@ const InternshipRequirements = ({ formData, setFormData }) => {
           }
         />
       </div>
-      {/* Image Upload Section */}
       <div className="border-2 border-gray-300 border-dashed rounded-xl p-4 text-center bg-white mt-8 w-full">
         <label htmlFor="image" className="cursor-pointer text-gray-500 text-sm">
-          {imagePreview
-            ? "Change Image"
-            : "Upload a job-related photo (Accepted formats: JPG, PNG)"}
+          {imagePreview ? "Change Image" : "Upload a job-related photo (Accepted formats: JPG, PNG)"}
         </label>
         <input
           type="file"
@@ -311,7 +293,7 @@ const InternshipRequirements = ({ formData, setFormData }) => {
             <button
               type="button"
               onClick={handleImageDelete}
-              className="absolute top-0 right-2 bg-white text-pink-500  p-1 hover:bg-gray-100  border-pink-500"
+              className="absolute top-0 right-2 bg-white text-pink-500 p-1 hover:bg-gray-100 border-pink-500"
               aria-label="Delete image"
             >
               <svg
@@ -337,7 +319,6 @@ const InternshipRequirements = ({ formData, setFormData }) => {
 };
 
 const ApplicationProcess = ({ formData, setFormData }) => {
-
   return (
     <>
       <div className="flex flex-col space-y-6 w-full">
@@ -346,10 +327,10 @@ const ApplicationProcess = ({ formData, setFormData }) => {
           args={{
             placeholder: "Posting Date",
             type: "date",
-            value: new Date().toISOString().split("T")[0], // Set today's date
-            readOnly: true, // Make it read-only
+            value: new Date().toISOString().split("T")[0],
+            readOnly: true,
           }}
-          setter={() => { }} // Prevent changes
+          setter={() => { }}
           type="date"
         />
         <FormInputField
@@ -359,7 +340,7 @@ const ApplicationProcess = ({ formData, setFormData }) => {
             placeholder: "Enter Application Deadline (YYYY-MM-DD)",
             type: "date",
             value: formData.application_deadline,
-            min: new Date(Date.now() + 86400000).toISOString().split("T")[0], // Set min to tomorrow
+            min: new Date(Date.now() + 86400000).toISOString().split("T")[0],
             maxLength: 300,
           }}
           setter={(val) =>
@@ -373,7 +354,7 @@ const ApplicationProcess = ({ formData, setFormData }) => {
             placeholder: "Enter Interview Start Date (YYYY-MM-DD)",
             type: "date",
             value: formData.interview_start_date,
-            min: new Date(Date.now() + 86400000).toISOString().split("T")[0], // Set min to tomorrow
+            min: new Date(Date.now() + 86400000).toISOString().split("T")[0],
             maxLength: 300,
           }}
           setter={(val) =>
@@ -403,7 +384,7 @@ const ApplicationProcess = ({ formData, setFormData }) => {
             value: formData.interview_end_date,
             min: formData.interview_start_date
               ? new Date(new Date(formData.interview_start_date).getTime() + 86400000).toISOString().split("T")[0]
-              : new Date(Date.now() + 86400000).toISOString().split("T")[0], // Must be after Interview Start Date
+              : new Date(Date.now() + 86400000).toISOString().split("T")[0],
             maxLength: 300,
           }}
           setter={(val) =>
@@ -416,12 +397,13 @@ const ApplicationProcess = ({ formData, setFormData }) => {
           required={true}
           args={{
             placeholder: "Enter the application link",
-            value: formData.internship_link,
+            value: formData.internship_link.trim(),
             maxLength: 300,
           }}
-          setter={(val) =>
-            setFormData((prev) => ({ ...prev, internship_link: val }))
-          }
+          setter={(val) => {
+            const filteredValue = val.trim();
+            setFormData((prev) => ({ ...prev, internship_link: filteredValue }));
+          }}
         />
         <FormTextAreaField
           label={"Selection Process"}
@@ -574,7 +556,7 @@ const InternPostForm = () => {
     application_deadline:
       initialInternshipData.application_deadline &&
         !isNaN(Date.parse(initialInternshipData.application_deadline))
-        ? initialInternshipData.application_deadline // Keep it as a string
+        ? initialInternshipData.application_deadline
         : null,
     skills_required: initialInternshipData.required_skills || [],
     job_description: initialInternshipData.job_description || "",
@@ -588,23 +570,25 @@ const InternPostForm = () => {
     internship_posting_date:
       initialInternshipData.internship_posting_date &&
         !isNaN(Date.parse(initialInternshipData.internship_posting_date))
-        ? initialInternshipData.internship_posting_date.split("T")[0] // "2025-03-12"
+        ? initialInternshipData.internship_posting_date.split("T")[0]
         : null,
     interview_start_date:
       initialInternshipData.interview_start_date &&
         !isNaN(Date.parse(initialInternshipData.interview_start_date))
-        ? initialInternshipData.interview_start_date.split("T")[0] // "2025-03-13"
+        ? initialInternshipData.interview_start_date.split("T")[0]
         : null,
     interview_end_date:
       initialInternshipData.interview_end_date &&
         !isNaN(Date.parse(initialInternshipData.interview_end_date))
-        ? initialInternshipData.interview_end_date.split("T")[0] // "2025-03-14"
+        ? initialInternshipData.interview_end_date.split("T")[0]
         : null,
     internship_link: initialInternshipData.internship_link || "",
     selection_process: initialInternshipData.selection_process || "",
     steps_to_apply: initialInternshipData.steps_to_apply || "",
     image: initialInternshipData.image || null,
   });
+
+  const [initialFormData, setInitialFormData] = useState({ ...formData });
 
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -620,7 +604,6 @@ const InternPostForm = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   useEffect(() => {
-    // Check if screen is mobile on initial load
     const checkScreenSize = () => {
       if (window.innerWidth < 768) {
         setIsSidebarOpen(false);
@@ -629,13 +612,10 @@ const InternPostForm = () => {
       }
     };
 
-    // Check on initial load
     checkScreenSize();
 
-    // Add event listener for window resize
     window.addEventListener("resize", checkScreenSize);
 
-    // Cleanup
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
@@ -643,9 +623,8 @@ const InternPostForm = () => {
     if (loading) {
       const timer = setTimeout(() => {
         setLoading(false);
-      }, 10000); // 10000 milliseconds = 10 seconds
+      }, 10000);
 
-      // Cleanup function to clear the timer if the component unmounts or loading changes
       return () => clearTimeout(timer);
     }
   }, [loading]);
@@ -711,7 +690,7 @@ const InternPostForm = () => {
         setUserId(payload.superadmin_user);
       }
     }
-  }, []); // Removed navigate from dependencies
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -769,7 +748,6 @@ const InternPostForm = () => {
   };
 
   const handleSubmit = async () => {
-
     const today = new Date().toISOString().split("T")[0];
     if (formData.application_deadline < today) {
       setToastMessage("Application deadline must be a future date.");
@@ -777,31 +755,39 @@ const InternPostForm = () => {
     }
     if (formData.company_website && !validateUrl(formData.company_website)) {
       toast.error("Invalid URL");
-      setLoading(false); // Stop the loader if validation fails
+      setLoading(false);
       return;
     }
     if (!validateDeadline(formData.application_deadline)) {
       toast.error("please check the deadline");
-      setLoading(false); // Stop the loader if validation fails
+      setLoading(false);
       return;
     }
+
+    // Check if any fields have been edited
+    const isFormEdited = Object.keys(formData).some(
+      (key) => formData[key] !== initialFormData[key]
+    );
+
+    if (!isFormEdited) {
+      toast.info("No fields have been edited.");
+      return;
+    }
+
     setLoading(true);
-    // Start the loader
 
     setTimeout(async () => {
       if (formData.company_website && !validateUrl(formData.company_website)) {
         toast.error("Invalid URL");
-        setLoading(false); // Stop the loader if validation fails
+        setLoading(false);
         return;
       }
 
-      // Validate Deadline
       if (!validateDeadline(formData.application_deadline)) {
         toast.error("please check the deadline");
-        setLoading(false); // Stop the loader if validation fails
+        setLoading(false);
         return;
       }
-
 
       setIsSubmitting(true);
       setMessage("");
@@ -812,25 +798,22 @@ const InternPostForm = () => {
         if (!token) {
           setError("No token found. Please log in.");
           setIsSubmitting(false);
-          setLoading(false); // Stop the loader if no token is found
+          setLoading(false);
           return;
         }
 
-        // Prepare internship data object and format values
         const formDataToSend = new FormData();
         const internshipData = {
           ...formData,
           required_skills: formData.technical_skills,
         };
 
-        // Only append image if it's a File object
         if (internshipData.image instanceof File) {
           formDataToSend.append("image", internshipData.image);
         } else {
-          delete internshipData.image; // Exclude image from update if not a file
+          delete internshipData.image;
         }
 
-        // Format dates and handle empty fields
         Object.keys(internshipData).forEach((key) => {
           if (
             key === "application_deadline" &&
@@ -860,12 +843,10 @@ const InternPostForm = () => {
         formDataToSend.append("role", userRole);
         formDataToSend.append("userId", userId);
 
-        console.log("Sending data to API:", internshipData); // Debugging
-
         const internshipId = sessionStorage.getItem("internshipId");
         const url = internshipId
-          ? `https://cce-backend-54k0.onrender.com/api/internship-edit/${internshipId}/`
-          : "https://cce-backend-54k0.onrender.com/api/post-internship/";
+          ? `https://cce-backend.onrender.com/api/internship-edit/${internshipId}/`
+          : "https://cce-backend.onrender.com/api/post-internship/";
         const method = internshipId ? axios.put : axios.post;
 
         const response = await method(url, formDataToSend, {
@@ -875,27 +856,21 @@ const InternPostForm = () => {
           },
         });
 
-        console.log("API Response:", response.data);
-
         setMessage(response.data.message);
 
-        // Get the stored return URL
         const returnUrl = sessionStorage.getItem("returnToPreview");
 
-        // Clean up session storage
         sessionStorage.removeItem("internshipData");
         sessionStorage.removeItem("internshipId");
         navigate("/internships");
         sessionStorage.removeItem("returnToPreview");
 
-        // Navigate to return URL if it exists, otherwise go to internships list
         if (returnUrl) {
           navigate(returnUrl);
         } else {
           navigate('/internships');
         }
       } catch (error) {
-        console.error("API Error:", error); // Debugging
         setError(
           `Error: ${error.response?.data?.error || "Something went wrong"}`
         );
@@ -904,9 +879,9 @@ const InternPostForm = () => {
         );
       } finally {
         setIsSubmitting(false);
-        setLoading(false); // Stop the loader after API call
+        setLoading(false);
       }
-    }, 10000); // Adjust the duration to match your loader duration
+    }, 10000);
   };
 
   useEffect(() => {
@@ -996,7 +971,6 @@ const InternPostForm = () => {
           )}
 
           <div className="flex flex-col md:flex-row mt-4">
-            {/* Mobile toggle button */}
             <button
               className="md:hidden flex items-center justify-center p-2 mb-4 bg-gray-200 rounded-md"
               onClick={toggleSidebar}
@@ -1004,7 +978,6 @@ const InternPostForm = () => {
               {isSidebarOpen ? "Hide Steps" : "Show Steps"}
             </button>
 
-            {/* Sidebar */}
             {isSidebarOpen && (
               <div className="w-full md:w-1/4 md:border-r border-gray-300 flex flex-col p-2 md:p-4 mb-4 md:mb-0">
                 <div className="border-y border-r border-gray-300 flex flex-col rounded-lg mb-4">
@@ -1076,7 +1049,6 @@ const InternPostForm = () => {
               </div>
             )}
 
-            {/* Form content */}
             <div className="flex-1 p-2 md:p-4 grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 items-start">
               {
                 {
@@ -1113,7 +1085,6 @@ const InternPostForm = () => {
             </div>
           </div>
 
-          {/* Mobile navigation buttons */}
           <div className="flex justify-between mt-6 md:hidden">
             <button
               className={`px-3 py-1.5 border rounded text-sm ${activeIndex === 0

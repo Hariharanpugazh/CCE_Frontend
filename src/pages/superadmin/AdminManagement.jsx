@@ -19,8 +19,7 @@ export default function ManagementHomePage() {
     useEffect(() => {
         const fetchAdminDetails = async () => {
             try {
-                const response = await axios.get("https://cce-backend-54k0.onrender.com/api/admins-list/");
-                console.log("Fetched admins:", response.data.admins); // Debugging line
+                const response = await axios.get("https://cce-backend.onrender.com/api/admins-list/");
                 setAdmins(response.data.admins); // Set admin details
             } catch (err) {
                 console.error("Error fetching admin details:", err);
@@ -64,8 +63,6 @@ export default function ManagementHomePage() {
             return 0;
         });
 
-    console.log("Filtered Admins:", filteredAdmins); // Debugging line
-
     // Calculate metrics
     const totalAdmins = admins.length;
     const activeAdmins = admins.filter(admin => admin.status === "Active").length;
@@ -73,13 +70,10 @@ export default function ManagementHomePage() {
 
     // Handle admin card click
     const handleAdminClick = (adminId) => {
-        console.log("Admin clicked:", adminId); // Debugging line
         navigate(`/admin-details/${adminId}`);
     };
 
     const handleCreateUser = () => {
-        // Navigate to the create user page or trigger create user action
-        console.log("Create new admin clicked"); // Debugging line
         navigate('/admin-signup');
     };
 
@@ -89,7 +83,6 @@ export default function ManagementHomePage() {
             direction = 'descending';
         }
         setSortConfig({ key, direction });
-        console.log("Sort requested:", key, direction); // Debugging line
     };
 
     // Pagination logic

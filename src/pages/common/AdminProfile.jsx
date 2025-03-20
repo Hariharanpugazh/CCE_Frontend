@@ -16,7 +16,6 @@ const AdminProfile = () => {
   const navigate = useNavigate();
   const [editMode, setEditMode] = useState(false);
   const [admin, setAdmin] = useState(null);
-  console.log(admin);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editedName, setEditedName] = useState("");
@@ -74,7 +73,7 @@ const AdminProfile = () => {
         }
 
         const userId = JSON.parse(atob(token.split(".")[1])).admin_user;
-        const response = await axios.get(`https://cce-backend-54k0.onrender.com/api/get-admin/${userId}/`);
+        const response = await axios.get(`https://cce-backend.onrender.com/api/get-admin/${userId}/`);
         const adminData = response.data.data;
 
         setAdmin(adminData);
@@ -93,7 +92,7 @@ const AdminProfile = () => {
         if (!token) return;
 
         // Fetch jobs and internships
-        const jobsResponse = await axios.get("https://cce-backend-54k0.onrender.com/api/get-jobs/", {
+        const jobsResponse = await axios.get("https://cce-backend.onrender.com/api/get-jobs/", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -209,12 +208,12 @@ const AdminProfile = () => {
         department: editableAdmin.department,
       };
 
-      await axios.put(`https://cce-backend-54k0.onrender.com/api/update-admin/${userId}/`, updatedData);
+      await axios.put(`https://cce-backend.onrender.com/api/update-admin/${userId}/`, updatedData);
 
       setEditMode(false);
       setShowAdminPopup(false); // Hide pop-up after saving
       // Refresh admin data
-      const response = await axios.get(`https://cce-backend-54k0.onrender.com/api/get-admin/${userId}/`);
+      const response = await axios.get(`https://cce-backend.onrender.com/api/get-admin/${userId}/`);
       setAdmin(response.data.data);
     } catch (error) {
       console.error("Error updating profile:", error);

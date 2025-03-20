@@ -58,7 +58,7 @@ const AchievementTable = ({
   
     try {
       await axios.put(
-        `https://cce-backend-54k0.onrender.com/api/edit-achievement/${id}/`,
+        `https://cce-backend.onrender.com/api/edit-achievement/${id}/`,
         { starred: !isStarred },
         {
           headers: {

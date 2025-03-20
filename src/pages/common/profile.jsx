@@ -21,7 +21,6 @@ export default function Profile() {
     const token = Cookies.get("jwt");
     if (token) {
       const payload = JSON.parse(atob(token.split(".")[1])); // Decode JWT payload
-      console.log("Decoded JWT Payload:", payload); // Debugging line
       setUserRole(!payload.student_user ? payload.role : "student"); // Assuming the payload has a 'role' field
     }
   }, []);

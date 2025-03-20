@@ -129,7 +129,7 @@ export default function StudentStudyDetail() {
   //     const token = Cookies.get("jwt");
   //     const headers = { Authorization: `Bearer ${token}` };
   //     try {
-  //       const response = await axios.get('https://cce-backend-54k0.onrender.com/api/study-materials/', { headers });
+  //       const response = await axios.get('https://cce-backend.onrender.com/api/study-materials/', { headers });
   //       setStudyMaterials(response.data);
   //     } catch (error) {
   //       console.error('Error fetching study materials:', error);
@@ -145,7 +145,7 @@ export default function StudentStudyDetail() {
     const token = Cookies.get("jwt");
     const headers = { Authorization: `Bearer ${token}` };
     try {
-      const response = await axios.get(`https://cce-backend-54k0.onrender.com/api/study-material/${id}/`, { headers });
+      const response = await axios.get(`https://cce-backend.onrender.com/api/study-material/${id}/`, { headers });
       const data = response.data.study_material || { links: [] }; // Use nested study_material with fallback
       setEditedCard(data);
       sessionStorage.setItem('savedStudyMaterial', JSON.stringify(data));
@@ -264,7 +264,7 @@ export default function StudentStudyDetail() {
     const headers = { Authorization: `Bearer ${token}` };
     try {
       const response = await axios.put(
-        `https://cce-backend-54k0.onrender.com/api/study-material-edit/${editedCard._id}/`,
+        `https://cce-backend.onrender.com/api/study-material-edit/${editedCard._id}/`,
         editedCard,
         { headers }
       );
@@ -326,7 +326,7 @@ export default function StudentStudyDetail() {
   const handleToggleStatus = async (material) => {
     const updatedStatus = material.status === "active" ? "inactive" : "active";
     try {
-      await axios.put(`https://cce-backend-54k0.onrender.com/api/study-materials/${material._id}/update/`, { status: updatedStatus });
+      await axios.put(`https://cce-backend.onrender.com/api/study-materials/${material._id}/update/`, { status: updatedStatus });
       setEditedCard(prev => ({ ...prev, status: updatedStatus }));
     } catch (error) {
       console.error("Error updating study material status:", error);
@@ -337,7 +337,7 @@ export default function StudentStudyDetail() {
     const token = Cookies.get("jwt");
     const headers = { Authorization: `Bearer ${token}` };
     try {
-      const response = await axios.delete(`https://cce-backend-54k0.onrender.com/api/study-material-delete/${id}/`, { headers });
+      const response = await axios.delete(`https://cce-backend.onrender.com/api/study-material-delete/${id}/`, { headers });
       if (response.status === 200) {
         navigate(-1);
         toast.success("Material deleted successfully!");

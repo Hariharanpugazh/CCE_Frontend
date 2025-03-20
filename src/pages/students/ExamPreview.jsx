@@ -75,7 +75,7 @@ const ExamPreview = () => {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`http://127.0.0.1:8000/api/exam/${id}/`)
+    fetch(`https://cce-backend.onrender.com/api/exam/${id}/`)
       .then((response) => response.json())
       .then((data) => {
         setExam(data.exam);
@@ -92,9 +92,8 @@ const ExamPreview = () => {
       setLoadingExams(true);
       try {
         const response = await axios.get(
-          "https://cce-backend-54k0.onrender.com/api/published-exams/" // Adjust endpoint as needed
+          "https://cce-backend.onrender.com/api/published-exams/" // Adjust endpoint as needed
         );
-        console.log("Published exams API response:", response.data);
 
         const examsData = Array.isArray(response.data)
           ? response.data
@@ -105,8 +104,6 @@ const ExamPreview = () => {
           const examId = exam._id || exam.id;
           return examId !== currentExamId;
         });
-
-        console.log("Filtered exams:", filteredExams);
         setPublishedExams(filteredExams);
         setLoadingExams(false);
       } catch (error) {
@@ -135,7 +132,7 @@ const ExamPreview = () => {
           return;
         }
         const response = await axios.delete(
-          `https://cce-backend-54k0.onrender.com/api/exam-delete/${id}/`,
+          `https://cce-backend.onrender.com/api/exam-delete/${id}/`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -158,7 +155,7 @@ const ExamPreview = () => {
     try {
       const token = Cookies.get("jwt");
       const userId = JSON.parse(atob(token.split(".")[1])).student_user;
-      await axios.post("https://cce-backend-54k0.onrender.com/api/apply-exam/", {
+      await axios.post("https://cce-backend.onrender.com/api/apply-exam/", {
         studentId: userId,
         examId: id,
       });
@@ -190,7 +187,7 @@ const ExamPreview = () => {
     try {
       const token = Cookies.get("jwt");
       const userId = JSON.parse(atob(token.split(".")[1])).student_user;
-      await axios.post(`https://cce-backend-54k0.onrender.com/api/save-exam/${id}/`, {
+      await axios.post(`https://cce-backend.onrender.com/api/save-exam/${id}/`, {
         userId: userId,
         examId: id,
       });
@@ -269,7 +266,7 @@ const ExamPreview = () => {
       )}
 
       <div
-        className={`flex-grow p-4  sm:p-6 max-w-8xl mx-auto w-full ${
+        className={`flex-grow p-4  sm:p-6 max-w-8xl mx-auto w-screen ${
           userRole === "admin" || userRole === "superadmin" ? "lg:ml-70 lg:max-w-7xl" : ""
         }`}
       >

@@ -53,8 +53,7 @@ export default function ApplicationCard({
   const [userId, setUserId] = useState(null);
   const [isSaved, setIsSaved] = useState(initialIsSaved);
   const [showSaveSuccess, setShowSaveSuccess] = useState(false);
-  const [viewCount, setViewCount] = useState(formatViewCount(application.views ? application.views : 0));
-  console.log(application);  
+  const [viewCount, setViewCount] = useState(formatViewCount(application.views ? application.views : 0)); 
 
   useEffect(() => {
     const token = Cookies.get("jwt");
@@ -83,7 +82,7 @@ export default function ApplicationCard({
 
     try {
       const jobId = application._id || application.id;
-      await axios.post(`https://cce-backend-54k0.onrender.com/api/increment-view-count/${jobId}/`, {
+      await axios.post(`https://cce-backend.onrender.com/api/increment-view-count/${jobId}/`, {
         student_id: userId, // Include the student's ObjectId in the request payload
       });
 
@@ -113,16 +112,16 @@ export default function ApplicationCard({
 
       if (application.type === "exam") {
         endpoint = isSaved
-          ? `https://cce-backend-54k0.onrender.com/api/unsave-exam/${jobId}/`
-          : `https://cce-backend-54k0.onrender.com/api/save-exam/${jobId}/`;
+          ? `https://cce-backend.onrender.com/api/unsave-exam/${jobId}/`
+          : `https://cce-backend.onrender.com/api/save-exam/${jobId}/`;
       } else if (application.type === "internship") {
         endpoint = isSaved
-          ? `https://cce-backend-54k0.onrender.com/api/unsave-internship/${jobId}/`
-          : `https://cce-backend-54k0.onrender.com/api/save-internship/${jobId}/`;
+          ? `https://cce-backend.onrender.com/api/unsave-internship/${jobId}/`
+          : `https://cce-backend.onrender.com/api/save-internship/${jobId}/`;
       } else {
         endpoint = isSaved
-          ? `https://cce-backend-54k0.onrender.com/api/unsave-job/${jobId}/`
-          : `https://cce-backend-54k0.onrender.com/api/save-job/${jobId}/`;
+          ? `https://cce-backend.onrender.com/api/unsave-job/${jobId}/`
+          : `https://cce-backend.onrender.com/api/save-job/${jobId}/`;
       }
 
       const response = await axios.post(endpoint, {

@@ -28,7 +28,7 @@ export default function Message() {
       }
       try {
         const response = await axios.get(
-          "http://127.0.0.1:8000/api/get_all_student_chats/",
+          "https://cce-backend.onrender.com/api/get_all_student_chats/",
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -52,24 +52,33 @@ export default function Message() {
 
   const fetchMessages = async (student_id) => {
     setSelectedStudent(student_id);
-    setIsChatOpen(true); // Ensure chat is open when selecting a student
+    setIsChatOpen(true);
+    
     const token = Cookies.get("jwt");
     if (!token) {
       console.error("No token found. Please log in.");
       return;
     }
+    
     try {
+      // Fetch messages
       const response = await axios.get(
-        `http://127.0.0.1:8000/api/get_student_messages/${student_id}/`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        `https://cce-backend.onrender.com/api/get_student_messages/${student_id}/`,
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setMessages(response.data.messages || []);
+
+      // Mark messages as seen by admin
+      await axios.post(
+        `https://cce-backend.onrender.com/api/mark_messages_as_seen/${student_id}/`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
-  };
+};
 
   const sendReply = async (e) => {
     e?.preventDefault();
@@ -92,7 +101,7 @@ export default function Message() {
 
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/admin_reply_message/",
+        "https://cce-backend.onrender.com/api/admin_reply_message/",
         replyData,
         {
           headers: { Authorization: `Bearer ${token}` },

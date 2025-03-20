@@ -37,7 +37,7 @@
 //   const fetchMessages = async (student_id) => {
 //     try {
 //       const response = await fetch(
-//         `https://cce-backend-54k0.onrender.com/api/get_student_messages/${student_id}/`,
+//         `https://cce-backend.onrender.com/api/get_student_messages/${student_id}/`,
 //         {
 //           method: "GET",
 //           headers: {
@@ -59,7 +59,7 @@
 //   const markMessagesAsSeenByStudent = async (student_id) => {
 //     try {
 //       const response = await fetch(
-//         `https://cce-backend-54k0.onrender.com/api/mark_messages_as_seen_by_student/${student_id}/`,
+//         `https://cce-backend.onrender.com/api/mark_messages_as_seen_by_student/${student_id}/`,
 //         {
 //           method: "POST",
 //           headers: {
@@ -94,7 +94,7 @@
 
 //     try {
 //       const response = await fetch(
-//         "https://cce-backend-54k0.onrender.com/api/student_send_message/",
+//         "https://cce-backend.onrender.com/api/student_send_message/",
 //         {
 //           method: "POST",
 //           headers: {
@@ -325,7 +325,7 @@ const StudentMail = () => {
   const fetchMessages = async (student_id) => {
     try {
       const response = await fetch(
-        `https://cce-backend-54k0.onrender.com/api/get_student_messages/${student_id}/`,
+        `https://cce-backend.onrender.com/api/get_student_messages/${student_id}/`,
         {
           method: "GET",
           headers: {
@@ -347,7 +347,7 @@ const StudentMail = () => {
   const markMessagesAsSeenByStudent = async (student_id) => {
     try {
       const response = await fetch(
-        `https://cce-backend-54k0.onrender.com/api/mark_messages_as_seen_by_student/${student_id}/`,
+        `https://cce-backend.onrender.com/api/mark_messages_as_seen_by_student/${student_id}/`,
         {
           method: "POST",
           headers: {
@@ -359,7 +359,6 @@ const StudentMail = () => {
       );
 
       if (response.ok) {
-        console.log("Messages marked as seen by student.");
         fetchMessages(student_id); // Refresh messages to reflect the status change
       } else {
         console.error("Failed to mark messages as seen by student.");
@@ -371,42 +370,40 @@ const StudentMail = () => {
 
   const sendMessage = async () => {
     if (!studentId) {
-        setStatus("Student ID not found.");
-        return;
+      setStatus("Student ID not found.");
+      return;
     }
 
     const messageData = {
-        student_id: studentId,
-        content: newMessage,
+      student_id: studentId,
+      content: newMessage,
     };
 
-    console.log("Sending message data:", messageData); // Log the data being sent
-
     try {
-        const response = await fetch(
-            "https://cce-backend-54k0.onrender.com/api/student_send_message/",
-            {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${Cookies.get("jwt")}`,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(messageData),
-            }
-        );
-
-        if (response.ok) {
-            setStatus("Message sent successfully!");
-            setNewMessage(""); // Clear input field
-            fetchMessages(studentId); // Refresh chat
-        } else {
-            const errorData = await response.json();
-            setStatus(`Failed to send message: ${errorData.error}`);
+      const response = await fetch(
+        "https://cce-backend.onrender.com/api/student_send_message/",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${Cookies.get("jwt")}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(messageData),
         }
+      );
+
+      if (response.ok) {
+        setStatus("Message sent successfully!");
+        setNewMessage(""); // Clear input field
+        fetchMessages(studentId); // Refresh chat
+      } else {
+        const errorData = await response.json();
+        setStatus(`Failed to send message: ${errorData.error}`);
+      }
     } catch (error) {
-        setStatus("Error sending message.");
+      setStatus("Error sending message.");
     }
-};
+  };
 
   const formatDate = (timestamp) => {
     const today = new Date();
@@ -467,18 +464,16 @@ const StudentMail = () => {
                   )}
                   <div className="flex items-start mb-4">
                     <div
-                      className={`flex flex-col ${
-                        message.sender === "student"
+                      className={`flex flex-col ${message.sender === "student"
                           ? "items-end ml-auto"
                           : "items-start mr-auto"
-                      }`}
+                        }`}
                     >
                       <div
-                        className={`flex items-start ${
-                          message.sender === "student"
+                        className={`flex items-start ${message.sender === "student"
                             ? "justify-end"
                             : "justify-start"
-                        }`}
+                          }`}
                       >
                         {message.sender !== "student" && (
                           <div
@@ -491,11 +486,10 @@ const StudentMail = () => {
                           initial={{ y: 20, opacity: 0 }}
                           animate={{ y: 0, opacity: 1 }}
                           transition={{ delay: index * 0.1 }}
-                          className={`p-3 rounded-lg w-xs ${
-                            message.sender === "student"
+                          className={`p-3 rounded-lg w-xs ${message.sender === "student"
                               ? "bg-[#f5f5f5] text-black"
                               : "bg-[#ffc800]"
-                          }`}
+                            }`}
                         >
                           <p className="text-sm md:text-base">
                             {message.content}
@@ -504,30 +498,17 @@ const StudentMail = () => {
                             {message.sender === "student" && (
                               <>
                                 <span className="mr-1 text-gray-700">
-                                  {new Date(
-                                    message.timestamp
-                                  ).toLocaleTimeString([], {
+                                  {new Date(message.timestamp).toLocaleTimeString([], {
                                     hour: "2-digit",
                                     minute: "2-digit",
                                   })}
                                 </span>
                                 {message.status === "seen" ? (
-                                  <FaCheckDouble />
+                                  <FaCheckDouble className="text-gray-500" />  // Seen tick when viewed by admin
                                 ) : (
-                                  <FaCheck />
+                                  <FaCheck className="text-gray-500" />  // Single tick if not yet seen
                                 )}
                               </>
-                            )}
-                            {message.sender !== "student" && (
-                              <span className="text-gray-700">
-                                {new Date(message.timestamp).toLocaleTimeString(
-                                  [],
-                                  {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                  }
-                                )}
-                              </span>
                             )}
                           </div>
                         </motion.div>

@@ -48,7 +48,7 @@ export default function AdminLogin() {
         setIsLoading(true);
     
         try {
-            const response = await fetch("https://cce-backend-54k0.onrender.com/api/login/", {
+            const response = await fetch("https://cce-backend.onrender.com/api/login/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -85,7 +85,7 @@ export default function AdminLogin() {
     const handleGoogleSuccess = async (credentialResponse) => {
             setIsLoading(true);
             try {
-                const response = await fetch("https://cce-backend-54k0.onrender.com/api/admin/google/login/", {
+                const response = await fetch("https://cce-backend.onrender.com/api/admin/google/login/", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -135,7 +135,7 @@ export default function AdminLogin() {
         const email = formData.email;
 
         try {
-            const response = await fetch("https://cce-backend-54k0.onrender.com/api/forgot-password/", {
+            const response = await fetch("https://cce-backend.onrender.com/api/forgot-password/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -162,7 +162,7 @@ export default function AdminLogin() {
         const email = formData.email;
         const otp = formData.token;
         try {
-            const response = await fetch("https://cce-backend-54k0.onrender.com/api/verify-otp/", {
+            const response = await fetch("https://cce-backend.onrender.com/api/verify-otp/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -194,7 +194,7 @@ export default function AdminLogin() {
         }
 
         try {
-            const response = await fetch("https://cce-backend-54k0.onrender.com/api/reset-password/", {
+            const response = await fetch("https://cce-backend.onrender.com/api/reset-password/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

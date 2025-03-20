@@ -45,7 +45,7 @@ export default function AdminMail() {
     const fetchData = async () => {
       setIsLoading(true); // Show loader when fetching data
       try {
-        const response = await fetch("https://cce-backend-54k0.onrender.com/api/mailjobs/", {
+        const response = await fetch("https://cce-backend.onrender.com/api/mailjobs/", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -66,8 +66,6 @@ export default function AdminMail() {
         }
 
         const data = await response.json();
-        console.log("API Response:", data); // Log the full API response
-        console.log("Exams in API Response:", data.exams); // Log exams specifically
         setJobs(data.jobs || []);
         setExams(data.exam || []);
         setInternships(data.internships || []);
@@ -84,7 +82,7 @@ export default function AdminMail() {
     const fetchReview = async () => {
       try {
         const response = await fetch(
-          "https://cce-backend-54k0.onrender.com/api/fetch-review/",
+          "https://cce-backend.onrender.com/api/fetch-review/",
           {
             method: "GET",
             headers: {
@@ -121,7 +119,6 @@ export default function AdminMail() {
 
   // Log exams state whenever it changes
   useEffect(() => {
-    console.log("Exams state updated:", exams);
   }, [exams]);
 
   if (isLoading) {
@@ -158,7 +155,6 @@ export default function AdminMail() {
         return null;
     }
 
-    console.log(`Items to display for ${activeTab}:`, itemsToDisplay);
 
     if (!Array.isArray(itemsToDisplay)) {
       console.error(`itemsToDisplay is not an array for ${activeTab}:`, itemsToDisplay);

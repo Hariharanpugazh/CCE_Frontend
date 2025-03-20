@@ -1,4 +1,4 @@
-const apiBaseURL = "https://cce-backend-54k0.onrender.com";
+const apiBaseURL = "https://cce-backend.onrender.com";
 
 const AppPages = {
   studentLogin: {

@@ -39,7 +39,6 @@ export default function JobCard({ job }) {
     const navigate = useNavigate();
 
     const handleCardClick = () => {
-        console.log(job)
 
         if (job._id) {
             navigate(`/job-preview/${job._id}`);

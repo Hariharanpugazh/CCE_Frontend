@@ -38,7 +38,7 @@ export default function StudyMaterial() {
     const fetchStudyMaterials = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/all-study-material/');
+        const response = await fetch('https://cce-backend.onrender.com/api/all-study-material/');
         const data = await response.json();
         setCards(data.study_materials);
         updateCategories(data.study_materials, selectedType);

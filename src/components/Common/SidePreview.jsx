@@ -70,8 +70,6 @@ function getTimeAgo(dateString) {
 
 export default function SidePreview({ selectedItem, handleViewItem, setSelectedItem, isSaved, fetchSavedJobs }) {
     useEffect(() => {
-        console.log({ selectedItem, happy: "happy" })
-        console.log(selectedItem?.updated_at);
     }, [selectedItem])
 
     const handleBookmark = async (event) => {
@@ -82,7 +80,7 @@ export default function SidePreview({ selectedItem, handleViewItem, setSelectedI
             const userId = JSON.parse(atob(token.split(".")[1])).student_user;
             if (selectedItem.job_data) {
                 const res = await axios.post(
-                    `https://cce-backend-54k0.onrender.com/api/save-job/${selectedItem._id}/`,
+                    `https://cce-backend.onrender.com/api/save-job/${selectedItem._id}/`,
                     { applicationId: selectedItem._id, userId }
                 );
                 if (res.status === 200) {
@@ -91,7 +89,7 @@ export default function SidePreview({ selectedItem, handleViewItem, setSelectedI
                 }
             } else {
                 const res = await axios.post(
-                    `https://cce-backend-54k0.onrender.com/api/save-internship/${selectedItem.id}/`,
+                    `https://cce-backend.onrender.com/api/save-internship/${selectedItem.id}/`,
                     { applicationId: selectedItem.id, userId }
                 );
                 if (res.status === 200) {
@@ -112,7 +110,7 @@ export default function SidePreview({ selectedItem, handleViewItem, setSelectedI
             const userId = JSON.parse(atob(token.split(".")[1])).student_user;
             if (selectedItem.job_data) {
                 const res = await axios.post(
-                    `https://cce-backend-54k0.onrender.com/api/unsave-job/${selectedItem._id}/`,
+                    `https://cce-backend.onrender.com/api/unsave-job/${selectedItem._id}/`,
                     { applicationId: selectedItem._id, userId }
                 );
                 if (res.status === 200) {
@@ -121,7 +119,7 @@ export default function SidePreview({ selectedItem, handleViewItem, setSelectedI
                 }
             } else {
                 const res = await axios.post(
-                    `https://cce-backend-54k0.onrender.com/api/unsave-internship/${selectedItem.id}/`,
+                    `https://cce-backend.onrender.com/api/unsave-internship/${selectedItem.id}/`,
                     { applicationId: selectedItem.id, userId }
                 );
                 if (res.status === 200) {

@@ -38,7 +38,7 @@ export default function AdminMail() {
     const fetchReview = async () => {
       try {
         const response = await fetch(
-          "https://cce-backend-54k0.onrender.com/api/fetch-review/",
+          "https://cce-backend.onrender.com/api/fetch-review/",
           {
             method: "GET",
             headers: {

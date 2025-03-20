@@ -19,7 +19,6 @@ const InternshipPreview = () => {
         if (token) {
             try {
                 const payload = JSON.parse(atob(token.split(".")[1]));
-                console.log("Decoded JWT Payload:", payload);
 
                 if (payload.role) {
                     setUserRole(payload.role);
@@ -41,7 +40,7 @@ const InternshipPreview = () => {
     }, []);
 
     useEffect(() => {
-        fetch(`http://127.0.0.1:8000/api/internship/${id}/`)
+        fetch(`https://cce-backend.onrender.com/api/internship/${id}/`)
             .then((response) => response.json())
             .then((data) => setInternship(data.internship))
             .catch((error) => console.error("Error fetching internship:", error));

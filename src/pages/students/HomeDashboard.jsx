@@ -650,7 +650,7 @@ const AboutCCE = () => {
 
         <div
           className="flex flex-col md:flex-row md:space-x-3 lg:space-x-6 xl:space-x-14 space-y-8 md:space-y-0 
-                  mb-8 md:mb-12 lg:mb-18 w-full max-w-7xl mx-auto mt-8 justify-center items-center md:items-stretch"
+                  mb-8 md:mb-12 lg:mb-18 w-full max-w-5xl mx-auto mt-8 justify-center items-center md:items-stretch"
         >
           {[
             {
@@ -749,9 +749,9 @@ export default function HomeDashboard() {
       setIsLoading(true);
       try {
         const [jobsRes, achievementsRes, internshipsRes] = await Promise.all([
-          axios.get("https://cce-backend-54k0.onrender.com/api/published-jobs/"),
-          axios.get("https://cce-backend-54k0.onrender.com/api/published-achievement/"),
-          axios.get("https://cce-backend-54k0.onrender.com/api/published-internship/"),
+          axios.get("https://cce-backend.onrender.com/api/published-jobs/"),
+          axios.get("https://cce-backend.onrender.com/api/published-achievement/"),
+          axios.get("https://cce-backend.onrender.com/api/published-internship/"),
         ]);
 
         setJobs(jobsRes.data.jobs);
@@ -774,7 +774,7 @@ export default function HomeDashboard() {
         const token = Cookies.get("jwt");
         const userId = JSON.parse(atob(token.split(".")[1])).student_user;
         const response = await axios.get(
-          `https://cce-backend-54k0.onrender.com/api/applied-jobs/${userId}/`
+          `https://cce-backend.onrender.com/api/applied-jobs/${userId}/`
         );
         const appliedJobs = response.data.jobs;
 
@@ -782,7 +782,7 @@ export default function HomeDashboard() {
         if (unconfirmed) {
           // Fetch job details using the job ID
           const jobResponse = await axios.get(
-            `https://cce-backend-54k0.onrender.com/api/job/${unconfirmed.job_id}/`
+            `https://cce-backend.onrender.com/api/job/${unconfirmed.job_id}/`
           );
           const jobDetails = jobResponse.data.job;
           setUnconfirmedJob({ ...unconfirmed, job_data: jobDetails.job_data });
@@ -800,7 +800,7 @@ export default function HomeDashboard() {
     try {
       const token = Cookies.get("jwt");
       const userId = JSON.parse(atob(token.split(".")[1])).student_user;
-      await axios.post("https://cce-backend-54k0.onrender.com/api/confirm-job/", {
+      await axios.post("https://cce-backend.onrender.com/api/confirm-job/", {
         studentId: userId,
         jobId: unconfirmedJob.job_id,
         confirmed: true,
@@ -816,7 +816,7 @@ export default function HomeDashboard() {
     try {
       const token = Cookies.get("jwt");
       const userId = JSON.parse(atob(token.split(".")[1])).student_user;
-      await axios.post("https://cce-backend-54k0.onrender.com/api/confirm-job/", {
+      await axios.post("https://cce-backend.onrender.com/api/confirm-job/", {
         studentId: userId,
         jobId: unconfirmedJob.job_id,
         confirmed: false,
@@ -914,7 +914,7 @@ export default function HomeDashboard() {
 
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/contact-us/",
+        "https://cce-backend.onrender.com/api/contact-us/",
         formData,
         {
           headers: { "Content-Type": "application/json" },
@@ -1001,7 +1001,6 @@ export default function HomeDashboard() {
                     ...internships[0],
                   }}
                   handleCardClick={() => {
-                    console.log(internships[0]);
                   }}
                   isSaved={undefined}
                 />

@@ -30,7 +30,6 @@ const ItemCard = ({ item, type }) => {
     company = item.job_data?.company_name || "Unknown Company";
     jobLocation = item.job_data?.job_location || "Not Specified";
     status = item.is_publish;
-    console.log(item);
     selectedCategory = item.job_data ? "Job" : "No Category required";
     previewPath = `/job-preview/${itemId}`;
 
@@ -136,7 +135,7 @@ const ManageJobs = () => {
         setIsLoading(true);
         const token = Cookies.get("jwt");
         const response = await axios.get(
-          `https://cce-backend-54k0.onrender.com/api/${endpoint}/`,
+          `https://cce-backend.onrender.com/api/${endpoint}/`,
           {
             headers: { Authorization: `Bearer ${token}` },
             withCredentials: true,

@@ -42,7 +42,7 @@ export default function SuperAdminLogin() {
         setIsLoading(true);
     
         try {
-            const response = await fetch("https://cce-backend-54k0.onrender.com/api/superadmin_login/", {
+            const response = await fetch("https://cce-backend.onrender.com/api/superadmin_login/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -75,7 +75,7 @@ export default function SuperAdminLogin() {
     const handleGoogleSuccess = async (credentialResponse) => {
                 setIsLoading(true);
                 try {
-                    const response = await fetch("https://cce-backend-54k0.onrender.com/api/superadmin/google/login/", {
+                    const response = await fetch("https://cce-backend.onrender.com/api/superadmin/google/login/", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",

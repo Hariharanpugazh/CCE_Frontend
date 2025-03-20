@@ -21,7 +21,7 @@ export default function AppliedJobs() {
         const token = Cookies.get("jwt");
         const userId = JSON.parse(atob(token.split(".")[1])).student_user;
         const response = await axios.get(
-          `https://cce-backend-54k0.onrender.com/api/applied-jobs/${userId}/`
+          `https://cce-backend.onrender.com/api/applied-jobs/${userId}/`
         );
 
         // Access the job details within the response data
@@ -33,7 +33,7 @@ export default function AppliedJobs() {
         // Fetch additional job details if necessary
         const jobIds = confirmedJobs.map(job => job.job_id);
         const jobDetailsPromises = jobIds.map(jobId =>
-          axios.get(`https://cce-backend-54k0.onrender.com/api/job/${jobId}/`)
+          axios.get(`https://cce-backend.onrender.com/api/job/${jobId}/`)
         );
 
         const jobResponses = await Promise.all(jobDetailsPromises);
@@ -45,9 +45,6 @@ export default function AppliedJobs() {
           ...confirmedJobs[index], // Include the confirmed status
           type: "job", // Add type field
         }));
-
-        // Log the jobs to inspect their structure
-        console.log("Applied Jobs:", jobsWithType);
 
         if (Array.isArray(jobsWithType)) {
           setAppliedJobs(jobsWithType);
@@ -66,14 +63,11 @@ export default function AppliedJobs() {
         const token = Cookies.get("jwt");
         const userId = JSON.parse(atob(token.split(".")[1])).student_user;
         const response = await axios.get(
-          `https://cce-backend-54k0.onrender.com/api/saved-jobs/${userId}/`
+          `https://cce-backend.onrender.com/api/saved-jobs/${userId}/`
         );
 
         // Access the jobs array within the response data
         const jobs = response.data.jobs;
-
-        // Log the jobs to inspect their structure
-        console.log("Saved Jobs:", jobs);
 
         if (Array.isArray(jobs)) {
           setSavedJobs(jobs);
@@ -103,13 +97,10 @@ export default function AppliedJobs() {
   };
 
   useEffect(() => {
-    console.log("Filtering jobs with search phrase:", searchPhrase);
     const filtered = appliedJobs.filter(job => {
       const jobTitle = job.title || job.job_data?.title; // Check both job and job_data for title
-      console.log("Checking job:", jobTitle);
       return jobTitle?.toLowerCase().includes(searchPhrase.toLowerCase());
     });
-    console.log("Filtered Jobs:", filtered); // Log filtered jobs for debugging
     setFilteredJobs(filtered);
   }, [searchPhrase, appliedJobs]);
 

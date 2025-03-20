@@ -21,7 +21,7 @@ const JobEdit = () => {
             setUserRole(payload.role);
         }
 
-        fetch(`http://127.0.0.1:8000/api/job/${id}/`)
+        fetch(`https://cce-backend.onrender.com/api/job/${id}/`)
             .then(response => response.json())
             .then(data => {
                 setJob(data.job);
@@ -53,9 +53,8 @@ const JobEdit = () => {
             ...editedJob,
             edited: role // Include the role in the request payload
         };
-        console.log(updatedJobData);
 
-        fetch(`http://127.0.0.1:8000/api/job-edit/${id}/`, {
+        fetch(`https://cce-backend.onrender.com/api/job-edit/${id}/`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -74,7 +73,7 @@ const JobEdit = () => {
 
     const handleDelete = () => {
         if (window.confirm("Are you sure you want to delete this job?")) {
-            fetch(`http://127.0.0.1:8000/api/job-delete/${id}/`, {
+            fetch(`https://cce-backend.onrender.com/api/job-delete/${id}/`, {
                 method: 'DELETE'
             })
             .then(response => {

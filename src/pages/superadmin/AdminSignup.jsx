@@ -129,7 +129,7 @@ export default function AdminSignup() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("https://cce-backend-54k0.onrender.com/api/admin-signup/", {
+      const response = await fetch("https://cce-backend.onrender.com/api/admin-signup/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

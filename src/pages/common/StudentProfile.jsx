@@ -45,34 +45,31 @@ const StudentProfile = () => {
         const token = Cookies.get("jwt");
         const userId = JSON.parse(atob(token.split(".")[1])).student_user;
 
-        const profileResponse = await axios.get(`https://cce-backend-54k0.onrender.com/api/profile/${userId}/`);
+        const profileResponse = await axios.get(`https://cce-backend.onrender.com/api/profile/${userId}/`);
         const studentData = profileResponse.data.data;
-        console.log("Student Data:", studentData);
         setStudent(studentData);
 
-        const jobsResponse = await axios.get(`https://cce-backend-54k0.onrender.com/api/saved-jobs/${userId}/`);
+        const jobsResponse = await axios.get(`https://cce-backend.onrender.com/api/saved-jobs/${userId}/`);
         if (jobsResponse.data && jobsResponse.data.jobs) {
           setSavedJobs(jobsResponse.data.jobs);
         }
 
-        const internshipsResponse = await axios.get(`https://cce-backend-54k0.onrender.com/api/saved-internships/${userId}/`);
+        const internshipsResponse = await axios.get(`https://cce-backend.onrender.com/api/saved-internships/${userId}/`);
         if (internshipsResponse.data && internshipsResponse.data.internships) {
           setSavedInternships(internshipsResponse.data.internships);
         } 
 
-        const appliedInternshipsResponse = await axios.get(`https://cce-backend-54k0.onrender.com/api/applied-internships/${userId}/`);
-        console.log("Applied Internships Response:", appliedInternshipsResponse.data);
+        const appliedInternshipsResponse = await axios.get(`https://cce-backend.onrender.com/api/applied-internships/${userId}/`);
         if (appliedInternshipsResponse.data && appliedInternshipsResponse.data.internships) {
           setAppliedInternships(appliedInternshipsResponse.data.internships);
         }
 
-        const examsResponse = await axios.get(`https://cce-backend-54k0.onrender.com/api/saved-exams/${userId}/`);
+        const examsResponse = await axios.get(`https://cce-backend.onrender.com/api/saved-exams/${userId}/`);
         if (examsResponse.data && examsResponse.data.exams) {
           setSavedExams(examsResponse.data.exams);
         }
 
-        const appliedJobsResponse = await axios.get(`https://cce-backend-54k0.onrender.com/api/applied-jobs/${userId}/`);
-        console.log("Applied Jobs Response:", appliedJobsResponse.data);
+        const appliedJobsResponse = await axios.get(`https://cce-backend.onrender.com/api/applied-jobs/${userId}/`);
         if (appliedJobsResponse.data && appliedJobsResponse.data.jobs) {
           setAppliedJobs(appliedJobsResponse.data.jobs);
         }
@@ -141,7 +138,6 @@ const StudentProfile = () => {
           <tbody>
             {currentPageItems.map((item, index) => {
               const itemData = tab === "Exams" ? item.exam_data : tab === "Internships" ? item.internship_data : item.job_data;
-              console.log("Item Data:", item._id);
               
               return (
                 <tr key={index} className="border-b border-gray-200 hover:bg-gray-50">

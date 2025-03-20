@@ -52,7 +52,7 @@ export default function ExamDashboard() {
       try {
         setIsLoading(true);
         const response = await axios.get(
-          "https://cce-backend-54k0.onrender.com/api/published-exams/"
+          "https://cce-backend.onrender.com/api/published-exams/"
         );
         const examsWithType = response.data.exams
           .filter(
@@ -96,7 +96,7 @@ export default function ExamDashboard() {
       const token = Cookies.get("jwt");
       const userId = JSON.parse(atob(token.split(".")[1])).student_user;
       const response = await axios.get(
-        `https://cce-backend-54k0.onrender.com/api/saved-exams/${userId}/`
+        `https://cce-backend.onrender.com/api/saved-exams/${userId}/`
       );
       setSavedExams(response.data.exams.map((exam) => exam._id));
     } catch (err) {
@@ -207,7 +207,7 @@ export default function ExamDashboard() {
         </header>
 
         {/* Search and Filter Bar */}
-        <div className="flex flex-col justify-between md:flex-row gap-4 mb-8 mr-12 ml-12">
+        <div className="flex flex-col bg-white justify-between md:flex-row gap-4 mb-8 mr-12 ml-12">
           <div
             className={`flex flex-1 ${
               userRole === "student" ||
@@ -282,7 +282,7 @@ export default function ExamDashboard() {
               )}
             </div>
 
-            {filteredExams.length > 0 && (
+            {filteredExams.length > itemsPerPage && (
               <Pagination
                 currentPage={currentPage}
                 totalItems={filteredExams.length}
